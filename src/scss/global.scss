@@ -1,0 +1,41 @@
+@use 'sass:map' as *;
+@use './design-system.scss' as *;
+@import './global-classes.scss';
+@import './typography.scss';
+
+html {
+	scroll-behavior: smooth;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+a,
+a:visited {
+	color: $c-accent;
+}
+
+body {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	color: $c-text-1;
+	line-height: 1.5;
+	background-color: $c-base;
+	overflow-x: hidden;
+}
+
+.gradient-border {
+	height: 2px;
+	min-height: 2px;
+	width: 100%;
+	background: linear-gradient(90deg, transparent, $c-accent, transparent);
+}
+
+article {
+	margin-top: $sd7;
+	scroll-margin-top: $s7;
+}

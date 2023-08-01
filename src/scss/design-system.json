@@ -1,0 +1,103 @@
+{
+    "colorBase": "hsl(235deg, 83%, 12%)",
+    "action": {
+        "100": "hsl(179deg, 69%, 56%)",
+        "200": "hsl(179deg, 54%, 47%)",
+        "300": "hsl(178deg, 54%, 39%)",
+        "400": "hsl(179deg, 54%, 31%)",
+        "500": "hsl(179deg, 54%, 24%)",
+        "600": "hsl(179deg, 55%, 16%)",
+        "700": "hsl(180deg, 55%, 10%)"
+    },
+    "accent": {
+        "100": "hsl(231deg, 69%, 85%)",
+        "200": "hsl(231deg, 70%, 76%)",
+        "300": "hsl(232deg, 70%, 68%)",
+        "400": "hsl(232deg, 69%, 59%)",
+        "500": "hsl(232deg, 70%, 50%)",
+        "600": "hsl(232deg, 79%, 36%)",
+        "700": "hsl(231deg, 80%, 22%)"
+    }
+}
+
+
+{
+    "resume": {
+        "description": "Color theme tokens at lightness of 5%, saturation of 90%",
+        "Background": {
+            "value": "hsl(235deg, 83%, 12%)",
+            "type": "color",
+            "description": "UI background color. All color contrasts evaluated and generated against this color."
+        },
+        "action100": {
+            "value": "hsl(180deg, 55%, 10%)",
+            "type": "color",
+            "description": "Do not use for UI elements or text. WCAG 2.x (relative luminance) contrast is 1.2:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "action200": {
+            "value": "hsl(179deg, 55%, 16%)",
+            "type": "color",
+            "description": "Do not use for UI elements or text. WCAG 2.x (relative luminance) contrast is 1.68:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "action300": {
+            "value": "hsl(179deg, 54%, 24%)",
+            "type": "color",
+            "description": "Do not use for UI elements or text. WCAG 2.x (relative luminance) contrast is 2.52:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "action400": {
+            "value": "hsl(179deg, 54%, 31%)",
+            "type": "color",
+            "description": "Color can be used for UI elements or large text. WCAG 2.x (relative luminance) contrast is 3.8:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "action500": {
+            "value": "hsl(178deg, 54%, 39%)",
+            "type": "color",
+            "description": "Color can be used for small text. WCAG 2.x (relative luminance) contrast is 5.61:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "action600": {
+            "value": "hsl(179deg, 54%, 47%)",
+            "type": "color",
+            "description": "Color can be used for small text. WCAG 2.x (relative luminance) contrast is 8.13:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "action700": {
+            "value": "hsl(179deg, 69%, 56%)",
+            "type": "color",
+            "description": "Color can be used for small text. WCAG 2.x (relative luminance) contrast is 11.41:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "accent100": {
+            "value": "hsl(231deg, 80%, 22%)",
+            "type": "color",
+            "description": "Do not use for UI elements or text. WCAG 2.x (relative luminance) contrast is 1.2:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "accent200": {
+            "value": "hsl(232deg, 79%, 36%)",
+            "type": "color",
+            "description": "Do not use for UI elements or text. WCAG 2.x (relative luminance) contrast is 1.68:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "accent300": {
+            "value": "hsl(232deg, 70%, 50%)",
+            "type": "color",
+            "description": "Do not use for UI elements or text. WCAG 2.x (relative luminance) contrast is 2.52:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "accent400": {
+            "value": "hsl(232deg, 69%, 59%)",
+            "type": "color",
+            "description": "Color can be used for UI elements or large text. WCAG 2.x (relative luminance) contrast is 3.8:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "accent500": {
+            "value": "hsl(232deg, 70%, 68%)",
+            "type": "color",
+            "description": "Color can be used for small text. WCAG 2.x (relative luminance) contrast is 5.61:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "accent600": {
+            "value": "hsl(231deg, 70%, 76%)",
+            "type": "color",
+            "description": "Color can be used for small text. WCAG 2.x (relative luminance) contrast is 8.13:1 against background hsl(235deg, 83%, 12%)"
+        },
+        "accent700": {
+            "value": "hsl(231deg, 69%, 85%)",
+            "type": "color",
+            "description": "Color can be used for small text. WCAG 2.x (relative luminance) contrast is 11.41:1 against background hsl(235deg, 83%, 12%)"
+        }
+    }
+}

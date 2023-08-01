@@ -1,0 +1,60 @@
+@keyframes fade {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes oscilate4x {
+	0% {
+		translate: 0, 4px;
+	}
+
+	25% {
+		translate: 4px, 0;
+	}
+
+	50% {
+		translate: 0, -4px;
+	}
+
+	100% {
+		translate: -4px, 0;
+	}
+}
+@keyframes oscilate2x {
+	0% {
+		translate: 0, 2px;
+	}
+
+	25% {
+		translate: 2px, 0;
+	}
+
+	50% {
+		translate: 0, -2px;
+	}
+
+	100% {
+		translate: -2px, 0;
+	}
+}
+
+@keyframes zoom-in {
+	from {
+		opacity: 0;
+		transform: scale(0);
+	}
+
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+.fade-in {
+	animation: fade 600ms both;
+}
