@@ -7,7 +7,7 @@
 	import { getInTouch } from './routes';
 </script>
 
-<!-- <TopBar /> -->
+<TopBar />
 <main id="main-content">
 	<slot />
 </main>

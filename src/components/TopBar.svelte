@@ -11,12 +11,9 @@
 
 <div class="top-bar {scrolled ? 'scrolled' : ''}">
 	<div class="container">
-		<a href="/" class="logo" aria-label="Home">
-			<Logo id="logo" />
-			<LogoIso id="logo-iso" />
-		</a>
-		<Nav />
-		<Button cls="cta" to={getInTouch.url}>{getInTouch.name}</Button>
+		<a href="/" class="logo" aria-label="Home"> TypeGrip </a>
+		<!-- <Nav /> -->
+		<!-- <Button cls="cta" to={getInTouch.url}>{getInTouch.name}</Button> -->
 	</div>
 	<div class="gradient-border" />
 </div>

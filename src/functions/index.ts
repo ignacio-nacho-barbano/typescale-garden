@@ -1,2 +1,1 @@
-export * from './initials';
-export * from './scroll-into-vew';
+export * from './generateCss';

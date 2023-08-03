@@ -1,2 +1,2 @@
-export * from './experience';
+export * from './lorem';
 export * from './breakpoints';

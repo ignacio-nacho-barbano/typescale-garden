@@ -1,2 +1,1 @@
-export * from './Job';
-export * from './Skill';
+export * from './type-variants';
