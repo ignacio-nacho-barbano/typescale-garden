@@ -7,6 +7,11 @@
 	align-items: center;
 }
 
+.main-page-section {
+	padding-top: $s6;
+	padding-bottom: $s8;
+}
+
 .glass {
 	color: $c-text-1;
 	background-color: hsla(187, 50%, 85%, 0.2);

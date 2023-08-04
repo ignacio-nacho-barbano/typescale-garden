@@ -1,16 +1,18 @@
 <script lang="ts">
 	import '../scss/global.scss';
 	import TopBar from '../components/TopBar.svelte';
-	import Nav from '../components/Nav.svelte';
-	import { page } from '$app/stores';
-	import Button from '../components/Button.svelte';
-	import { getInTouch } from './routes';
+	import ConfigSidebar from '../components/ConfigSidebar.svelte';
+	import CodeSidebar from '../components/CodeSidebar.svelte';
 </script>
 
 <TopBar />
-<main id="main-content">
-	<slot />
-</main>
+<div id="global-wrapper">
+	<ConfigSidebar />
+	<main id="main-content">
+		<slot />
+	</main>
+</div>
+<CodeSidebar />
 
 <!-- <Button
 	cls="floating-cta"
@@ -22,12 +24,18 @@
 <!-- <Nav /> -->
 
 <style lang="scss">
+	#global-wrapper {
+		display: flex;
+		flex-direction: row;
+		align-self: stretch;
+		overflow: hidden;
+	}
 	main {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 0 0 84px;
 		align-items: center;
+		overflow-y: auto;
 	}
 
 	:global(.btn.floating-cta.icon) {

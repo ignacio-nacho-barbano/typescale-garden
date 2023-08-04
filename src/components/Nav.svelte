@@ -8,28 +8,8 @@
 	import { onMount } from 'svelte';
 
 	const icons = [Up, Briefcase, CodeTags, Account];
-	let activeSection = $page.url.hash;
 
-	const handleIntersect = (entry: IntersectionObserverEntry) => {
-		if (entry.isIntersecting) {
-			activeSection = entry.target.id;
-		}
-	};
-
-	onMount(() => {
-		const appSections = routes.map(({ id }) => document.getElementById(id));
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach(handleIntersect);
-			},
-			{ threshold: 0.1 }
-		);
-
-		appSections.forEach((item) => {
-			if (item) observer.observe(item!);
-		});
-	});
+	console.log($page.route.id);
 </script>
 
 <nav>
@@ -37,8 +17,8 @@
 	<menu>
 		{#each routes as { name, url, id }, i}
 			<li>
-				<a href={url} class="nav-link" class:active={activeSection === id}>
-					<svelte:component this={icons[i]} size="20" ariaHidden />{name}
+				<a href={url} class="nav-link" class:active={$page.route.id === url}>
+					<!-- <svelte:component this={icons[i]} size="20" ariaHidden /> -->{name}
 				</a>
 			</li>
 		{/each}
@@ -59,10 +39,6 @@
 			gap: $s3;
 			justify-content: space-around;
 			list-style: none;
-
-			li:first-of-type {
-				order: 3;
-			}
 
 			.nav-link {
 				display: flex;
@@ -130,10 +106,6 @@
 
 		menu li .nav-link {
 			flex-direction: row;
-		}
-
-		menu li:first-of-type {
-			display: none;
 		}
 	}
 </style>

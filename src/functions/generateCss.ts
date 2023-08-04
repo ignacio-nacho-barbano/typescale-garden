@@ -2,23 +2,43 @@ import type { mockFontsApi } from '../constants/mockFontsApi';
 import type { TypeVariant } from '../models';
 
 export const generateCss = (
-	desktopVariants: TypeVariant[],
-	mobileVariants: TypeVariant[],
+	typescale: TypeVariant[],
 	breakpoint: number,
 	font: (typeof mockFontsApi)['items'][0]
-) => `
-@import('${font.files.regular}');
+) => {
+	return `
+@import url('https://fonts.googleapis.com/css2?family=${font.family.replaceAll(
+		' ',
+		'+'
+	)}&display=swap');
 
-table,
 body {
-    font-family: ${font.family}, ${font.category};
+	font-size: ${typescale.find(({ name }) => name === 'body')?.desktopSize}px;
+    font-family: "${font.family}", ${font.category};
 }
-${mobileVariants
+
+ 
+
+${typescale
+	.filter(({ isHeading }) => isHeading)
+	.map(({ name, mapsTo }) => (mapsTo ? `${mapsTo}, .${name}` : `.${name}`))} {
+		margin-bottom: 1rem;
+		font-style: ${typescale[0].italics ? 'italic' : 'normal'};
+		text-transform: ${typescale[0].uppercase ? 'uppercase' : 'none'};
+		max-width: 50ch;
+	}
+
+	p {
+		max-width: 80ch;
+		margin-bottom: 2rem;
+	}
+
+${typescale
 	.map(
-		({ name, kerning, line, size, weight }, i) => `
-.${name} {
-    font-size: ${size}px;
-    line-height: ${line}px;
+		({ name, kerning, mobileLine, mobileSize, weight, mapsTo }) => `
+${mapsTo ? `${mapsTo}, .${name}` : `.${name}`} {
+    font-size: ${mobileSize}px;
+    line-height: ${mobileLine}px;
     font-weight: ${weight};
     letter-spacing: ${kerning}em;
 }
@@ -27,14 +47,17 @@ ${mobileVariants
 	.join('')}
     
     @media (min-width: ${breakpoint}px) {
-        ${desktopVariants
+        ${typescale
 					.map(
-						({ size, line, name }) => `.${name} {
-            font-size: ${size}px;
-            line-height: ${line}px;
+						({ desktopSize, desktopLine, name, mapsTo }) => `${
+							mapsTo ? `${mapsTo}, .${name}` : `.${name}`
+						} {
+            font-size: ${desktopSize}px;
+            line-height: ${desktopLine}px;
         }
         `
 					)
 					.join('')}
 
     }`;
+};

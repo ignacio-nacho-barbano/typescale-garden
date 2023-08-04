@@ -1,199 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap');
+
 body {
-	font-size: 14px;
-	font-family: 'Spline Sans Mono', monospace;
+	font-size: 20px;
+	font-family: 'Red Hat Text', sans-serif;
 }
 
 h1,
+.heading1,
 h2,
+.heading2,
 h3,
+.heading3,
 h4,
+.heading4,
 h5,
+.heading5,
 h6,
-span,
-p,
-a,
-li {
-	text-align: left;
-	max-width: 768px;
+.heading6 {
+	margin-bottom: 1rem;
+	max-width: 50ch;
 }
 
-.sub-heading {
-	font-size: 16px;
-	font-weight: 400;
-}
-
-.giant,
-.title1,
-.title2,
-.title3,
-.title4,
-.title5,
-.title6 {
-	margin-bottom: $sd4;
-}
-
-.giant {
-	line-height: 1;
-}
-.title1 {
-	line-height: 1.2;
-	font-size: 40px;
-	font-weight: 700;
-}
-.title2 {
-	line-height: 1.2;
-	font-size: 36px;
-	font-weight: 700;
-}
-.title3 {
-	line-height: 1.2;
-	font-size: 32px;
-	font-weight: 700;
-}
-.title4 {
-	line-height: 1.2;
-	font-size: 28px;
-	font-weight: 700;
-}
-.title5 {
-	line-height: 1.4;
-	font-size: 24px;
-	font-weight: 700;
-}
-.title6 {
-	line-height: 1.4;
-	font-size: 20px;
-	font-weight: 700;
-}
-
-@media only screen and ($bp-m) {
-	body {
-		font-size: 16px;
-	}
-
-	.sub-heading {
-		font-size: 20px;
-	}
-
-	.giant {
-		font-size: 128px;
-	}
-
-	.title1 {
-		font-size: 64px;
-	}
-
-	.title2 {
-		font-size: 52px;
-	}
-
-	.title3 {
-		font-size: 48px;
-	}
-
-	.title4 {
-		font-size: 36px;
-	}
-
-	.title5 {
-		font-size: 32px;
-	}
-
-	.title6 {
-		font-size: 28px;
-	}
-}
-body {
-	font-size: 14px;
+p {
+	max-width: 80ch;
+	margin-bottom: 2rem;
 }
 
 h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-span,
-p,
-a,
-li {
-	text-align: left;
-	max-width: 768px;
-}
-
-.sub-heading {
-	font-size: 16px;
-	font-weight: 400;
-}
-
-.giant {
-	line-height: 1;
-}
-.title1 {
-	line-height: 1.2;
-	font-size: 40px;
-	font-weight: 700;
-}
-.title2 {
-	line-height: 1.2;
+.heading1 {
 	font-size: 36px;
-	font-weight: 700;
+	line-height: 40px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
 }
-.title3 {
-	line-height: 1.2;
+
+h2,
+.heading2 {
 	font-size: 32px;
-	font-weight: 700;
+	line-height: 40px;
+	font-weight: 600;
+	letter-spacing: 0em;
 }
-.title4 {
-	line-height: 1.2;
+
+h3,
+.heading3 {
 	font-size: 28px;
-	font-weight: 700;
+	line-height: 36px;
+	font-weight: 600;
+	letter-spacing: 0em;
 }
-.title5 {
-	line-height: 1.4;
+
+h4,
+.heading4 {
+	font-size: 28px;
+	line-height: 40px;
+	font-weight: 600;
+	letter-spacing: 0em;
+}
+
+h5,
+.heading5 {
 	font-size: 24px;
-	font-weight: 700;
+	line-height: 40px;
+	font-weight: 600;
+	letter-spacing: 0em;
 }
-.title6 {
-	line-height: 1.4;
+
+h6,
+.heading6 {
 	font-size: 20px;
-	font-weight: 700;
+	line-height: 36px;
+	font-weight: 600;
+	letter-spacing: 0em;
 }
 
-@media only screen and ($bp-m) {
-	body {
-		font-size: 16px;
-	}
+p,
+button,
+.body {
+	font-size: 20px;
+	line-height: 32px;
+	font-weight: 400;
+	letter-spacing: 0em;
+}
 
-	.sub-heading {
-		font-size: 20px;
-	}
+.small {
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 400;
+	letter-spacing: 0em;
+}
 
-	.giant {
-		font-size: 128px;
-	}
+.very-small {
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 400;
+	letter-spacing: 0em;
+}
 
-	.title1 {
+@media (min-width: 768px) {
+	h1,
+	.heading1 {
 		font-size: 64px;
+		line-height: 72px;
 	}
-
-	.title2 {
+	h2,
+	.heading2 {
 		font-size: 52px;
+		line-height: 64px;
 	}
-
-	.title3 {
-		font-size: 48px;
+	h3,
+	.heading3 {
+		font-size: 44px;
+		line-height: 60px;
 	}
-
-	.title4 {
+	h4,
+	.heading4 {
 		font-size: 36px;
+		line-height: 52px;
 	}
-
-	.title5 {
+	h5,
+	.heading5 {
 		font-size: 32px;
+		line-height: 52px;
 	}
-
-	.title6 {
-		font-size: 28px;
+	h6,
+	.heading6 {
+		font-size: 24px;
+		line-height: 44px;
+	}
+	p,
+	button,
+	.body {
+		font-size: 20px;
+		line-height: 32px;
+	}
+	.small {
+		font-size: 16px;
+		line-height: 24px;
+	}
+	.very-small {
+		font-size: 12px;
+		line-height: 20px;
 	}
 }

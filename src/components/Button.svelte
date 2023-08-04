@@ -76,7 +76,8 @@
 		border: 2px solid currentColor;
 		display: flex;
 		font-size: 14px;
-		height: $s6;
+		min-height: $s6;
+		max-height: $s6;
 		padding: 0 $s5;
 		border-radius: calc($s6 / 2);
 		transition: 0.2s ease-in-out;

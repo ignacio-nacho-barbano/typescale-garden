@@ -1,22 +1,17 @@
 export const routes = [
 	{
-		name: 'Top',
-		url: '/#top',
-		id: 'top'
+		name: 'How it Works',
+		url: '/',
+		id: 'how-it-works'
 	},
 	{
-		name: 'Experience',
-		url: '/#experience',
-		id: 'experience'
-	},
-	{
-		name: 'Skills',
-		url: '/#skills',
-		id: 'skills'
+		name: 'Typescale',
+		url: '/table',
+		id: 'typescale'
 	},
 	{
 		name: 'About',
-		url: '/#about',
+		url: '/about',
 		id: 'about'
 	}
 ];
