@@ -8,7 +8,7 @@
 
 <div class="top-bar">
 	<div class="container">
-		<a href="/" class="logo" aria-label="Home"><h1>Typescale Grip</h1> </a>
+		<a href="/" class="logo" aria-label="Home">Typescale Grip</a>
 		<Nav />
 		<!-- <Button cls="cta" to={getInTouch.url}>{getInTouch.name}</Button> -->
 	</div>
@@ -33,15 +33,6 @@
 		justify-content: space-evenly;
 		align-items: center;
 		transition: height 300ms;
-
-		:global(#logo) {
-			height: 40px;
-			width: 40px;
-		}
-
-		:global(#logo-iso) {
-			max-width: 33vw;
-		}
 
 		.container {
 			display: flex;
@@ -70,7 +61,7 @@
 			align-items: center;
 			text-decoration: none;
 
-			h1 {
+			&.logo {
 				font-size: 24px;
 				letter-spacing: 0.1em;
 			}

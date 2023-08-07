@@ -1,24 +1,15 @@
 export const calculateDistributeWeights = (
 	headingsFinalWeight: number,
 	headingsInitialWeight: number,
-	variants: any[]
+	variants: any[],
+	weightSteps: number[]
 ): number[] => {
-	const ascendingWeight = headingsFinalWeight >= headingsInitialWeight;
-	const starting = ascendingWeight ? headingsInitialWeight : headingsFinalWeight;
 	//  add weight steps to cssOutput, correct extra values
-	const weightSteps = new Array(Math.abs(headingsInitialWeight - headingsFinalWeight) / 100 + 1)
-		.fill(0)
-		.map((_, i) => starting + (ascendingWeight ? 100 : -100) * i);
-	const repetitionsPerWeight = Math.ceil(variants.length / weightSteps.length);
+	const variantWeights: number[] = variants.map(
+		(_, i) => weightSteps[Math.ceil(weightSteps.length / i - 1)] || headingsFinalWeight
+	);
 
-	const variantWeights: number[] = [];
-
-	weightSteps.forEach((weight) => {
-		for (let i = 0; i < repetitionsPerWeight; i++) {
-			variantWeights.unshift(weight);
-		}
-	});
-	console.log(variantWeights, headingsInitialWeight, headingsFinalWeight);
+	console.log(weightSteps.length, variantWeights, headingsInitialWeight, headingsFinalWeight);
 
 	return variantWeights;
 };

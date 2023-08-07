@@ -3,6 +3,46 @@
 body {
 	font-size: 20px;
 	font-family: 'Red Hat Text', sans-serif;
+	--paragraph-space: 2rem;
+	--title-space: 1rem;
+}
+
+.space-text-above,
+p + h1,
+p + h2,
+p + h3,
+p + h4,
+p + h5,
+p + h6,
+h1 + h2,
+h2 + h3,
+h3 + h4,
+h4 + h5,
+h5 + h6 {
+	margin-top: var(--paragraph-space);
+}
+
+h1 + p,
+h2 + p,
+h3 + p,
+h4 + p,
+h5 + p,
+h6 + p {
+	margin-top: var(--title-space);
+}
+
+p + p {
+	margin-top: var(--title-space);
+}
+
+h1 + p,
+h2 + p,
+h3 + p,
+h4 + p,
+h5 + p,
+h6 + p,
+.space-text-below {
+	margin-bottom: var(--paragraph-space);
 }
 
 h1,
@@ -17,13 +57,11 @@ h5,
 .heading5,
 h6,
 .heading6 {
-	margin-bottom: 1rem;
 	max-width: 50ch;
 }
 
 p {
 	max-width: 80ch;
-	margin-bottom: 2rem;
 }
 
 h1,

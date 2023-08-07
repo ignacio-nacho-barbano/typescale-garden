@@ -1,4 +1,4 @@
-import { derived, writable } from 'svelte/store';
+import { derived, writable, type Readable, type Writable } from 'svelte/store';
 import type { ApiFont, TypeVariant } from '../models';
 import { mockFontsApi } from '../constants/mockFontsApi';
 import { calculateDistributeWeights, generateCss } from '../functions';
@@ -15,36 +15,52 @@ const variants = [
 	{ isHeading: false, location: -1, name: 'small' },
 	{ isHeading: false, location: -2, name: 'very-small' }
 ];
-const initialFont: ApiFont = mockFontsApi.items[Math.round(Math.random() * 1546)];
+const initialFont: ApiFont =
+	mockFontsApi.items[Math.round(Math.random() * mockFontsApi.items.length)];
 // writables
+
 export const breakpoint = writable(768);
 export const count = writable(0);
 export const fontName = writable(initialFont.family);
 export const seeCode = writable(false);
-export const baseSize = writable(20);
+export const baseSize = writable(22);
 export const baseUnit = writable(4);
-export const desktopRatio = writable(1.2);
-export const mobileRatio = writable(1.1);
-export const kerningRatio = writable(0.25);
+export const desktopRatio = writable(1.18);
+export const mobileRatio = writable(1.12);
+export const kerningRatio = writable(0.05);
 export const useUppercaseForTitles = writable(false);
 export const useItallicsForTitles = writable(false);
-export const headingsInitialWeight = writable(500);
-export const headingsFinalWeight = writable(800);
+export const headingsInitialWeight = writable(600);
+export const headingsFinalWeight = writable(900);
 // deriveds
-export const currentFont = derived(
-	fontName,
-	($newFont: string): ApiFont =>
-		mockFontsApi.items.find(({ family }) => $newFont.toLowerCase() === family.toLowerCase()) ||
-		mockFontsApi.items[0]
+export const weightSteps: Readable<number[]> = derived(
+	[headingsInitialWeight, headingsFinalWeight],
+	([$headingsInitialWeight, $headingsFinalWeight]) => {
+		const ascendingWeight = $headingsFinalWeight >= $headingsInitialWeight;
+		const starting = ascendingWeight ? $headingsInitialWeight : $headingsFinalWeight;
+		return new Array(Math.abs($headingsInitialWeight - $headingsFinalWeight) / 100 + 1)
+			.fill(0)
+			.map((_, i) => starting + (ascendingWeight ? 100 : -100) * i);
+	}
 );
 
+export const currentFont = derived(fontName, ($fontName: string): ApiFont => {
+	console.log($fontName);
+
+	return (
+		mockFontsApi.items.find(({ family }) => $fontName.toLowerCase() === family.toLowerCase()) ||
+		mockFontsApi.items[0]
+	);
+});
+
 export const distributedWeights = derived(
-	[headingsFinalWeight, headingsInitialWeight],
-	([$headingsFinalWeight, $headingsInitialWeight]) =>
+	[headingsFinalWeight, headingsInitialWeight, weightSteps],
+	([$headingsFinalWeight, $headingsInitialWeight, $weightSteps]) =>
 		calculateDistributeWeights(
 			$headingsFinalWeight,
 			$headingsInitialWeight,
-			variants.filter(({ isHeading }) => isHeading)
+			variants.filter(({ isHeading }) => isHeading),
+			$weightSteps
 		)
 );
 
@@ -101,6 +117,7 @@ export const typescale = derived(
 );
 
 export const cssCode = derived(
-	[typescale, breakpoint, currentFont],
-	([$typescale, $breakpoint, $currentFont]) => generateCss($typescale, $breakpoint, $currentFont)
+	[typescale, breakpoint, currentFont, weightSteps],
+	([$typescale, $breakpoint, $currentFont, $weightSteps]) =>
+		generateCss($typescale, $breakpoint, $currentFont, $weightSteps)
 );

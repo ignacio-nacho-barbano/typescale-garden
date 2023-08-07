@@ -26,7 +26,7 @@
 	<Input name="desktop-ratio" label="Desktop Sizes Ratio" bind:value={$desktopRatio} />
 	<Input name="mobile-ratio" label="Mobile Sizes Ratio" bind:value={$mobileRatio} />
 	<fieldset>
-		<legend class="small">Headings Weight</legend>
+		<legend class="small">Headings Weight Range</legend>
 		<select name="cars" id="cars" bind:value={$headingsInitialWeight}>
 			<option value={100}>100</option>
 			<option value={200}>200</option>

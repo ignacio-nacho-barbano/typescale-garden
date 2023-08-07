@@ -8,8 +8,6 @@
 	import { onMount } from 'svelte';
 
 	const icons = [Up, Briefcase, CodeTags, Account];
-
-	console.log($page.route.id);
 </script>
 
 <nav>
