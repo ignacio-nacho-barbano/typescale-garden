@@ -5,7 +5,7 @@
 </script>
 
 <aside class="code-group {$seeCode && 'visible'}">
-	<code>
+	<code class="very-small">
 		{$cssCode}
 	</code>
 	<Button on:click={() => copyToClipboard($cssCode)} cls="copy-btn">Copy Code!</Button>
@@ -19,6 +19,7 @@
 		background: $c-base;
 		top: 0;
 		bottom: 0;
+		max-width: 50vw;
 		width: fit-content;
 		padding: $s6 $s6 $s5 $s5;
 		height: 100vh;
@@ -33,6 +34,7 @@
 
 		code {
 			white-space: break-spaces;
+			line-break: anywhere;
 		}
 
 		:global(.copy-btn) {

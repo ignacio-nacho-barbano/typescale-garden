@@ -6,7 +6,7 @@
 	import Nav from './Nav.svelte';
 </script>
 
-<div class="top-bar">
+<div class="top-bar glass">
 	<div class="container">
 		<a href="/" class="logo" aria-label="Home">Typescale Grip</a>
 		<Nav />
@@ -23,9 +23,8 @@
 	.top-bar {
 		flex: 1 0 auto;
 		z-index: 4;
-		background-color: hsla(0, 0%, 100%, 0);
-		backdrop-filter: blur(12px);
 		color: var(--green-1);
+		background-color: $c-base;
 		height: $s7;
 		width: 100vw;
 		display: flex;

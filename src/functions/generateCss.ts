@@ -1,10 +1,9 @@
-import type { mockFontsApi } from '../constants/mockFontsApi';
-import type { TypeVariant } from '../models';
+import type { ApiFont, TypeVariant } from '../models';
 
 export const generateCss = (
 	typescale: TypeVariant[],
 	breakpoint: number,
-	font: (typeof mockFontsApi)['items'][0],
+	font: ApiFont,
 	weights: number[]
 ) => {
 	// 	<style>
@@ -14,7 +13,9 @@ export const generateCss = (
 @import url('https://fonts.googleapis.com/css2?family=${font.family.replaceAll(
 		' ',
 		'+'
-	)}:wght@${weights.join(';')}&display=swap');
+	)}:wght@${Array.from(new Set(weights.sort((a, b) => (a >= b ? 1 : -1)))).join(
+		';'
+	)}&display=swap');
 
 body {
 	font-size: ${typescale.find(({ name }) => name === 'body')?.desktopSize}px;
@@ -40,7 +41,7 @@ h5 + h6 {
 
 ${typescale
 	.filter(({ isHeading }) => isHeading)
-	.map(({ name, mapsTo }) => (mapsTo ? `${mapsTo}, .${name}` : `.${name}`))} {
+	.map(({ name, mapsTo }) => (mapsTo ? `${mapsTo}, .${name} ` : `.${name} `))} {
 		font-style: ${typescale[0].italics ? 'italic' : 'normal'};
 		text-transform: ${typescale[0].uppercase ? 'uppercase' : 'none'};
 		max-width: 50ch;

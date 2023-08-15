@@ -30,38 +30,50 @@ export const mobileRatio = writable(1.12);
 export const kerningRatio = writable(0.05);
 export const useUppercaseForTitles = writable(false);
 export const useItallicsForTitles = writable(false);
-export const headingsInitialWeight = writable(600);
-export const headingsFinalWeight = writable(900);
+
 // deriveds
-export const weightSteps: Readable<number[]> = derived(
-	[headingsInitialWeight, headingsFinalWeight],
-	([$headingsInitialWeight, $headingsFinalWeight]) => {
-		const ascendingWeight = $headingsFinalWeight >= $headingsInitialWeight;
-		const starting = ascendingWeight ? $headingsInitialWeight : $headingsFinalWeight;
-		return new Array(Math.abs($headingsInitialWeight - $headingsFinalWeight) / 100 + 1)
-			.fill(0)
-			.map((_, i) => starting + (ascendingWeight ? 100 : -100) * i);
-	}
-);
 
 export const currentFont = derived(fontName, ($fontName: string): ApiFont => {
-	console.log($fontName);
-
 	return (
 		mockFontsApi.items.find(({ family }) => $fontName.toLowerCase() === family.toLowerCase()) ||
 		mockFontsApi.items[0]
 	);
 });
+export const availableWeights = derived(currentFont, ($currentFont) => {
+	const fontVariants = [...$currentFont.variants];
+	const regularIndex = fontVariants.findIndex((variant) => variant === 'regular');
+	fontVariants[regularIndex] = '400';
+	const variants = Array.from(
+		new Set(fontVariants.map((variant) => parseInt(variant)).filter((variant) => variant))
+	);
 
-export const distributedWeights = derived(
-	[headingsFinalWeight, headingsInitialWeight, weightSteps],
-	([$headingsFinalWeight, $headingsInitialWeight, $weightSteps]) =>
-		calculateDistributeWeights(
-			$headingsFinalWeight,
-			$headingsInitialWeight,
-			variants.filter(({ isHeading }) => isHeading),
-			$weightSteps
-		)
+	return variants;
+});
+
+export const headingsInitialWeight = derived(availableWeights, ($aw) => {
+	return $aw[Math.floor($aw.length / 2)];
+});
+export const headingsFinalWeight = derived(availableWeights, ($aw) => $aw.at(-1) || $aw[0]);
+
+export const weightSteps: Readable<number[]> = derived(
+	[headingsInitialWeight, headingsFinalWeight],
+	([$hiw, $hfw]) => {
+		const ascendingWeight = $hfw >= $hiw;
+		const starting = ascendingWeight ? $hiw : $hfw;
+		const finishing = ascendingWeight ? $hfw : $hiw;
+		const stepsCount = (finishing - starting) / 100 + 1;
+
+		return new Array(stepsCount)
+			.fill(0)
+			.map((_, i) => starting + (ascendingWeight ? 100 : -100) * i);
+	}
+);
+
+export const distributedWeights = derived([weightSteps], ([$weightSteps]) =>
+	calculateDistributeWeights(
+		variants.filter(({ isHeading }) => isHeading),
+		$weightSteps
+	)
 );
 
 export const typescale = derived(

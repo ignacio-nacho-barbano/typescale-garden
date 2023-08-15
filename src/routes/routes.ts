@@ -5,7 +5,7 @@ export const routes = [
 		id: 'how-it-works'
 	},
 	{
-		name: 'Typescale',
+		name: 'Your Typescale',
 		url: '/table',
 		id: 'typescale'
 	},

@@ -62,9 +62,12 @@
 	</p>
 	<h4>The Desktop vs Mobile Ratios Problem</h4>
 	<h5>TL;DR</h5>
-	The same size difference between your smaller fonts and your biggers fonts won't work on both small
-	and big screens. If you proportionally scale it, you will either have a font that's absurdly oversized
-	on the bigger headings, or completely out of the accessibity standards on the paragraphs.
+	<p>
+		The same size difference between your smaller fonts and your biggers fonts won't work on both
+		small and big screens. If you proportionally scale it, you will either have a font that's
+		absurdly oversized on the bigger headings, or completely out of the accessibity standards on the
+		paragraphs.
+	</p>
 
 	<h5>Let's analyze this scenario:</h5>
 	<p>

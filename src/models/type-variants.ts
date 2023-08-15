@@ -1,5 +1,20 @@
 import type { mockFontsApi } from '../constants/mockFontsApi';
 
+export type NumericWeights = '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
+
+export type Weights =
+	| NumericWeights
+	| 'regular'
+	| 'italic'
+	| '100italic'
+	| '200italic'
+	| '300italic'
+	| '400italic'
+	| '500italic'
+	| '600italic'
+	| '700italic'
+	| '800italic'
+	| '900italic';
 export interface TypeVariant {
 	isHeading: boolean;
 	name: string;

@@ -5,7 +5,6 @@
 	import Account from 'svelte-material-icons/AccountOutline.svelte';
 	import { page } from '$app/stores';
 	import { routes } from '../routes/routes';
-	import { onMount } from 'svelte';
 
 	const icons = [Up, Briefcase, CodeTags, Account];
 </script>
@@ -15,7 +14,7 @@
 	<menu>
 		{#each routes as { name, url, id }, i}
 			<li>
-				<a href={url} class="nav-link" class:active={$page.route.id === url}>
+				<a href={url} class="nav-link small" class:active={$page.route.id === url}>
 					<!-- <svelte:component this={icons[i]} size="20" ariaHidden /> -->{name}
 				</a>
 			</li>
