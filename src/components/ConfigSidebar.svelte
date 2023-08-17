@@ -25,11 +25,12 @@
 
 	<Input name="family" label="Font Family (Google Fonts)" useSearch bind:value={$fontName} />
 	<Input name="base-font" label="Body Font (px)" bind:value={$baseSize} />
+	<Input name="visual-size" label="Base Visual Size" bind:value={$baseUnit} />
 	<Input name="desktop-ratio" label="Desktop Sizes Ratio" bind:value={$desktopRatio} />
 	<Input name="mobile-ratio" label="Mobile Sizes Ratio" bind:value={$mobileRatio} />
 	<fieldset>
 		<legend class="small">Headings Weight Range</legend>
-		<!-- <Select
+		<Select
 			id="headings-initial-weight"
 			bind:value={$headingsInitialWeight}
 			disabled={!$availableWeights.length}
@@ -40,8 +41,8 @@
 			bind:value={$headingsFinalWeight}
 			disabled={!$availableWeights.length}
 			options={$availableWeights}
-		/> -->
-		<select name="cars" id="cars" bind:value={$headingsInitialWeight}>
+		/>
+		<!-- <select name="cars" id="cars" bind:value={$headingsInitialWeight}>
 			<option value={100}>100</option>
 			<option value={200}>200</option>
 			<option value={300}>300</option>
@@ -62,7 +63,7 @@
 			<option value={700}>700</option>
 			<option value={800}>800</option>
 			<option value={900}>900</option>
-		</select>
+		</select> -->
 	</fieldset>
 	<Input name="breakpoint" label="Breakpoint (px)" bind:value={$breakpoint} />
 	<Input name="kerning" label="Kerning Ratio" bind:value={$kerningRatio} />

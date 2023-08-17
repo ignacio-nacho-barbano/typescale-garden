@@ -47,7 +47,7 @@
 		configurable than most other tools and it provides the possibilty of generating two sets of
 		related typographic scales, one for phones and other small devices and one for bigger screens.
 	</p>
-	<h3>Why do I need more than one?</h3>
+	<h3>Two Typescales? Why?</h3>
 	<p>
 		Tpypographic scales have been here long before screens. In printed media you knew the format you
 		where working with, and therefore you could design the ideal scale for such media, sizes and

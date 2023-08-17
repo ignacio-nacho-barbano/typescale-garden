@@ -1,15 +1,26 @@
 <script lang="ts">
 	import Logo from '../../static/logo.svg';
 	import LogoIso from '../../static/nacho-barbano.svg';
-	import { getInTouch } from '../routes/routes';
+	import { getInTouch, routes } from '../routes/routes';
 	import Button from './Button.svelte';
-	import Nav from './Nav.svelte';
+	import Tabs from './Tabs.svelte';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import Tab from './Tab.svelte';
 </script>
 
 <div class="top-bar glass">
 	<div class="container">
 		<a href="/" class="logo" aria-label="Home">Typescale Grip</a>
-		<Nav />
+		<Tabs>
+			{#each routes as { name, url, id }, i}
+				<Tab active={$page.route.id === url}>
+					<a href={url}>
+						<!-- <svelte:component this={icons[i]} size="20" ariaHidden /> -->{name}
+					</a>
+				</Tab>
+			{/each}
+		</Tabs>
 		<!-- <Button cls="cta" to={getInTouch.url}>{getInTouch.name}</Button> -->
 	</div>
 	<div class="gradient-border" />
@@ -18,14 +29,14 @@
 <style lang="scss">
 	.gradient-border {
 		position: absolute;
-		bottom: 0;
+		bottom: 1px;
+		opacity: 0.5;
 	}
 	.top-bar {
 		flex: 1 0 auto;
 		z-index: 4;
 		color: var(--green-1);
 		background-color: $c-base;
-		height: $s7;
 		width: 100vw;
 		display: flex;
 		flex-direction: column;
@@ -49,10 +60,6 @@
 			}
 		}
 
-		:global(nav) {
-			display: none;
-		}
-
 		a {
 			display: flex;
 			justify-content: center;
@@ -63,13 +70,7 @@
 			&.logo {
 				font-size: 24px;
 				letter-spacing: 0.1em;
-			}
-		}
-
-		@media screen and (min-width: 921px) {
-			& :global(nav) {
-				display: block;
-				margin-left: auto;
+				margin-right: auto;
 			}
 		}
 	}

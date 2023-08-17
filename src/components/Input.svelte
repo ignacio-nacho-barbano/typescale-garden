@@ -1,11 +1,14 @@
 <script lang="ts">
 	import Magnify from 'svelte-material-icons/Magnify.svelte';
+	import type { Writable } from 'svelte/store';
+	import type { FormValidator } from '../models';
 
 	export let name: string;
-	export let value: string | number;
+	export let value: Writable<string> | Writable<number> | string | number;
 	export let label: string | null = null;
 	export let changeOnBlur: boolean = false;
 	export let useSearch: boolean = false;
+	export let validators: FormValidator<typeof value>[] = [];
 	let blurEvent: boolean = false;
 	let internalValue: string = (value || '') as string;
 
@@ -30,7 +33,7 @@
 	/>
 	{#if useSearch}
 		<button
-			class="search-icon"
+			class="search-icon glass"
 			on:click={() => {
 				value = internalValue;
 			}}

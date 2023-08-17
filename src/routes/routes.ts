@@ -1,4 +1,6 @@
-export const routes = [
+import type { Route } from '../models';
+
+export const routes: Route[] = [
 	{
 		name: 'How it Works',
 		url: '/',

@@ -25,8 +25,8 @@ export const fontName = writable(initialFont.family);
 export const seeCode = writable(false);
 export const baseSize = writable(22);
 export const baseUnit = writable(4);
-export const desktopRatio = writable(1.18);
-export const mobileRatio = writable(1.12);
+export const desktopRatio = writable(1.22);
+export const mobileRatio = writable(1.15);
 export const kerningRatio = writable(0.05);
 export const useUppercaseForTitles = writable(false);
 export const useItallicsForTitles = writable(false);
@@ -41,19 +41,29 @@ export const currentFont = derived(fontName, ($fontName: string): ApiFont => {
 });
 export const availableWeights = derived(currentFont, ($currentFont) => {
 	const fontVariants = [...$currentFont.variants];
+
 	const regularIndex = fontVariants.findIndex((variant) => variant === 'regular');
 	fontVariants[regularIndex] = '400';
 	const variants = Array.from(
 		new Set(fontVariants.map((variant) => parseInt(variant)).filter((variant) => variant))
 	);
 
+	console.log({ fontVariants, variants });
+
 	return variants;
 });
 
-export const headingsInitialWeight = derived(availableWeights, ($aw) => {
-	return $aw[Math.floor($aw.length / 2)];
+export const headingsInitialWeight = writable(
+	parseInt(initialFont.variants[Math.floor(initialFont.variants.length / 2)])
+);
+export const headingsFinalWeight = writable(
+	parseInt(initialFont.variants.at(-1) || initialFont.variants[0])
+);
+
+availableWeights.subscribe(($aw) => {
+	headingsInitialWeight.set($aw[Math.floor($aw.length / 2)]);
+	headingsFinalWeight.set($aw.at(-1) || $aw[0]);
 });
-export const headingsFinalWeight = derived(availableWeights, ($aw) => $aw.at(-1) || $aw[0]);
 
 export const weightSteps: Readable<number[]> = derived(
 	[headingsInitialWeight, headingsFinalWeight],
