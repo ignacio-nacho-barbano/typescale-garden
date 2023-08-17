@@ -2,7 +2,7 @@
 	export let active = false;
 </script>
 
-<div class="tab small" class:active>
+<div class="tab body-2" class:active>
 	<li>
 		<slot />
 	</li>
@@ -39,8 +39,9 @@
 		}
 
 		&:hover::before {
-			background: $c-primary;
+			background: $c-accent;
 			width: 100%;
+			height: $s2;
 		}
 
 		&:active::before {
@@ -52,6 +53,7 @@
 
 		&.active::before {
 			width: 100%;
+			height: $s2;
 			background: $c-accent;
 		}
 		:global(a),

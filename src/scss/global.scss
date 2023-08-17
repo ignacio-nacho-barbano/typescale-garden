@@ -29,6 +29,11 @@ body {
 	overflow-x: hidden;
 }
 
+legend,
+label {
+	margin-bottom: $s2;
+}
+
 .gradient-border {
 	height: 2px;
 	min-height: 2px;

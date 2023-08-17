@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { lorem } from '../constants';
-	import { typescale, cssCode, currentFont } from '../stores/config';
+	import { typescale, cssCode, currentFont, breakpoint } from '../stores/config';
 	import { onDestroy } from 'svelte';
 	import { routes } from './routes';
 	import typescale3d from '../../raw-assets/typescale-3d.jpg?w=500&format=webp';
@@ -8,6 +8,7 @@
 	let tableStyles = '';
 	const unsubscribe = cssCode.subscribe((code) => {
 		tableStyles = code.replace('body', '.how-it-works-page.main-page-section');
+		tableStyles = tableStyles.replace($breakpoint + '', $breakpoint + 360 + '');
 	});
 
 	onDestroy(unsubscribe);
@@ -28,7 +29,7 @@
 		</div>
 		<figure>
 			<img src={typescale3d} alt="a nice 3d typography by Alexander Andrews from Unsplash" />
-			<figcaption class="small">
+			<figcaption class="body-2">
 				Foto de <a
 					href="https://unsplash.com/es/@alex_andrews?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
 					>Alexander Andrews</a

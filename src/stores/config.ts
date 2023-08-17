@@ -11,9 +11,9 @@ const variants = [
 	{ isHeading: true, location: 4, name: 'heading4', mapsTo: 'h4' },
 	{ isHeading: true, location: 3, name: 'heading5', mapsTo: 'h5' },
 	{ isHeading: true, location: 2, name: 'heading6', mapsTo: 'h6' },
-	{ isHeading: false, location: 0, name: 'body', mapsTo: 'p, button' },
-	{ isHeading: false, location: -1, name: 'small' },
-	{ isHeading: false, location: -2, name: 'very-small' }
+	{ isHeading: false, location: 0, name: 'body-1', mapsTo: 'p, button' },
+	{ isHeading: false, location: -1, name: 'body-2', mapsTo: 'label, figcaption, input' },
+	{ isHeading: false, location: -2, name: 'tooltip' }
 ];
 const initialFont: ApiFont =
 	mockFontsApi.items[Math.round(Math.random() * mockFontsApi.items.length)];
@@ -25,6 +25,7 @@ export const fontName = writable(initialFont.family);
 export const seeCode = writable(false);
 export const baseSize = writable(22);
 export const baseUnit = writable(4);
+export const visibleGrid = writable(false);
 export const desktopRatio = writable(1.22);
 export const mobileRatio = writable(1.15);
 export const kerningRatio = writable(0.05);
@@ -114,8 +115,8 @@ export const typescale = derived(
 				(Math.pow($kerningRatio, 8 - Math.abs(location)) * (location > 0 ? -0.05 : 10)).toFixed(2)
 			);
 			const lineHeightMultiplier = Math.pow(1.1, 8 - location);
-			const desktopSize = Math.round(($baseSize * desktopSizeMultiplier) / 4) * 4;
-			const mobileSize = Math.round(($baseSize * mobileSizeMultiplier) / 4) * 4;
+			const desktopSize = Math.round(($baseSize * desktopSizeMultiplier) / 2) * 2;
+			const mobileSize = Math.round(($baseSize * mobileSizeMultiplier) / 2) * 2;
 			const desktopLine =
 				Math.round((desktopSize * (isHeading ? lineHeightMultiplier : 1.5)) / $baseUnit) *
 				$baseUnit;

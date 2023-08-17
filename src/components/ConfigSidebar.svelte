@@ -24,22 +24,24 @@
 	<h2 class="heading6">Options</h2>
 
 	<Input name="family" label="Font Family (Google Fonts)" useSearch bind:value={$fontName} />
-	<Input name="base-font" label="Body Font (px)" bind:value={$baseSize} />
+	<Input name="base-font" label="Body-1 Font Size (px)" bind:value={$baseSize} />
 	<Input name="visual-size" label="Base Visual Size" bind:value={$baseUnit} />
 	<Input name="desktop-ratio" label="Desktop Sizes Ratio" bind:value={$desktopRatio} />
 	<Input name="mobile-ratio" label="Mobile Sizes Ratio" bind:value={$mobileRatio} />
 	<fieldset>
-		<legend class="small">Headings Weight Range</legend>
+		<legend class="body-2">Headings Weight Range</legend>
 		<Select
+			label="From"
 			id="headings-initial-weight"
 			bind:value={$headingsInitialWeight}
-			disabled={!$availableWeights.length}
+			disabled={$availableWeights.length < 2}
 			options={$availableWeights}
 		/>
 		<Select
+			label="To"
 			id="headings-final-weight"
 			bind:value={$headingsFinalWeight}
-			disabled={!$availableWeights.length}
+			disabled={$availableWeights.length < 2}
 			options={$availableWeights}
 		/>
 		<!-- <select name="cars" id="cars" bind:value={$headingsInitialWeight}>

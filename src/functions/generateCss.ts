@@ -18,11 +18,13 @@ export const generateCss = (
 	)}&display=swap');
 
 body {
-	font-size: ${typescale.find(({ name }) => name === 'body')?.desktopSize}px;
+	font-size: ${typescale.find(({ name }) => name === 'body-1')?.desktopSize}px;
     font-family: "${font.family}", ${font.category};
+	--paragraph-space: 2rem;
+	--title-space: 1rem;
 }
 
-.space-above,
+.space-text-above,
 p + h1,
 p + h2,
 p + h3,
@@ -34,10 +36,31 @@ h2 + h3,
 h3 + h4,
 h4 + h5,
 h5 + h6 {
-	margin-bottom: 1.5rem;
+	margin-top: var(--paragraph-space);
 }
 
- 
+h1 + p,
+h2 + p,
+h3 + p,
+h4 + p,
+h5 + p,
+h6 + p {
+	margin-top: var(--title-space);
+}
+
+p + p {
+	margin-top: var(--title-space);
+}
+
+h1 + p,
+h2 + p,
+h3 + p,
+h4 + p,
+h5 + p,
+h6 + p,
+.space-text-below {
+	margin-bottom: var(--paragraph-space);
+}
 
 ${typescale
 	.filter(({ isHeading }) => isHeading)
@@ -48,7 +71,7 @@ ${typescale
 	}
 
 	p {
-		max-width: 80ch;
+		max-width: 70ch;
 	}
 
 ${typescale

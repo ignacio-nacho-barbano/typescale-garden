@@ -5,7 +5,7 @@
 </script>
 
 <aside class="code-group {$seeCode && 'visible'}">
-	<code class="very-small">
+	<code class="tooltip">
 		{$cssCode}
 	</code>
 	<Button on:click={() => copyToClipboard($cssCode)} cls="copy-btn">Copy Code!</Button>

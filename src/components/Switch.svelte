@@ -5,7 +5,7 @@
 </script>
 
 <div class="input-wrapper switch {value ? 'active' : ''}">
-	<label class="small" for={name}>{label || name}</label>
+	<label class="body-2" for={name}>{label || name}</label>
 	<input id={name} type="checkbox" bind:value />
 	<button class="slider" on:click={() => (value = !value)} />
 </div>

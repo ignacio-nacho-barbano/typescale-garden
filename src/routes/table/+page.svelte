@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { lorem } from '../../constants';
-	import { typescale, cssCode } from '../../stores/config';
+	import { typescale, cssCode, breakpoint } from '../../stores/config';
 	import { onDestroy } from 'svelte';
 	import { routes } from '../routes';
 	import CharsChart from '../../components/CharsChart.svelte';
@@ -10,7 +10,7 @@
 	let tableStyles = '';
 	const unsubscribe = cssCode.subscribe((code) => {
 		tableStyles = code.replace('body', '.table-page.main-page-section');
-		console.log(tableStyles);
+		tableStyles = tableStyles.replace($breakpoint + '', $breakpoint + 360 + '');
 	});
 	type Option = 'Desktop' | 'Mobile' | 'Both';
 	let currentView: Option = 'Desktop';
@@ -19,8 +19,8 @@
 	onDestroy(unsubscribe);
 </script>
 
-<section id={routes[1].id} class="container table-page main-page-section">
-	<div>
+<section id={routes[1].id} class="table-page main-page-section">
+	<div class="container">
 		<h1>Table of Variants</h1>
 		<p>
 			This is your current Typescale ussing the configurations you've set on the configs tab.
@@ -28,14 +28,17 @@
 			You won't have to manually use the mobile variants ever 😁, but that's how each of those will look
 			on a device with a screen smaller than the configured breakpoint 📱.
 		</p>
-		<Tabs>
+	</div>
+	<Tabs>
+		<div class="container tabs-wrapper">
 			{#each tabs as tab}
 				<Tab active={currentView === tab}>
 					<button on:click={() => (currentView = tab)}>{tab}</button>
 				</Tab>
 			{/each}
-		</Tabs>
-
+		</div>
+	</Tabs>
+	<div class="container">
 		<div class="variants {currentView.toLowerCase()}">
 			{@html `<style>
 				${tableStyles}
@@ -104,6 +107,12 @@
 		}
 	}
 
+	.tabs-wrapper {
+		display: flex;
+		flex-direction: row;
+		gap: $s3;
+	}
+
 	.device {
 		&.mobile {
 			background: black;
@@ -130,8 +139,6 @@
 
 		ol {
 			padding: $sd5;
-			border-top: solid $lw $c-primary;
-			border-bottom: solid $lw $c-primary;
 			display: flex;
 			flex-direction: column;
 			gap: $s6;

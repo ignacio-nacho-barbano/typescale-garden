@@ -3,12 +3,19 @@
 	import TopBar from '../components/TopBar.svelte';
 	import ConfigSidebar from '../components/ConfigSidebar.svelte';
 	import CodeSidebar from '../components/CodeSidebar.svelte';
+	import { baseUnit, visibleGrid } from '../stores/config';
 </script>
 
 <TopBar />
 <div id="global-wrapper">
 	<ConfigSidebar />
 	<main id="main-content">
+		<div
+			class="grid-overlay"
+			style="display: {$visibleGrid
+				? 'block'
+				: 'none'};		background-size: {$baseUnit}px {$baseUnit}px;"
+		/>
 		<slot />
 	</main>
 </div>
@@ -30,12 +37,26 @@
 		align-self: stretch;
 		overflow: hidden;
 	}
-	main {
+	main#main-content {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		overflow-y: auto;
+		position: relative;
+	}
+
+	.grid-overlay {
+		background-color: transparent;
+		opacity: 0.3;
+		left: 0;
+		top: 0;
+		background-repeat: repeat;
+		background-image: linear-gradient(#444cf7 1px, transparent 1px),
+			linear-gradient(to right, #444cf7 1px, transparent 1px);
+		position: absolute;
+		width: 100%;
+		height: 100%;
 	}
 
 	:global(.btn.floating-cta.icon) {

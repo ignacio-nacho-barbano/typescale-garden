@@ -15,6 +15,11 @@ export const routes: Route[] = [
 		name: 'About',
 		url: '/about',
 		id: 'about'
+	},
+	{
+		name: 'Contrast',
+		url: '/contrast',
+		id: 'contrast'
 	}
 ];
 

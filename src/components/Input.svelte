@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Magnify from 'svelte-material-icons/Magnify.svelte';
 	import type { Writable } from 'svelte/store';
 	import type { FormValidator } from '../models';
+	import Button from './Button.svelte';
 
 	export let name: string;
 	export let value: Writable<string> | Writable<number> | string | number;
@@ -23,24 +23,25 @@
 </script>
 
 <div class="input-wrapper">
-	<label for={name}>{label || name}</label>
-	<input
-		id={name}
-		bind:value={internalValue}
-		on:blur={() => {
-			blurEvent = true;
-		}}
-	/>
-	{#if useSearch}
-		<button
-			class="search-icon glass"
-			on:click={() => {
-				value = internalValue;
+	<label class="body-2" for={name}>{label || name}</label>
+	<div class="controls-wrapper">
+		<input
+			class="body-2"
+			id={name}
+			bind:value={internalValue}
+			on:blur={() => {
+				blurEvent = true;
 			}}
-		>
-			<Magnify size={32} />
-		</button>
-	{/if}
+		/>
+		{#if useSearch}
+			<Button
+				on:click={() => {
+					value = internalValue;
+				}}
+				leadIcon="Search"
+			/>
+		{/if}
+	</div>
 </div>
 
 <style lang="scss">
@@ -60,7 +61,6 @@
 			margin-bottom: $s2;
 		}
 		input {
-			font-size: 20px;
 			min-height: $s6;
 			max-height: $s6;
 			background: $c-base;
@@ -68,30 +68,12 @@
 			color: $c-accent;
 			padding: 0 $s3;
 			border-radius: $s2;
+			flex: 1 1;
 		}
 
-		.search-icon {
+		.controls-wrapper {
 			display: flex;
-			justify-content: center;
-			align-items: center;
-			color: $c-primary;
-			position: absolute;
-			right: 0;
-			bottom: 0;
-			border: none;
-			height: $s6;
-			width: $s6;
-			border-left: $c-primary solid $lw;
-			border-top-right-radius: $s2;
-			border-bottom-right-radius: $s2;
-			background: none;
-			transition: 300ms;
-
-			&:hover,
-			&:focus {
-				color: $c-base;
-				background: $c-accent;
-			}
+			gap: $s3;
 		}
 	}
 </style>

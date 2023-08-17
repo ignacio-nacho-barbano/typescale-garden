@@ -11,7 +11,7 @@
 				? desktopSize
 				: mobileSize}px;  line-height: {viewing === 'desktop' ? desktopLine : mobileLine}px;"
 			><span>Ab</span>
-			<span class="very-small weight-ref">{weight}</span>
+			<span class="tooltip weight-ref">{weight}</span>
 			<div class="line-height-ref" />
 		</span>
 	{/each}
