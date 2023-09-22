@@ -28,25 +28,25 @@ describe('tpyographyc scale config', () => {
 		expect(get(distributedWeights).at(-1)!).toBe(get(distributedWeights)[0]);
 	});
 
-	test('The weight distributions are correct for an descending set of values', () => {
+	test('The weight distributions are correct for an descending range', () => {
 		fontName.set('Roboto');
-		headingsInitialWeight.set(800);
+		headingsInitialWeight.set(900);
 		headingsFinalWeight.set(400);
 		expect(get(distributedWeights).at(-1)!).toBeGreaterThan(get(distributedWeights)[0]);
 		get(distributedWeights).forEach((weight) => {
-			expect(weight).toSatisfy((val: number) => expectedRange(val, 400, 800));
+			expect(weight).toSatisfy((val: number) => expectedRange(val, 400, 900));
 		});
 	});
 
 	test('The weight initial assiged weight is ussed', () => {
 		fontName.set('Roboto');
-		headingsInitialWeight.set(800);
+		headingsInitialWeight.set(900);
 		headingsFinalWeight.set(400);
-		expect(get(headingsInitialWeight)).toEqual(800);
+		expect(get(headingsInitialWeight)).toEqual(900);
 	});
 	test('The weight final assiged weight is ussed', () => {
 		fontName.set('Roboto');
-		headingsInitialWeight.set(800);
+		headingsInitialWeight.set(900);
 		headingsFinalWeight.set(400);
 		expect(get(headingsFinalWeight)).toEqual(400);
 	});

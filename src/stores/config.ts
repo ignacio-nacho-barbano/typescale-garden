@@ -1,7 +1,7 @@
 import { derived, writable, type Readable, type Writable } from 'svelte/store';
 import type { ApiFont, TypeVariant } from '../models';
 import { mockFontsApi } from '../constants/mockFontsApi';
-import { calculateDistributeWeights, generateCss } from '../functions';
+import { calculateDistributeWeights, expectedRange, generateCss } from '../functions';
 
 export interface ConfigOptions {
 	breakpoint: number;
@@ -90,16 +90,17 @@ availableWeights.subscribe(($aw) => {
 });
 
 export const weightSteps: Readable<number[]> = derived(
-	[headingsInitialWeight, headingsFinalWeight],
-	([$hiw, $hfw]) => {
+	[headingsInitialWeight, headingsFinalWeight, availableWeights],
+	([$hiw, $hfw, $aw]) => {
 		const ascendingWeight = $hfw >= $hiw;
 		const starting = ascendingWeight ? $hiw : $hfw;
 		const finishing = ascendingWeight ? $hfw : $hiw;
-		const stepsCount = (finishing - starting) / 100 + 1;
 
-		return new Array(stepsCount)
-			.fill(0)
-			.map((_, i) => starting + (ascendingWeight ? 100 : -100) * i);
+		const steps = $aw.filter((weight) => expectedRange(weight, starting, finishing));
+
+		if (ascendingWeight) steps.reverse();
+
+		return steps;
 	}
 );
 
@@ -116,7 +117,6 @@ export const typescale = derived(
 		baseUnit,
 		desktopRatio,
 		mobileRatio,
-		kerningRatio,
 		useUppercaseForTitles,
 		useItallicsForTitles,
 		distributedWeights
@@ -126,18 +126,21 @@ export const typescale = derived(
 		$baseUnit,
 		$desktopRatio,
 		$mobileRatio,
-		$kerningRatio,
 		$useUppercaseForTitles,
 		$useItallicsForTitles,
 		$distributedWeights
 	]) =>
 		variants.map(({ location, name, mapsTo, isHeading }, i) => {
+			const sortedWeights = [...new Set($distributedWeights)]
+				.filter((weight) => weight > 400)
+				.sort()
+				.reverse();
+			sortedWeights[0] = 400;
 			const desktopSizeMultiplier = Math.pow($desktopRatio, location);
 			const mobileSizeMultiplier = Math.pow($mobileRatio, location);
-			// const kerning = parseFloat(
-			// 	(Math.pow($kerningRatio, 8 - Math.abs(location)) * (location > 0 ? -0.05 : 10)).toFixed(2)
-			// );
-			const weight = isHeading ? $distributedWeights[i] : 400;
+			const weight = isHeading
+				? $distributedWeights[i]
+				: sortedWeights.at(location) || sortedWeights[0];
 
 			const lineHeightMultiplier = Math.pow(1.1, 8 - location);
 			const desktopSize = Math.round(($baseSize * desktopSizeMultiplier) / 2) * 2;
@@ -151,11 +154,9 @@ export const typescale = derived(
 				(
 					(desktopSize >= $baseSize ? -0.00005 : -0.00625) * desktopSize +
 					(desktopSize >= $baseSize ? 0.00033 : 0.14) +
-					weight / 360000
+					weight! / 360000
 				).toFixed(3)
 			);
-
-			console.log(desktopSize, $baseSize, `${name}: ${kerning}`);
 
 			return {
 				name,

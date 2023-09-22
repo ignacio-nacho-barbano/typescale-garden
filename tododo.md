@@ -5,3 +5,7 @@
 .handjet
 
 noto Music
+
+Saira Semi Condensed
+
+Space Grotesk
