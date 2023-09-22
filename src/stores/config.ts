@@ -3,6 +3,31 @@ import type { ApiFont, TypeVariant } from '../models';
 import { mockFontsApi } from '../constants/mockFontsApi';
 import { calculateDistributeWeights, generateCss } from '../functions';
 
+export interface ConfigOptions {
+	breakpoint: number;
+	count: number;
+	fontname: string;
+	baseUnit: number;
+	desktopRatio: number;
+	mobileRatio: number;
+	kerningRatio: number;
+	useUppercaseForTitles: boolean;
+	useItallicsForTitles: boolean;
+}
+
+export const preset: Writable<ConfigOptions> = writable({
+	breakpoint: 768,
+	count: 0,
+	fontname: 'Roboto',
+	baseSize: 22,
+	baseUnit: 4,
+	desktopRatio: 1.22,
+	mobileRatio: 1.15,
+	kerningRatio: 0.05,
+	useUppercaseForTitles: false,
+	useItallicsForTitles: false
+});
+
 // constants
 const variants = [
 	{ isHeading: true, location: 7, name: 'heading1', mapsTo: 'h1' },
@@ -28,7 +53,7 @@ export const baseUnit = writable(4);
 export const visibleGrid = writable(false);
 export const desktopRatio = writable(1.22);
 export const mobileRatio = writable(1.15);
-export const kerningRatio = writable(0.05);
+export const kerningRatio = writable(0.5);
 export const useUppercaseForTitles = writable(false);
 export const useItallicsForTitles = writable(false);
 
@@ -48,8 +73,6 @@ export const availableWeights = derived(currentFont, ($currentFont) => {
 	const variants = Array.from(
 		new Set(fontVariants.map((variant) => parseInt(variant)).filter((variant) => variant))
 	);
-
-	console.log({ fontVariants, variants });
 
 	return variants;
 });
@@ -111,9 +134,11 @@ export const typescale = derived(
 		variants.map(({ location, name, mapsTo, isHeading }, i) => {
 			const desktopSizeMultiplier = Math.pow($desktopRatio, location);
 			const mobileSizeMultiplier = Math.pow($mobileRatio, location);
-			const kerning = parseFloat(
-				(Math.pow($kerningRatio, 8 - Math.abs(location)) * (location > 0 ? -0.05 : 10)).toFixed(2)
-			);
+			// const kerning = parseFloat(
+			// 	(Math.pow($kerningRatio, 8 - Math.abs(location)) * (location > 0 ? -0.05 : 10)).toFixed(2)
+			// );
+			const weight = isHeading ? $distributedWeights[i] : 400;
+
 			const lineHeightMultiplier = Math.pow(1.1, 8 - location);
 			const desktopSize = Math.round(($baseSize * desktopSizeMultiplier) / 2) * 2;
 			const mobileSize = Math.round(($baseSize * mobileSizeMultiplier) / 2) * 2;
@@ -122,6 +147,15 @@ export const typescale = derived(
 				$baseUnit;
 			const mobileLine =
 				Math.round((mobileSize * (isHeading ? lineHeightMultiplier : 1.5)) / $baseUnit) * $baseUnit;
+			const kerning = parseFloat(
+				(
+					(desktopSize >= $baseSize ? -0.00005 : -0.00625) * desktopSize +
+					(desktopSize >= $baseSize ? 0.00033 : 0.14) +
+					weight / 360000
+				).toFixed(3)
+			);
+
+			console.log(desktopSize, $baseSize, `${name}: ${kerning}`);
 
 			return {
 				name,
@@ -132,9 +166,9 @@ export const typescale = derived(
 				mobileLine,
 				kerning,
 				mapsTo,
+				weight,
 				uppercase: isHeading ? $useUppercaseForTitles : false,
-				italics: isHeading ? $useItallicsForTitles : false,
-				weight: isHeading ? $distributedWeights[i] : 400
+				italics: isHeading ? $useItallicsForTitles : false
 			} as TypeVariant;
 		})
 );

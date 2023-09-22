@@ -24,7 +24,7 @@
 	<h2 class="heading6">Options</h2>
 
 	<Input name="family" label="Font Family (Google Fonts)" useSearch bind:value={$fontName} />
-	<Input name="base-font" label="Body-1 Font Size (px)" bind:value={$baseSize} />
+	<Input name="base-font" label="Base Font Size (px)" bind:value={$baseSize} />
 	<Input name="visual-size" label="Base Visual Size" bind:value={$baseUnit} />
 	<Input name="desktop-ratio" label="Desktop Sizes Ratio" bind:value={$desktopRatio} />
 	<Input name="mobile-ratio" label="Mobile Sizes Ratio" bind:value={$mobileRatio} />

@@ -8,7 +8,10 @@
 	let tableStyles = '';
 	const unsubscribe = cssCode.subscribe((code) => {
 		tableStyles = code.replace('body', '.how-it-works-page.main-page-section');
-		tableStyles = tableStyles.replace($breakpoint + '', $breakpoint + 360 + '');
+		tableStyles = tableStyles.replaceAll(
+			'(min-width: ' + $breakpoint,
+			'(min-width: ' + ($breakpoint + 380)
+		);
 	});
 
 	onDestroy(unsubscribe);
@@ -18,7 +21,7 @@
 	{@html `<style>
 			${tableStyles}
 		</style>`}
-	<h1 class="heading1 space-text-below">Typescale Grip<br /> a Typescale Creation Tool</h1>
+	<h1 class="heading1 space-text-below">Typescale Drift<br /> a Typescale Creation Tool</h1>
 	<div class="text-and-image space-text-below">
 		<div>
 			<h2>What is a Typescale</h2>
@@ -42,9 +45,9 @@
 			</figcaption>
 		</figure>
 	</div>
-	<h2>What is different about Typescale Grip?</h2>
+	<h2>What is different about Typescale Drift?</h2>
 	<p>
-		Typescale Grip is another tool for generating a typescale based on several relations. It's more
+		Typescale Drift is another tool for generating a typescale based on several relations. It's more
 		configurable than most other tools and it provides the possibilty of generating two sets of
 		related typographic scales, one for phones and other small devices and one for bigger screens.
 	</p>
@@ -106,7 +109,8 @@
 
 	.text-and-image {
 		display: flex;
-		gap: $s5;
+		flex-wrap: wrap;
+		gap: $sd5;
 
 		figure {
 			min-width: 200px;

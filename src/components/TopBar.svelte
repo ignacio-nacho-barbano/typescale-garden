@@ -11,7 +11,7 @@
 
 <div class="top-bar glass">
 	<div class="container">
-		<a href="/" class="logo" aria-label="Home">Typescale Grip</a>
+		<a href="/" class="logo" aria-label="Home">Typescale Drift</a>
 		<Tabs>
 			{#each routes as { name, url, id }, i}
 				<Tab active={$page.route.id === url}>

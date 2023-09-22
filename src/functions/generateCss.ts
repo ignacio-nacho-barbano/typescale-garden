@@ -67,11 +67,11 @@ ${typescale
 	.map(({ name, mapsTo }) => (mapsTo ? `${mapsTo}, .${name} ` : `.${name} `))} {
 		font-style: ${typescale[0].italics ? 'italic' : 'normal'};
 		text-transform: ${typescale[0].uppercase ? 'uppercase' : 'none'};
-		max-width: 50ch;
+		max-width: 768px;
 	}
 
 	p {
-		max-width: 70ch;
+		max-width: 768px;
 	}
 
 ${typescale

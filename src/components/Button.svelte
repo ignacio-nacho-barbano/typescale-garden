@@ -103,6 +103,7 @@
 		}
 
 		&.icon {
+			flex: 0 0 auto;
 			padding: 0;
 			width: $s6;
 		}
