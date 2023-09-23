@@ -29,4 +29,22 @@ export interface TypeVariant {
 	mapsTo?: string;
 }
 
+export interface TypeConfigOptions {
+	breakpoint: number;
+	fontName: string;
+	baseUnit: number;
+	baseSize: number;
+	desktopRatio: number;
+	mobileRatio: number;
+	kerningRatio: number;
+	useUppercaseForTitles: boolean;
+	useItallicsForTitles: boolean;
+	headingsInitialWeight: number;
+	headingsFinalWeight: number;
+}
+
+export interface TypePreset extends TypeConfigOptions {
+	name: string;
+}
+
 export type ApiFont = (typeof mockFontsApi.items)[0];

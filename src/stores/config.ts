@@ -1,32 +1,54 @@
-import { derived, writable, type Readable, type Writable } from 'svelte/store';
-import type { ApiFont, TypeVariant } from '../models';
+import { derived, writable, type Readable, type Writable, get } from 'svelte/store';
+import type { ApiFont, TypePreset, TypeVariant } from '../models';
 import { mockFontsApi } from '../constants/mockFontsApi';
 import { calculateDistributeWeights, expectedRange, generateCss } from '../functions';
+export const presets: TypePreset[] = [
+	{
+		name: 'Typescale Drift',
+		breakpoint: 768,
+		fontName: 'Red Hat Text',
+		baseSize: 22,
+		baseUnit: 4,
+		kerningRatio: 1.5,
+		desktopRatio: 1.2,
+		mobileRatio: 1.15,
+		useUppercaseForTitles: false,
+		useItallicsForTitles: false,
+		headingsInitialWeight: 700,
+		headingsFinalWeight: 500
+	},
+	{
+		name: 'IBM Carbon Design',
+		breakpoint: 768,
+		fontName: 'IBM Plex Sans',
+		baseSize: 16,
+		baseUnit: 4,
+		desktopRatio: 1.29,
+		mobileRatio: 1.15,
+		kerningRatio: 1.2,
+		useUppercaseForTitles: false,
+		useItallicsForTitles: false,
+		headingsInitialWeight: 200,
+		headingsFinalWeight: 400
+	},
+	{
+		name: 'Material Design 2',
+		breakpoint: 768,
+		fontName: 'Roboto',
+		baseSize: 16,
+		baseUnit: 4,
+		desktopRatio: 1.29,
+		mobileRatio: 1.15,
+		kerningRatio: 1.7,
+		useUppercaseForTitles: false,
+		useItallicsForTitles: false,
+		headingsInitialWeight: 200,
+		headingsFinalWeight: 600
+	}
+];
+export const selPresetIndex: Writable<number> = writable(0);
 
-export interface ConfigOptions {
-	breakpoint: number;
-	count: number;
-	fontname: string;
-	baseUnit: number;
-	desktopRatio: number;
-	mobileRatio: number;
-	kerningRatio: number;
-	useUppercaseForTitles: boolean;
-	useItallicsForTitles: boolean;
-}
-
-export const preset: Writable<ConfigOptions> = writable({
-	breakpoint: 768,
-	count: 0,
-	fontname: 'Roboto',
-	baseSize: 22,
-	baseUnit: 4,
-	desktopRatio: 1.22,
-	mobileRatio: 1.15,
-	kerningRatio: 0.05,
-	useUppercaseForTitles: false,
-	useItallicsForTitles: false
-});
+const currentPreset = () => presets[get(selPresetIndex)];
 
 // constants
 const variants = [
@@ -40,22 +62,20 @@ const variants = [
 	{ isHeading: false, location: -1, name: 'body-2', mapsTo: 'label, figcaption, input' },
 	{ isHeading: false, location: -2, name: 'tooltip' }
 ];
-const initialFont: ApiFont =
-	mockFontsApi.items[Math.round(Math.random() * mockFontsApi.items.length)];
+
 // writables
 
-export const breakpoint = writable(768);
-export const count = writable(0);
-export const fontName = writable(initialFont.family);
+export const breakpoint = writable(currentPreset().breakpoint);
+export const fontName = writable(currentPreset().fontName);
 export const seeCode = writable(false);
-export const baseSize = writable(22);
-export const baseUnit = writable(4);
+export const baseSize = writable(currentPreset().baseSize);
+export const baseUnit = writable(currentPreset().baseUnit);
 export const visibleGrid = writable(false);
-export const desktopRatio = writable(1.22);
-export const mobileRatio = writable(1.15);
-export const kerningRatio = writable(0.5);
-export const useUppercaseForTitles = writable(false);
-export const useItallicsForTitles = writable(false);
+export const desktopRatio = writable(currentPreset().desktopRatio);
+export const mobileRatio = writable(currentPreset().mobileRatio);
+export const kerningRatio = writable(currentPreset().kerningRatio);
+export const useUppercaseForTitles = writable(currentPreset().useUppercaseForTitles);
+export const useItallicsForTitles = writable(currentPreset().useItallicsForTitles);
 
 // deriveds
 
@@ -77,16 +97,13 @@ export const availableWeights = derived(currentFont, ($currentFont) => {
 	return variants;
 });
 
-export const headingsInitialWeight = writable(
-	parseInt(initialFont.variants[Math.floor(initialFont.variants.length / 2)])
-);
-export const headingsFinalWeight = writable(
-	parseInt(initialFont.variants.at(-1) || initialFont.variants[0])
-);
+export const headingsInitialWeight = writable(currentPreset().headingsInitialWeight);
+export const headingsFinalWeight = writable(currentPreset().headingsFinalWeight);
 
 availableWeights.subscribe(($aw) => {
-	headingsInitialWeight.set($aw[Math.floor($aw.length / 2)]);
-	headingsFinalWeight.set($aw.at(-1) || $aw[0]);
+	if (!$aw.includes(get(headingsInitialWeight)))
+		headingsInitialWeight.set($aw[Math.floor($aw.length / 2)]);
+	if (!$aw.includes(get(headingsFinalWeight))) headingsFinalWeight.set($aw.at(-1) || $aw[0]);
 });
 
 export const weightSteps: Readable<number[]> = derived(
@@ -117,6 +134,7 @@ export const typescale = derived(
 		baseUnit,
 		desktopRatio,
 		mobileRatio,
+		kerningRatio,
 		useUppercaseForTitles,
 		useItallicsForTitles,
 		distributedWeights
@@ -126,6 +144,7 @@ export const typescale = derived(
 		$baseUnit,
 		$desktopRatio,
 		$mobileRatio,
+		$kerningRatio,
 		$useUppercaseForTitles,
 		$useItallicsForTitles,
 		$distributedWeights
@@ -152,9 +171,10 @@ export const typescale = derived(
 				Math.round((mobileSize * (isHeading ? lineHeightMultiplier : 1.5)) / $baseUnit) * $baseUnit;
 			const kerning = parseFloat(
 				(
-					(desktopSize >= $baseSize ? -0.00005 : -0.00625) * desktopSize +
-					(desktopSize >= $baseSize ? 0.00033 : 0.14) +
-					weight! / 360000
+					$kerningRatio *
+					((desktopSize >= $baseSize ? -0.00005 : -0.00625) * desktopSize +
+						(desktopSize >= $baseSize ? 0.00033 : 0.14) +
+						weight! / 360000)
 				).toFixed(3)
 			);
 
@@ -179,3 +199,11 @@ export const cssCode = derived(
 	([$typescale, $breakpoint, $currentFont, $weightSteps]) =>
 		generateCss($typescale, $breakpoint, $currentFont, $weightSteps)
 );
+
+export const randomFont = () => {
+	const random = mockFontsApi.items[Math.round(Math.random() * mockFontsApi.items.length)];
+
+	fontName.set(random.family);
+};
+
+fontName.subscribe(console.log);

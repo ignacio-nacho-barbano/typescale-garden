@@ -14,7 +14,8 @@
 		kerningRatio,
 		useUppercaseForTitles,
 		useItallicsForTitles,
-		availableWeights
+		availableWeights,
+		randomFont
 	} from '../stores/config';
 	import Button from './Button.svelte';
 	import Select from './Select.svelte';
@@ -22,7 +23,7 @@
 
 <section class="side-bar">
 	<h2 class="heading6">Options</h2>
-
+	<Button on:click={randomFont}>Random Font 🎲</Button>
 	<Input name="family" label="Font Family (Google Fonts)" useSearch bind:value={$fontName} />
 	<Input name="base-font" label="Base Font Size (px)" bind:value={$baseSize} />
 	<Input name="visual-size" label="Base Visual Size" bind:value={$baseUnit} />
@@ -68,7 +69,7 @@
 		</select> -->
 	</fieldset>
 	<Input name="breakpoint" label="Breakpoint (px)" bind:value={$breakpoint} />
-	<Input name="kerning" label="Kerning Ratio" bind:value={$kerningRatio} />
+	<Input name="kerning" label="Kerning Multiplier" bind:value={$kerningRatio} />
 	<Switch name="Uppercase for Titles" bind:value={$useUppercaseForTitles} />
 	<Switch name="Itallics for Titles" bind:value={$useItallicsForTitles} />
 	<Button on:click={() => seeCode.set(!$seeCode)}>{$seeCode ? 'Hide Code' : 'See Code'}</Button>

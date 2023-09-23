@@ -108,13 +108,12 @@
 	}
 
 	.text-and-image {
-		display: flex;
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
 		gap: $sd5;
+		align-items: end;
 
 		figure {
-			min-width: 200px;
-			max-width: 500px;
 			flex: 1 1 auto;
 
 			img {

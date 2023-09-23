@@ -12,6 +12,7 @@
 				: mobileSize}px;  line-height: {viewing === 'desktop' ? desktopLine : mobileLine}px;"
 			><span>Ab</span>
 			<span class="tooltip weight-ref">{weight}</span>
+			<p class="tooltip size-ref">{desktopSize}px {desktopLine}px</p>
 			<div class="line-height-ref" />
 		</span>
 	{/each}
@@ -39,6 +40,12 @@
 		bottom: -1.5em;
 		left: 0;
 		border-left: $lw solid rgba(128, 128, 128, 0.3);
+	}
+
+	.size-ref {
+		position: absolute;
+		left: 0;
+		transform: translateY(100%);
 	}
 
 	.line-height-ref {
