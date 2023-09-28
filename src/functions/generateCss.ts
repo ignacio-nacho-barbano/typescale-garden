@@ -76,12 +76,12 @@ ${typescale
 
 ${typescale
 	.map(
-		({ name, kerning, mobileLine, mobileSize, weight, mapsTo }) => `
+		({ name, letterSpacing, mobileLine, mobileSize, weight, mapsTo }) => `
 ${mapsTo ? `${mapsTo}, .${name}` : `.${name}`} {
     font-size: ${mobileSize}px;
     line-height: ${mobileLine}px;
     font-weight: ${weight};
-    letter-spacing: ${kerning}em;
+    letter-spacing: ${letterSpacing}em;
 }
 `
 	)

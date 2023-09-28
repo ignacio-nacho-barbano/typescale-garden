@@ -12,9 +12,11 @@ const expectedRange = (value: number, from: number, to: number) => value >= from
 describe('tpyographyc scale config', () => {
 	fontName.set('Roboto');
 
-	test('The kerning values fall within the expected ranges', () => {
-		expect(get(typescale)[0].kerning).toSatisfy((val: number) => expectedRange(val, -0.01, 0.06));
-		expect(get(typescale).at(-1)!.kerning).toSatisfy((val: number) =>
+	test('The letterSpacing values fall within the expected ranges', () => {
+		expect(get(typescale)[0].letterSpacing).toSatisfy((val: number) =>
+			expectedRange(val, -0.01, 0.06)
+		);
+		expect(get(typescale).at(-1)!.letterSpacing).toSatisfy((val: number) =>
 			expectedRange(val, -0.01, 0.06)
 		);
 	});

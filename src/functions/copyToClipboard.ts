@@ -1,9 +1,11 @@
-export const copyToClipboard = async (text: string) => {
+import { showNotification } from '../stores/notifications';
+
+export const copyToClipboard = async (text: string, description?: string) => {
 	try {
 		await navigator.clipboard.writeText(text);
-		alert('Text copied to clipboard!');
+		showNotification((description || 'Text') + ' copied to clipboard!');
 	} catch (err) {
 		console.error('Error copying text to clipboard:', err);
-		alert('Failed to copy text to clipboard.');
+		showNotification('Failed to copy text to clipboard.');
 	}
 };

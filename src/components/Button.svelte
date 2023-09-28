@@ -10,7 +10,7 @@
 	export let active: boolean | null = null;
 	export let alt: string | undefined = undefined;
 	export let type: 'primary' | 'outline' | 'ghost' | '' = '';
-	export let size: string = 'm';
+	export let size: 'm' | 's' = 'm';
 	let leadIconComp: typeof Icon;
 	let trailIconComp: typeof Icon;
 	let classes = `glass btn ${size} ${cls} ${type}`;
@@ -75,9 +75,7 @@
 		color: currentColor;
 		border: 2px solid currentColor;
 		display: flex;
-		font-size: 14px;
-		min-height: $s6;
-		max-height: $s6;
+
 		padding: 0 $s5;
 		border-radius: calc($s6 / 2);
 		transition: 0.2s ease-in-out;
@@ -88,6 +86,16 @@
 
 		@media only screen and ($bp-m) {
 			font-size: 16px;
+		}
+
+		&.m {
+			min-height: $s6;
+			max-height: $s6;
+		}
+
+		&.s {
+			min-height: $s5;
+			max-height: $s5;
 		}
 
 		&.secondary {
@@ -105,7 +113,13 @@
 		&.icon {
 			flex: 0 0 auto;
 			padding: 0;
-			width: $s6;
+
+			&.m {
+				width: $s6;
+			}
+			&.s {
+				width: $s5;
+			}
 		}
 
 		&.lead-icon {

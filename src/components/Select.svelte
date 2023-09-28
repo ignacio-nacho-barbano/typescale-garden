@@ -1,9 +1,11 @@
 <script lang="ts">
 	import type { Writable } from 'svelte/store';
 
+	type LabeledValue<T> = { label: string; value: T };
+
 	export let id: string = '';
 	export let value: string | number | Writable<number> | Writable<string> = '';
-	export let options: (typeof value)[];
+	export let options: (typeof value | LabeledValue<typeof value>)[];
 	export let disabled: boolean = false;
 	export let label: string;
 </script>
@@ -12,7 +14,11 @@
 	<label for={id}> {label}</label>
 	<select {id} class="ds-select body-2" bind:value {disabled}>
 		{#each options as option}
-			<option value={option}>{option}</option>
+			{#if typeof option === 'object'}
+				<option value={option.value}>{option.label}</option>
+			{:else}
+				<option value={option}>{option}</option>
+			{/if}
 		{/each}
 	</select>
 </div>

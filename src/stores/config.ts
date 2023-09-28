@@ -1,15 +1,22 @@
 import { derived, writable, type Readable, type Writable, get } from 'svelte/store';
 import type { ApiFont, TypePreset, TypeVariant } from '../models';
 import { mockFontsApi } from '../constants/mockFontsApi';
-import { calculateDistributeWeights, expectedRange, generateCss } from '../functions';
+import {
+	calculateDistributeWeights,
+	expectedRange,
+	generateCss,
+	generateTokens
+} from '../functions';
+
 export const presets: TypePreset[] = [
 	{
-		name: 'Typescale Drift',
+		id: 0,
+		name: 'Typescale Garden',
 		breakpoint: 768,
 		fontName: 'Red Hat Text',
 		baseSize: 22,
 		baseUnit: 4,
-		kerningRatio: 1.5,
+		letterSpacingRatio: 1.5,
 		desktopRatio: 1.2,
 		mobileRatio: 1.15,
 		useUppercaseForTitles: false,
@@ -18,6 +25,7 @@ export const presets: TypePreset[] = [
 		headingsFinalWeight: 500
 	},
 	{
+		id: 1,
 		name: 'IBM Carbon Design',
 		breakpoint: 768,
 		fontName: 'IBM Plex Sans',
@@ -25,13 +33,14 @@ export const presets: TypePreset[] = [
 		baseUnit: 4,
 		desktopRatio: 1.29,
 		mobileRatio: 1.15,
-		kerningRatio: 1.2,
+		letterSpacingRatio: 1.2,
 		useUppercaseForTitles: false,
 		useItallicsForTitles: false,
 		headingsInitialWeight: 200,
 		headingsFinalWeight: 400
 	},
 	{
+		id: 2,
 		name: 'Material Design 2',
 		breakpoint: 768,
 		fontName: 'Roboto',
@@ -39,7 +48,7 @@ export const presets: TypePreset[] = [
 		baseUnit: 4,
 		desktopRatio: 1.29,
 		mobileRatio: 1.15,
-		kerningRatio: 1.7,
+		letterSpacingRatio: 1.7,
 		useUppercaseForTitles: false,
 		useItallicsForTitles: false,
 		headingsInitialWeight: 200,
@@ -73,7 +82,7 @@ export const baseUnit = writable(currentPreset().baseUnit);
 export const visibleGrid = writable(false);
 export const desktopRatio = writable(currentPreset().desktopRatio);
 export const mobileRatio = writable(currentPreset().mobileRatio);
-export const kerningRatio = writable(currentPreset().kerningRatio);
+export const letterSpacingRatio = writable(currentPreset().letterSpacingRatio);
 export const useUppercaseForTitles = writable(currentPreset().useUppercaseForTitles);
 export const useItallicsForTitles = writable(currentPreset().useItallicsForTitles);
 
@@ -134,7 +143,7 @@ export const typescale = derived(
 		baseUnit,
 		desktopRatio,
 		mobileRatio,
-		kerningRatio,
+		letterSpacingRatio,
 		useUppercaseForTitles,
 		useItallicsForTitles,
 		distributedWeights
@@ -144,7 +153,7 @@ export const typescale = derived(
 		$baseUnit,
 		$desktopRatio,
 		$mobileRatio,
-		$kerningRatio,
+		$letterSpacingRatio,
 		$useUppercaseForTitles,
 		$useItallicsForTitles,
 		$distributedWeights
@@ -169,9 +178,9 @@ export const typescale = derived(
 				$baseUnit;
 			const mobileLine =
 				Math.round((mobileSize * (isHeading ? lineHeightMultiplier : 1.5)) / $baseUnit) * $baseUnit;
-			const kerning = parseFloat(
+			const letterSpacing = parseFloat(
 				(
-					$kerningRatio *
+					$letterSpacingRatio *
 					((desktopSize >= $baseSize ? -0.00005 : -0.00625) * desktopSize +
 						(desktopSize >= $baseSize ? 0.00033 : 0.14) +
 						weight! / 360000)
@@ -185,7 +194,7 @@ export const typescale = derived(
 				desktopLine,
 				mobileSize,
 				mobileLine,
-				kerning,
+				letterSpacing,
 				mapsTo,
 				weight,
 				uppercase: isHeading ? $useUppercaseForTitles : false,
@@ -193,6 +202,22 @@ export const typescale = derived(
 			} as TypeVariant;
 		})
 );
+
+selPresetIndex.subscribe((i) => {
+	const p = presets[i];
+
+	fontName.set(p.fontName);
+	breakpoint.set(p.breakpoint);
+	baseSize.set(p.baseSize);
+	baseUnit.set(p.baseUnit);
+	letterSpacingRatio.set(p.letterSpacingRatio);
+	desktopRatio.set(p.desktopRatio);
+	mobileRatio.set(p.mobileRatio);
+	useUppercaseForTitles.set(p.useUppercaseForTitles);
+	useItallicsForTitles.set(p.useItallicsForTitles);
+	headingsInitialWeight.set(p.headingsInitialWeight);
+	headingsFinalWeight.set(p.headingsFinalWeight);
+});
 
 export const cssCode = derived(
 	[typescale, breakpoint, currentFont, weightSteps],
@@ -205,5 +230,11 @@ export const randomFont = () => {
 
 	fontName.set(random.family);
 };
+
+export const designTokens = derived(
+	[typescale, breakpoint, currentFont, weightSteps],
+	([$typescale, $breakpoint, $currentFont, $weightSteps]) =>
+		generateTokens($typescale, $breakpoint, $currentFont, $weightSteps)
+);
 
 fontName.subscribe(console.log);

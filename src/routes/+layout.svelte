@@ -4,9 +4,11 @@
 	import ConfigSidebar from '../components/ConfigSidebar.svelte';
 	import CodeSidebar from '../components/CodeSidebar.svelte';
 	import { baseUnit, visibleGrid } from '../stores/config';
+	import NotificationsProjector from '../components/NotificationsProjector.svelte';
 </script>
 
 <TopBar />
+<NotificationsProjector />
 <div id="global-wrapper">
 	<ConfigSidebar />
 	<main id="main-content">

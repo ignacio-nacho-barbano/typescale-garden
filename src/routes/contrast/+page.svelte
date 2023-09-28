@@ -2,6 +2,8 @@
 	// based on https://dev.to/alvaromontoro/building-your-own-color-contrast-checker-4j7o
 	import Icon from 'svelte-material-icons/Pan.svelte';
 	import Input from '../../components/Input.svelte';
+	import ColorPicker from 'svelte-awesome-color-picker';
+	import type { A11yColor } from 'svelte-awesome-color-picker/type/types';
 	interface RGBColor {
 		r: number;
 		g: number;
@@ -10,8 +12,8 @@
 	interface Palette {
 		accent: string;
 		primary: string;
-		textLightPrimary: string;
-		textLightSecondary: string;
+		textMainLight: string;
+		textSecondaryLight: string;
 		textDarkPrimary?: string;
 		textDarkSecondary?: string;
 		base: string;
@@ -26,8 +28,8 @@
 	interface PaletteData {
 		accent: ColorData;
 		primary: ColorData;
-		textLightPrimary: ColorData;
-		textLightSecondary: ColorData;
+		textMainLight: ColorData;
+		textSecondaryLight: ColorData;
 		textDarkPrimary?: ColorData;
 		textDarkSecondary?: ColorData;
 		base: ColorData;
@@ -53,16 +55,16 @@
 
 	let accent = '#1be0ee';
 	let primary = '#17495e';
-	let textLightPrimary = '#c6e7ec';
-	let textLightSecondary = '#50b2b9';
+	let textMainLight = '#c6e7ec';
+	let textSecondaryLight = '#50b2b9';
 	let textDarkPrimary = '#000538';
 	let base = '#ffffff';
 
 	let appPalette: Palette = {
 		accent,
 		primary,
-		textLightPrimary,
-		textLightSecondary,
+		textMainLight,
+		textSecondaryLight,
 		textDarkPrimary,
 		base
 	};
@@ -70,16 +72,16 @@
 	const assignPalette = ({
 		accent,
 		primary,
-		textLightPrimary,
-		textLightSecondary,
+		textMainLight,
+		textSecondaryLight,
 		textDarkPrimary,
 		base
 	}: Palette) =>
 		(appPalette = {
 			accent,
 			primary,
-			textLightPrimary,
-			textLightSecondary,
+			textMainLight,
+			textSecondaryLight,
 			textDarkPrimary,
 			base
 		});
@@ -87,8 +89,8 @@
 	$: assignPalette({
 		accent,
 		primary,
-		textLightPrimary,
-		textLightSecondary,
+		textMainLight,
+		textSecondaryLight,
 		textDarkPrimary,
 		base
 	});
@@ -96,8 +98,8 @@
 	const newPalette: Palette = {
 		accent: '#1be0ee',
 		primary: '#17495e',
-		textLightPrimary: '#c6e7ec',
-		textLightSecondary: '#50b2b9',
+		textMainLight: '#c6e7ec',
+		textSecondaryLight: '#50b2b9',
 		textDarkPrimary: '#000538',
 		base: '#ffffff'
 	};
@@ -186,31 +188,84 @@
 		},
 		{
 			description: 'primary text color is contrasting enough with the background',
-			...testContrast(appPalette.textLightPrimary, appPalette.base, 5, 7)
+			...testContrast(appPalette.textMainLight, appPalette.base, 5, 7)
 		},
 		{
 			description: 'secondary text color is contrasting enough with the background',
-			...testContrast(appPalette.textLightSecondary, appPalette.base, 5, 7)
+			...testContrast(appPalette.textSecondaryLight, appPalette.base, 5, 7)
 		}
 	];
 	const darkModeChecks: ColorCheck[] = [
 		{
 			description: 'Primary text color is not so light it could produce a halo effect',
-			...testContrast(appPalette.textLightPrimary, appPalette.base, 13, 15)
+			...testContrast(appPalette.textMainLight, appPalette.base, 13, 15)
 		}
 	];
+
+	const getContrastColors = (colorName: keyof Palette): A11yColor[] => {
+		// It's not updating when one changes
+		const allColors: Palette = { accent, primary, textMainLight, textSecondaryLight, base };
+		delete allColors[colorName];
+		const colorNames = Object.keys(allColors);
+		const hexObj = (hex: string, i: number): A11yColor => {
+			const placeholder = colorNames[i];
+			return {
+				hex,
+				placeholder,
+				size: placeholder.includes('text') ? 'normal' : 'large'
+			};
+		};
+
+		return Object.values(allColors).map(hexObj);
+	};
+	let baseThing;
 </script>
 
 <section class="container main-page-section">
 	<h1>Color Tests</h1>
-	<form>
-		<Input name="accent Color" value={accent} />
-		<Input name="primary Color" value={primary} />
-		<Input name="textLightPrimary Color" value={textLightPrimary} />
-		<Input name="textLightSecondary Color" value={textLightSecondary} />
-		<Input name="textDarkPrimary Color" value={textDarkPrimary} />
-		<Input name="base Color" value={base} />
-	</form>
+	<div class="color-pickers-group tooltip">
+		<ColorPicker
+			color={baseThing}
+			hex={base}
+			label="Base color"
+			isTextInput
+			isA11y
+			isA11yOpen
+			a11yColors={getContrastColors('base')}
+		/>
+		<ColorPicker
+			hex={accent}
+			label="Accent"
+			isTextInput
+			isA11y
+			isA11yOpen
+			a11yColors={getContrastColors('accent')}
+		/>
+		<ColorPicker
+			hex={primary}
+			label="Primary"
+			isTextInput
+			isA11y
+			isA11yOpen
+			a11yColors={getContrastColors('primary')}
+		/>
+		<ColorPicker
+			hex={textMainLight}
+			label="Main text"
+			isTextInput
+			isA11y
+			isA11yOpen
+			a11yColors={getContrastColors('textMainLight')}
+		/>
+		<ColorPicker
+			hex={textSecondaryLight}
+			label="Secondary text"
+			isTextInput
+			isA11y
+			isA11yOpen
+			a11yColors={getContrastColors('textSecondaryLight')}
+		/>
+	</div>
 	<h2>General Tests</h2>
 	<ol>
 		{#each checks as { description, state, ratio }}
@@ -234,11 +289,11 @@
 		<p style="color: {appPalette.primary};">
 			primary Color {calculateRatio(appPalette.primary, appPalette.base)}
 		</p>
-		<p style="color: {appPalette.textLightPrimary};">
-			Primary Text {calculateRatio(appPalette.textLightPrimary, appPalette.base)}
+		<p style="color: {appPalette.textMainLight};">
+			Primary Text {calculateRatio(appPalette.textMainLight, appPalette.base)}
 		</p>
-		<p style="color: {appPalette.textLightSecondary};" class="body-2 secondary">
-			Secondary Text {calculateRatio(appPalette.textLightSecondary, appPalette.base)}
+		<p style="color: {appPalette.textSecondaryLight};" class="body-2 secondary">
+			Secondary Text {calculateRatio(appPalette.textSecondaryLight, appPalette.base)}
 		</p>
 		<Icon size="52" color={appPalette.accent} />
 	</div>
@@ -253,11 +308,11 @@
 		<p style="color: {appPalette.primary};">
 			primary Color {calculateRatio(appPalette.primary, appPalette.primary)}
 		</p>
-		<p style="color: {appPalette.textLightPrimary};">
-			Primary Text {calculateRatio(appPalette.textLightPrimary, appPalette.primary)}
+		<p style="color: {appPalette.textMainLight};">
+			Primary Text {calculateRatio(appPalette.textMainLight, appPalette.primary)}
 		</p>
-		<p style="color: {appPalette.textLightSecondary};" class="body-2 secondary">
-			Secondary Text {calculateRatio(appPalette.textLightSecondary, appPalette.primary)}
+		<p style="color: {appPalette.textSecondaryLight};" class="body-2 secondary">
+			Secondary Text {calculateRatio(appPalette.textSecondaryLight, appPalette.primary)}
 		</p>
 		<Icon size="52" color={appPalette.accent} />
 	</div>
@@ -273,11 +328,11 @@
 		<p style="color: {newPalette.primary};">
 			primary Color {calculateRatio(newPalette.primary, newPalette.base)}
 		</p>
-		<p style="color: {newPalette.textLightPrimary};">
-			Primary Text {calculateRatio(newPalette.textLightPrimary, newPalette.base)}
+		<p style="color: {newPalette.textMainLight};">
+			Primary Text {calculateRatio(newPalette.textMainLight, newPalette.base)}
 		</p>
-		<p style="color: {newPalette.textLightSecondary};" class="body-2 secondary">
-			Secondary Text {calculateRatio(newPalette.textLightSecondary, newPalette.base)}
+		<p style="color: {newPalette.textSecondaryLight};" class="body-2 secondary">
+			Secondary Text {calculateRatio(newPalette.textSecondaryLight, newPalette.base)}
 		</p>
 		<Icon size="52" color={newPalette.accent} />
 	</div>
@@ -292,11 +347,11 @@
 		<p style="color: {newPalette.primary};">
 			primary Color {calculateRatio(newPalette.primary, newPalette.primary)}
 		</p>
-		<p style="color: {newPalette.textLightPrimary};">
-			Primary Text {calculateRatio(newPalette.textLightPrimary, newPalette.primary)}
+		<p style="color: {newPalette.textMainLight};">
+			Primary Text {calculateRatio(newPalette.textMainLight, newPalette.primary)}
 		</p>
-		<p style="color: {newPalette.textLightSecondary};" class="body-2 secondary">
-			Secondary Text {calculateRatio(newPalette.textLightSecondary, newPalette.primary)}
+		<p style="color: {newPalette.textSecondaryLight};" class="body-2 secondary">
+			Secondary Text {calculateRatio(newPalette.textSecondaryLight, newPalette.primary)}
 		</p>
 		<Icon size="52" color={newPalette.accent} />
 	</div>
@@ -311,6 +366,13 @@
 		h1,
 		h2 {
 			width: 100%;
+		}
+	}
+
+	.color-pickers-group {
+		:global(*) {
+			color: $c-base;
+			font-size: 12px;
 		}
 	}
 	.test-block {

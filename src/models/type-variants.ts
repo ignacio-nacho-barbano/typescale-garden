@@ -22,7 +22,7 @@ export interface TypeVariant {
 	desktopLine: number;
 	mobileSize: number;
 	mobileLine: number;
-	kerning: number;
+	letterSpacing: number;
 	uppercase: boolean;
 	italics: boolean;
 	weight: number;
@@ -36,7 +36,7 @@ export interface TypeConfigOptions {
 	baseSize: number;
 	desktopRatio: number;
 	mobileRatio: number;
-	kerningRatio: number;
+	letterSpacingRatio: number;
 	useUppercaseForTitles: boolean;
 	useItallicsForTitles: boolean;
 	headingsInitialWeight: number;
@@ -44,6 +44,7 @@ export interface TypeConfigOptions {
 }
 
 export interface TypePreset extends TypeConfigOptions {
+	id: number;
 	name: string;
 }
 

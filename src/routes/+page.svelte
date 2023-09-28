@@ -21,7 +21,7 @@
 	{@html `<style>
 			${tableStyles}
 		</style>`}
-	<h1 class="heading1 space-text-below">Typescale Drift<br /> a Typescale Creation Tool</h1>
+	<h1 class="heading1 space-text-below">Typescale Garden<br /> a Typescale Creation Tool</h1>
 	<div class="text-and-image space-text-below">
 		<div>
 			<h2>What is a Typescale</h2>
@@ -45,10 +45,10 @@
 			</figcaption>
 		</figure>
 	</div>
-	<h2>What is different about Typescale Drift?</h2>
+	<h2>What is different about Typescale Garden?</h2>
 	<p>
-		Typescale Drift is another tool for generating a typescale based on several relations. It's more
-		configurable than most other tools and it provides the possibilty of generating two sets of
+		Typescale Garden is another tool for generating a typescale based on several relations. It's
+		more configurable than most other tools and it provides the possibilty of generating two sets of
 		related typographic scales, one for phones and other small devices and one for bigger screens.
 	</p>
 	<h3>Two Typescales? Why?</h3>

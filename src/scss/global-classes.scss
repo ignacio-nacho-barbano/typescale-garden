@@ -12,6 +12,13 @@
 	padding-bottom: $s8;
 }
 
+.secondary,
+.secondary-light {
+	color: $c-text-2;
+}
+.secondary-light {
+}
+
 .glass {
 	color: $c-text-1;
 	background-color: hsla(187, 50%, 85%, 0.2);

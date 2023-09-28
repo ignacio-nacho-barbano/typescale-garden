@@ -1,14 +1,38 @@
 <script lang="ts">
+	import { json } from '@sveltejs/kit';
 	import { copyToClipboard } from '../functions';
-	import { cssCode, seeCode } from '../stores/config';
+	import { cssCode, designTokens, seeCode } from '../stores/config';
 	import Button from './Button.svelte';
+	import Tab from './Tab.svelte';
+	import Tabs from './Tabs.svelte';
+	type Option = 'CSS' | 'Design Tokens';
+	let currentView: Option = 'CSS';
+	const tabs: Option[] = ['CSS', 'Design Tokens'];
 </script>
 
 <aside class="code-group {$seeCode && 'visible'}">
-	<code class="tooltip">
-		{$cssCode}
-	</code>
-	<Button on:click={() => copyToClipboard($cssCode)} cls="copy-btn">Copy Code!</Button>
+	<Tabs>
+		{#each tabs as tab}
+			<Tab active={currentView === tab}>
+				<button on:click={() => (currentView = tab)}>{tab}</button>
+			</Tab>
+		{/each}
+	</Tabs>
+
+	{#if currentView === tabs[0]}
+		<code class="tooltip">
+			{$cssCode}
+		</code>
+		<Button on:click={() => copyToClipboard($cssCode, 'CSS Code')} cls="copy-btn">Copy Code!</Button
+		>
+	{:else}
+		<code class="tooltip">
+			{$designTokens}
+			<Button on:click={() => copyToClipboard($designTokens, 'Design Tokens')} cls="copy-btn"
+				>Copy Tokens!</Button
+			>
+		</code>
+	{/if}
 </aside>
 
 <style lang="scss">

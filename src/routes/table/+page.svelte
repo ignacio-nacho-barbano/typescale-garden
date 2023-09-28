@@ -48,7 +48,7 @@
 				<CharsChart viewing={currentView.toLowerCase()} />
 				<div class="device {currentView.toLowerCase()}">
 					<ol>
-						{#each $typescale as { mobileSize, desktopSize, desktopLine, mobileLine, weight, kerning, name, isHeading }}
+						{#each $typescale as { mobileSize, desktopSize, desktopLine, mobileLine, weight, letterSpacing, name, isHeading }}
 							<li>
 								<p>
 									{name}
