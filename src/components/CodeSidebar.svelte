@@ -40,11 +40,11 @@
 		z-index: 4;
 		position: fixed;
 		right: 100vw;
-		background: $c-base;
+		background: $c-primary;
 		top: 0;
 		bottom: 0;
 		max-width: 50vw;
-		width: fit-content;
+		width: 50vw;
 		padding: $s6 $s6 $s5 $s5;
 		height: 100vh;
 		overflow: auto;

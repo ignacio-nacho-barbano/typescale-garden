@@ -23,8 +23,8 @@
 	import Select from './Select.svelte';
 </script>
 
-<section class="side-bar">
-	<h2 class="heading6">Options</h2>
+<section class="side-bar glass shadow-high">
+	<h2 class="heading6">Parameters</h2>
 	<Button on:click={randomFont}>Random Font 🎲</Button>
 	<Select
 		label="Preset"
@@ -80,20 +80,31 @@
 	<Input name="letterSpacing" label="letterSpacing Multiplier" bind:value={$letterSpacingRatio} />
 	<Switch name="Uppercase for Titles" bind:value={$useUppercaseForTitles} />
 	<Switch name="Itallics for Titles" bind:value={$useItallicsForTitles} />
-	<Button on:click={() => seeCode.set(!$seeCode)}>{$seeCode ? 'Hide Code' : 'See Code'}</Button>
+	<Button type="primary" cls="see-code" on:click={() => seeCode.set(!$seeCode)}
+		>{$seeCode ? 'Hide Code' : 'See Code'}</Button
+	>
 </section>
 
 <style lang="scss">
 	section.side-bar {
 		min-width: 276px;
 		max-width: 400px;
+		height: calc(100vh - calc(98px + $s4));
+		position: sticky;
+		top: 98px;
 		display: flex;
 		flex-direction: column;
-		top: 0;
 		gap: $s4;
-		padding: $s5 $s5 $s8;
-		border-right: $c-accent $lw solid;
+		padding: $s4 $s5 $s5;
 		overflow: auto;
+		margin-left: $s4;
+		border: solid $lw $c-accent;
+		// background: $c-primary;
+
+		:global(.see-code) {
+			position: sticky;
+			bottom: 0;
+		}
 	}
 
 	fieldset {

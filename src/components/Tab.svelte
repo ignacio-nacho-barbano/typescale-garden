@@ -14,9 +14,7 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		gap: $sd2;
 		background: none;
-		border: solid 1px transparent;
 		position: relative;
 		text-decoration: none;
 		text-transform: capitalize;
@@ -24,37 +22,36 @@
 		height: 100%;
 
 		&.active {
-			color: white;
+			color: $c-text-ml;
 		}
 
 		&::before {
 			position: absolute;
-			bottom: 0;
+			left: $s2;
+			width: $s2;
+			height: $s2;
+			top: calc(50% + 2px);
+			transform: translate(0, -50%);
 			content: '';
 			display: block;
-			height: $s2;
-			border-radius: 50%;
-			transition: 100ms ease-in-out, transform 200ms ease-in-out;
-			transform: translateY(calc(50% - 1px));
+			pointer-events: none;
+			transition: 200ms ease-in-out, transform 200ms ease-in-out;
 		}
 
-		&:hover::before {
+		&:hover::before,
+		&:active::before,
+		&.active::before {
 			background: $c-accent;
-			width: 100%;
-			height: $s2;
+		}
+		&:hover::before {
 		}
 
 		&:active::before {
-			width: 50%;
-			background: $c-accent;
-			height: $s3;
-			bottom: 0;
+			opacity: 0.5;
+			transform: translate(0, -50%) rotateZ(20deg) scale(2);
 		}
 
 		&.active::before {
-			width: 100%;
-			height: $s2;
-			background: $c-accent;
 		}
 		:global(a),
 		:global(button) {

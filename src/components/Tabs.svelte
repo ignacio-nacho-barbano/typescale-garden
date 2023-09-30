@@ -6,24 +6,21 @@
 	import type { Route } from '../models';
 </script>
 
-<nav class="tabs">
+<nav class="tabs glass">
 	<menu>
 		<slot />
 	</menu>
-	<div class="gradient-border" />
+	<!-- <div class="gradient-border" /> -->
 </nav>
 
 <style lang="scss">
 	nav.tabs {
-		backdrop-filter: blur(12px);
 		bottom: 0%;
 		display: flex;
-		background: none;
 		position: relative;
 
 		menu {
 			display: flex;
-			gap: $s3;
 			justify-content: space-around;
 			list-style: none;
 			height: 100%;

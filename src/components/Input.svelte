@@ -67,7 +67,7 @@
 			border: $c-primary solid $lw;
 			color: $c-accent;
 			padding: 0 $s3;
-			border-radius: $s2;
+
 			flex: 1 1;
 		}
 

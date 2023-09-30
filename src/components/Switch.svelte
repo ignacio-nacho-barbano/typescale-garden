@@ -38,7 +38,6 @@
 			transition: 0.4s;
 			overflow: hidden;
 			border: $c-accent solid $lw;
-			border-radius: calc(calc($s5 + 4px) / 2);
 		}
 
 		.slider:before {
@@ -49,7 +48,6 @@
 			left: $s1;
 			top: 50%;
 			transform: translateY(-50%);
-			border-radius: 50%;
 			background-color: $c-primary;
 			transition: 300ms;
 		}

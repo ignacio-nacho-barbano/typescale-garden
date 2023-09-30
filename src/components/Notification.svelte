@@ -14,7 +14,6 @@
 
 <style lang="scss">
 	.notification {
-		border-radius: $s4;
 		border: solid $c-primary $lw;
 		padding: $s4 $s5;
 		position: relative;

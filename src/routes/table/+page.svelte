@@ -116,7 +116,7 @@
 	.device {
 		&.mobile {
 			background: black;
-			border-radius: $s5;
+
 			padding: $s6 0;
 			margin-left: auto;
 			margin-right: auto;
@@ -132,7 +132,7 @@
 				height: $s3;
 				border: gray solid 1px;
 				background: radial-gradient(circle at 75% 25%, transparent, $c-primary);
-				border-radius: 50%;
+
 				transform: translate(-50%, -50%);
 			}
 		}

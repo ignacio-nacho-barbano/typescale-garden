@@ -17,12 +17,29 @@ html {
 	--size-7: 52px;
 	--size-8: 84px;
 	--size-9: 136px;
-	--c-accent: hsl(184, 86%, 52%);
-	--c-primary: hsl(198, 61%, 23%);
-	--c-text-1: hsl(187, 50%, 85%);
-	--c-text-2: hsl(184, 43%, 52%);
-	--c-od-text-1: hsl(235, 100%, 11%);
-	--c-base: hsl(241, 10%, 12%);
+
+	--c-base: #f4f7cb;
+	--c-accent: #09613f;
+	--c-primary: #a2d765;
+	// main light
+	--c-text-ml: #06331a;
+	// secondary light
+	--c-text-sl: #2a594d;
+
+	// test area
+
+	--shadow-color: 65deg 31% 55%;
+	--shadow-elevation-low: 0.1px 0.1px 0.2px hsl(var(--shadow-color) / 0.09),
+		0.6px 0.6px 1.2px -0.4px hsl(var(--shadow-color) / 0.64);
+	--shadow-elevation-medium: 0.1px 0.1px 0.2px hsl(var(--shadow-color) / 0.39),
+		0.6px 0.7px 1.1px -1.1px hsl(var(--shadow-color) / 0.42),
+		2.4px 2.6px 4.1px -2.2px hsl(var(--shadow-color) / 0.45);
+	--shadow-elevation-high: 0.1px 0.1px 0.1px hsl(var(--shadow-color) / 1),
+		0.2px 0.3px 0.3px -1px hsl(var(--shadow-color) / 0.88),
+		1.1px 1.2px 1.2px -2px hsl(var(--shadow-color) / 0.71),
+		3.3px 3.6px 3.7px -3px hsl(var(--shadow-color) / 0.53),
+		7.6px 8.3px 8.4px -4px hsl(var(--shadow-color) / 0.35),
+		14.7px 16.1px 16.4px -5px hsl(var(--shadow-color) / 0.18);
 
 	@media screen and ($bp-m) {
 		--size-1: 4px;
@@ -37,8 +54,13 @@ html {
 	}
 }
 
-$lw: 2px;
+$c-base: var(--c-base);
+$c-accent: var(--c-accent);
+$c-primary: var(--c-primary);
+$c-text-ml: var(--c-text-ml);
+$c-text-sl: var(--c-text-sl);
 
+$lw: 0.5px;
 $s1: 4px;
 $s2: 8px;
 $s3: 12px;
@@ -58,9 +80,12 @@ $sd7: var(--size-7);
 $sd8: var(--size-8);
 $sd9: var(--size-9);
 
-$c-accent: var(--c-accent);
-$c-primary: var(--c-primary);
-$c-text-1: var(--c-text-1);
-$c-text-2: var(--c-text-2);
-$c-base: var(--c-base);
-$c-od-text-1: $c-base;
+@mixin shadow-low {
+	box-shadow: var(--shadow-elevation-low);
+}
+@mixin shadow-mid {
+	box-shadow: var(--shadow-elevation-medium);
+}
+@mixin shadow-high {
+	box-shadow: var(--shadow-elevation-high);
+}

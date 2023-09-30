@@ -14,20 +14,26 @@
 
 .secondary,
 .secondary-light {
-	color: $c-text-2;
+	color: $c-text-sl;
 }
 .secondary-light {
 }
 
 .glass {
-	color: $c-text-1;
-	background-color: hsla(187, 50%, 85%, 0.2);
+	color: $c-text-ml;
+	background-color: transparent;
+	border: solid $lw $c-primary;
 	backdrop-filter: blur(20px);
 }
 
-.shadow-1 {
-	box-shadow: 2px 5px 20px rgba(0, 0, 0, 0.2), -1px 4px 10px rgba(0, 0, 0, 0.2),
-		1px 2px 2px rgba(0, 0, 0, 0.2);
+.shadow-low {
+	@include shadow-low;
+}
+.shadow-mid {
+	@include shadow-mid;
+}
+.shadow-high {
+	@include shadow-high;
 }
 
 .custom-scrollbar {
@@ -46,8 +52,6 @@
 	/* Handle */
 	&::-webkit-scrollbar-thumb {
 		background: $c-primary;
-
-		border-radius: $s2;
 	}
 
 	/* Handle on hover */

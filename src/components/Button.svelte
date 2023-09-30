@@ -13,7 +13,7 @@
 	export let size: 'm' | 's' = 'm';
 	let leadIconComp: typeof Icon;
 	let trailIconComp: typeof Icon;
-	let classes = `glass btn ${size} ${cls} ${type}`;
+	let classes = `glass btn shadow-mid ${size} ${cls} ${type}`;
 	let isExternal = false;
 
 	if (to && !to.startsWith('/') && !to.startsWith('#')) {
@@ -71,18 +71,15 @@
 		position: relative;
 		display: flex;
 		gap: $s2;
-		background: none;
 		color: currentColor;
-		border: 2px solid currentColor;
 		display: flex;
-
+		text-transform: uppercase;
 		padding: 0 $s5;
-		border-radius: calc($s6 / 2);
 		transition: 0.2s ease-in-out;
 		align-items: center;
 		justify-content: center;
 		color: $c-accent;
-		font-family: 'Spline Sans Mono', monospace;
+		font-weight: 700;
 
 		@media only screen and ($bp-m) {
 			font-size: 16px;

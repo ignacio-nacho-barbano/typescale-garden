@@ -21,13 +21,11 @@ a:visited {
 
 body {
 	min-height: 100vh;
-	max-height: 100vh;
 	display: flex;
 	flex-direction: column;
-	color: $c-text-1;
+	color: $c-text-ml;
 	line-height: 1.5;
 	background-color: $c-base;
-	overflow-x: hidden;
 }
 
 legend,

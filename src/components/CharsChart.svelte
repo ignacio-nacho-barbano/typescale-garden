@@ -22,7 +22,7 @@
 	.chars-chart-wrapper {
 		justify-content: center;
 		padding: $s4 $sd5 $s6;
-		border-radius: $s4;
+
 		background-color: $c-primary;
 		display: flex;
 		gap: $s3;

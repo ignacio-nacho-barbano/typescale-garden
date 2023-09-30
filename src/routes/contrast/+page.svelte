@@ -4,6 +4,9 @@
 	import Input from '../../components/Input.svelte';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import type { A11yColor } from 'svelte-awesome-color-picker/type/types';
+	import { getFromLocalStorage, saveInLocalStorage } from '../../functions/localStorage';
+	import { copyToClipboard } from '../../functions';
+	import Button from '../../components/Button.svelte';
 	interface RGBColor {
 		r: number;
 		g: number;
@@ -53,12 +56,32 @@
 			: { r: 255, g: 255, b: 255 };
 	};
 
-	let accent = '#1be0ee';
-	let primary = '#17495e';
-	let textMainLight = '#c6e7ec';
-	let textSecondaryLight = '#50b2b9';
-	let textDarkPrimary = '#000538';
-	let base = '#ffffff';
+	const initialValues = getFromLocalStorage('accent');
+
+	let accent = getFromLocalStorage('accent') || '#1be0ee';
+	let primary = getFromLocalStorage('primary') || '#17495e';
+	let textMainLight = getFromLocalStorage('textMainLight') || '#c6e7ec';
+	let textSecondaryLight = getFromLocalStorage('textSecondaryLight') || '#50b2b9';
+	let textDarkPrimary = getFromLocalStorage('textDarkPrimary') || '#000538';
+	let base = getFromLocalStorage('base') || '#ffffff';
+
+	//test
+
+	$: {
+		saveInLocalStorage('base', base);
+	}
+	$: {
+		saveInLocalStorage('accent', accent);
+	}
+	$: {
+		saveInLocalStorage('primary', primary);
+	}
+	$: {
+		saveInLocalStorage('textMainLight', textMainLight);
+	}
+	$: {
+		saveInLocalStorage('textSecondaryLight', textSecondaryLight);
+	}
 
 	let appPalette: Palette = {
 		accent,
@@ -86,60 +109,6 @@
 			base
 		});
 
-	$: assignPalette({
-		accent,
-		primary,
-		textMainLight,
-		textSecondaryLight,
-		textDarkPrimary,
-		base
-	});
-
-	const newPalette: Palette = {
-		accent: '#1be0ee',
-		primary: '#17495e',
-		textMainLight: '#c6e7ec',
-		textSecondaryLight: '#50b2b9',
-		textDarkPrimary: '#000538',
-		base: '#ffffff'
-	};
-
-	const getRgb = (color: RGBColor | string): RGBColor => {
-		if (typeof color === 'object' && 'r' in color && 'g' in color && 'b' in color) {
-			return color;
-		}
-
-		return hexToRgb(color);
-	};
-
-	const luminance = (color: RGBColor | string) => {
-		const rgb = getRgb(color);
-
-		const a = Object.values(rgb).map((v) => {
-			v /= 255;
-			return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-		});
-		return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
-	};
-
-	const formatContrastRatio = (ratio: number) => `${(1 / ratio).toFixed(2)}: 1`;
-
-	const calculateRatio = (
-		colorA: RGBColor | string,
-		colorB: RGBColor | string,
-		formatted = true
-	) => {
-		const colorALuminance = luminance(colorA);
-		const colorBLuminance = luminance(colorB);
-
-		const ratio =
-			colorALuminance > colorBLuminance
-				? (colorBLuminance + 0.05) / (colorALuminance + 0.05)
-				: (colorALuminance + 0.05) / (colorBLuminance + 0.05);
-
-		return formatted ? formatContrastRatio(ratio) : ratio;
-	};
-
 	enum Test {
 		Error,
 		Warning,
@@ -152,59 +121,40 @@
 		ratio: number;
 	}
 
-	const testContrast = (
-		colorA: RGBColor | string,
-		colorB: RGBColor | string,
-		errorRange: number,
-		passingRange: number
-	): Omit<ColorCheck, 'description'> => {
-		const ratio = calculateRatio(colorA, colorB, false) as number;
-		const ratioAsContrast = parseFloat((1 / ratio).toFixed(2));
-		let state = Test.Warning;
+	// const checks: ColorCheck[] = [
+	// 	{
+	// 		description: 'Accent color is readable over the primary color.',
+	// 		...testContrast(appPalette.accent, appPalette.primary, 3, 7)
+	// 	},
+	// 	{
+	// 		description: 'Accent color is contrasting enough with the background',
+	// 		...testContrast(appPalette.accent, appPalette.base, 7, 9)
+	// 	},
+	// 	{
+	// 		description: 'primary color is contrasting enough with the background',
+	// 		...testContrast(appPalette.primary, appPalette.base, 3, 7)
+	// 	},
+	// 	{
+	// 		description: 'primary text color is contrasting enough with the background',
+	// 		...testContrast(appPalette.textMainLight, appPalette.base, 5, 7)
+	// 	},
+	// 	{
+	// 		description: 'secondary text color is contrasting enough with the background',
+	// 		...testContrast(appPalette.textSecondaryLight, appPalette.base, 5, 7)
+	// 	}
+	// ];
+	// const darkModeChecks: ColorCheck[] = [
+	// 	{
+	// 		description: 'Primary text color is not so light it could produce a halo effect',
+	// 		...testContrast(appPalette.textMainLight, appPalette.base, 13, 15)
+	// 	}
+	// ];
 
-		if (ratioAsContrast <= errorRange) {
-			state = Test.Error;
-		}
+	$: palette = { base, accent, primary, textMainLight, textSecondaryLight };
 
-		if (ratioAsContrast >= passingRange) {
-			state = Test.Passing;
-		}
-
-		return { state, ratio };
-	};
-
-	const checks: ColorCheck[] = [
-		{
-			description: 'Accent color is readable over the primary color.',
-			...testContrast(appPalette.accent, appPalette.primary, 3, 7)
-		},
-		{
-			description: 'Accent color is contrasting enough with the background',
-			...testContrast(appPalette.accent, appPalette.base, 7, 9)
-		},
-		{
-			description: 'primary color is contrasting enough with the background',
-			...testContrast(appPalette.primary, appPalette.base, 3, 7)
-		},
-		{
-			description: 'primary text color is contrasting enough with the background',
-			...testContrast(appPalette.textMainLight, appPalette.base, 5, 7)
-		},
-		{
-			description: 'secondary text color is contrasting enough with the background',
-			...testContrast(appPalette.textSecondaryLight, appPalette.base, 5, 7)
-		}
-	];
-	const darkModeChecks: ColorCheck[] = [
-		{
-			description: 'Primary text color is not so light it could produce a halo effect',
-			...testContrast(appPalette.textMainLight, appPalette.base, 13, 15)
-		}
-	];
-
-	const getContrastColors = (colorName: keyof Palette): A11yColor[] => {
+	const getContrastColors = (colorName: keyof Palette, palette: Palette): A11yColor[] => {
 		// It's not updating when one changes
-		const allColors: Palette = { accent, primary, textMainLight, textSecondaryLight, base };
+		const allColors: Palette = { ...palette };
 		delete allColors[colorName];
 		const colorNames = Object.keys(allColors);
 		const hexObj = (hex: string, i: number): A11yColor => {
@@ -219,6 +169,27 @@
 		return Object.values(allColors).map(hexObj);
 	};
 	let baseThing;
+	const pickerBaseConfig = { isTextInput: true, isA11y: true, isA11yOpen: true, isAlpha: false };
+
+	const copyColors = () => {
+		copyToClipboard(
+			`
+		--c-base: ${base};
+		--c-accent: ${accent};
+		--c-primary: ${primary};
+		--c-text-ml: ${textMainLight};
+		--c-text-sl: ${textSecondaryLight};
+
+		$c-base: var(--c-base);
+		$c-accent: var(--c-accent);
+		$c-primary: var(--c-primary);
+		$c-text-ml: var(--c-text-ml);
+		$c-text-sl: var(--c-text-sl);
+		`,
+			'Colors as CSS variables'
+		);
+	};
+	console.log(baseThing);
 </script>
 
 <section class="container main-page-section">
@@ -226,47 +197,38 @@
 	<div class="color-pickers-group tooltip">
 		<ColorPicker
 			color={baseThing}
-			hex={base}
+			{...pickerBaseConfig}
+			bind:hex={base}
 			label="Base color"
-			isTextInput
-			isA11y
-			isA11yOpen
-			a11yColors={getContrastColors('base')}
+			a11yColors={getContrastColors('base', palette)}
 		/>
 		<ColorPicker
-			hex={accent}
-			label="Accent"
-			isTextInput
-			isA11y
-			isA11yOpen
-			a11yColors={getContrastColors('accent')}
-		/>
-		<ColorPicker
-			hex={primary}
+			{...pickerBaseConfig}
+			bind:hex={primary}
 			label="Primary"
-			isTextInput
-			isA11y
-			isA11yOpen
-			a11yColors={getContrastColors('primary')}
+			a11yColors={getContrastColors('primary', palette)}
 		/>
 		<ColorPicker
-			hex={textMainLight}
+			{...pickerBaseConfig}
+			bind:hex={accent}
+			label="Accent"
+			a11yColors={getContrastColors('accent', palette)}
+		/>
+		<ColorPicker
+			{...pickerBaseConfig}
+			bind:hex={textMainLight}
 			label="Main text"
-			isTextInput
-			isA11y
-			isA11yOpen
-			a11yColors={getContrastColors('textMainLight')}
+			a11yColors={getContrastColors('textMainLight', palette)}
 		/>
 		<ColorPicker
-			hex={textSecondaryLight}
+			{...pickerBaseConfig}
+			bind:hex={textSecondaryLight}
 			label="Secondary text"
-			isTextInput
-			isA11y
-			isA11yOpen
-			a11yColors={getContrastColors('textSecondaryLight')}
+			a11yColors={getContrastColors('textSecondaryLight', palette)}
 		/>
+		<Button on:click={copyColors}>Copy Colors</Button>
 	</div>
-	<h2>General Tests</h2>
+	<!-- <h2>General Tests</h2>
 	<ol>
 		{#each checks as { description, state, ratio }}
 			<li>{description} - {formatContrastRatio(ratio)} - {['❌', '🟨', '✅'][state]}</li>
@@ -277,84 +239,7 @@
 		{#each darkModeChecks as { description, state, ratio }}
 			<li>{description} - {formatContrastRatio(ratio)} - {['✅', '🟨', '❌'][state]}</li>
 		{/each}
-	</ol>
-	<div
-		class="test-block"
-		style="background-color: {appPalette.base}; border-color: {appPalette.accent}"
-	>
-		<h2 class="heading4">Over Background Color</h2>
-		<p style="color: {appPalette.accent};">
-			Accent Color {calculateRatio(appPalette.accent, appPalette.base)}
-		</p>
-		<p style="color: {appPalette.primary};">
-			primary Color {calculateRatio(appPalette.primary, appPalette.base)}
-		</p>
-		<p style="color: {appPalette.textMainLight};">
-			Primary Text {calculateRatio(appPalette.textMainLight, appPalette.base)}
-		</p>
-		<p style="color: {appPalette.textSecondaryLight};" class="body-2 secondary">
-			Secondary Text {calculateRatio(appPalette.textSecondaryLight, appPalette.base)}
-		</p>
-		<Icon size="52" color={appPalette.accent} />
-	</div>
-	<div
-		class="test-block"
-		style="background-color: {appPalette.primary};border-color: {appPalette.accent};"
-	>
-		<h2 class="heading4">Over Primary Color</h2>
-		<p style="color: {appPalette.accent};">
-			Accent Color {calculateRatio(appPalette.accent, appPalette.primary)}
-		</p>
-		<p style="color: {appPalette.primary};">
-			primary Color {calculateRatio(appPalette.primary, appPalette.primary)}
-		</p>
-		<p style="color: {appPalette.textMainLight};">
-			Primary Text {calculateRatio(appPalette.textMainLight, appPalette.primary)}
-		</p>
-		<p style="color: {appPalette.textSecondaryLight};" class="body-2 secondary">
-			Secondary Text {calculateRatio(appPalette.textSecondaryLight, appPalette.primary)}
-		</p>
-		<Icon size="52" color={appPalette.accent} />
-	</div>
-	<h2>New Palette</h2>
-	<div
-		class="test-block"
-		style="background-color: {newPalette.base}; border-color: {newPalette.accent}"
-	>
-		<h2 class="heading4">Over Background Color</h2>
-		<p style="color: {newPalette.accent};">
-			Accent Color {calculateRatio(newPalette.accent, newPalette.base)}
-		</p>
-		<p style="color: {newPalette.primary};">
-			primary Color {calculateRatio(newPalette.primary, newPalette.base)}
-		</p>
-		<p style="color: {newPalette.textMainLight};">
-			Primary Text {calculateRatio(newPalette.textMainLight, newPalette.base)}
-		</p>
-		<p style="color: {newPalette.textSecondaryLight};" class="body-2 secondary">
-			Secondary Text {calculateRatio(newPalette.textSecondaryLight, newPalette.base)}
-		</p>
-		<Icon size="52" color={newPalette.accent} />
-	</div>
-	<div
-		class="test-block"
-		style="background-color: {newPalette.primary};border-color: {newPalette.accent};"
-	>
-		<h2 class="heading4">Over Primary Color</h2>
-		<p style="color: {newPalette.accent};">
-			Accent Color {calculateRatio(newPalette.accent, newPalette.primary)}
-		</p>
-		<p style="color: {newPalette.primary};">
-			primary Color {calculateRatio(newPalette.primary, newPalette.primary)}
-		</p>
-		<p style="color: {newPalette.textMainLight};">
-			Primary Text {calculateRatio(newPalette.textMainLight, newPalette.primary)}
-		</p>
-		<p style="color: {newPalette.textSecondaryLight};" class="body-2 secondary">
-			Secondary Text {calculateRatio(newPalette.textSecondaryLight, newPalette.primary)}
-		</p>
-		<Icon size="52" color={newPalette.accent} />
-	</div>
+	</ol> -->
 </section>
 
 <style lang="scss">
@@ -370,9 +255,19 @@
 	}
 
 	.color-pickers-group {
-		:global(*) {
-			color: $c-base;
+		display: flex;
+		flex-direction: column;
+		gap: $s5;
+		:global(.wrapper *) {
+			color: $c-text-ml;
 			font-size: 12px;
+		}
+
+		:global(div.color) {
+			height: $s6;
+			width: $s6;
+			border-radius: 0;
+			@include shadow-low;
 		}
 	}
 	.test-block {

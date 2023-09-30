@@ -9,39 +9,39 @@
 	import Tab from './Tab.svelte';
 </script>
 
-<div class="top-bar glass">
-	<div class="container">
+<div class="top-bar">
+	<div class="logo-wrapper glass">
 		<a href="/" class="logo" aria-label="Home">Typescale Garden</a>
-		<Tabs>
-			{#each routes as { name, url, id }, i}
-				<Tab active={$page.route.id === url}>
-					<a href={url}>
-						<!-- <svelte:component this={icons[i]} size="20" ariaHidden /> -->{name}
-					</a>
-				</Tab>
-			{/each}
-		</Tabs>
-		<!-- <Button cls="cta" to={getInTouch.url}>{getInTouch.name}</Button> -->
 	</div>
-	<div class="gradient-border" />
+	<Tabs>
+		{#each routes as { name, url, id }, i}
+			<Tab active={$page.route.id === url}>
+				<a href={url}>
+					<!-- <svelte:component this={icons[i]} size="20" ariaHidden /> -->{name}
+				</a>
+			</Tab>
+		{/each}
+	</Tabs>
+	<!-- <Button cls="cta" to={getInTouch.url}>{getInTouch.name}</Button> -->
 </div>
 
 <style lang="scss">
-	.gradient-border {
-		position: absolute;
-		bottom: 1px;
-		opacity: 0.5;
+	.logo-wrapper {
+		margin-right: auto;
+		padding: 0 $s4;
+		display: flex;
+		justify-content: center;
 	}
 	.top-bar {
-		flex: 1 0 auto;
 		z-index: 4;
+		padding: $s4 $sd6;
 		color: var(--green-1);
-		background-color: $c-base;
 		width: 100vw;
+		position: sticky;
+		top: 0;
 		display: flex;
-		flex-direction: column;
-		justify-content: space-evenly;
-		align-items: center;
+		align-items: stretch;
+		grid-template-columns: auto 1fr auto;
 		transition: height 300ms;
 
 		.container {
@@ -50,14 +50,13 @@
 			align-items: center;
 			justify-content: flex-start;
 			align-self: stretch;
-			:global(.cta) {
-				margin-left: auto;
-				display: none;
+		}
 
-				@media ($bp-xl) {
-					display: flex;
-				}
-			}
+		:global(nav.tabs) {
+			width: fit-content;
+
+			// background: $c-primary;
+			@include shadow-mid;
 		}
 
 		a {
@@ -70,7 +69,6 @@
 			&.logo {
 				font-size: 24px;
 				letter-spacing: 0.1em;
-				margin-right: auto;
 			}
 		}
 	}

@@ -38,6 +38,5 @@
 		border: solid $c-primary $lw;
 		padding: 0 $s3;
 		height: $s6;
-		border-radius: $s3;
 	}
 </style>
