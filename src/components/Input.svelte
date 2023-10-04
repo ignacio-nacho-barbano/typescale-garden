@@ -52,6 +52,7 @@
 		min-height: fit-content;
 		max-height: fit-content;
 		width: 100%;
+
 		&:focus-within {
 			.search-icon {
 				color: $c-accent;
@@ -66,6 +67,7 @@
 			background: $c-base;
 			border: $c-primary solid $lw;
 			color: $c-accent;
+			border-radius: $s4;
 			padding: 0 $s3;
 
 			flex: 1 1;

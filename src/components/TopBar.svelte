@@ -9,10 +9,7 @@
 	import Tab from './Tab.svelte';
 </script>
 
-<div class="top-bar">
-	<div class="logo-wrapper glass">
-		<a href="/" class="logo" aria-label="Home">Typescale Garden</a>
-	</div>
+<div class="top-bar glass shadow-mid">
 	<Tabs>
 		{#each routes as { name, url, id }, i}
 			<Tab active={$page.route.id === url}>
@@ -22,54 +19,24 @@
 			</Tab>
 		{/each}
 	</Tabs>
-	<!-- <Button cls="cta" to={getInTouch.url}>{getInTouch.name}</Button> -->
+	<h1 class="logo body-1">Typescale Garden</h1>
 </div>
 
 <style lang="scss">
-	.logo-wrapper {
-		margin-right: auto;
-		padding: 0 $s4;
-		display: flex;
-		justify-content: center;
+	.logo {
+		margin-left: $sd6;
 	}
 	.top-bar {
 		z-index: 4;
-		padding: $s4 $sd6;
+		border-radius: $s4;
+		padding: $s2 $sd5 0;
+		height: $s6;
 		color: var(--green-1);
-		width: 100vw;
+		width: fit-content;
 		position: sticky;
-		top: 0;
+		top: $s4;
+		left: $s5;
+		align-items: baseline;
 		display: flex;
-		align-items: stretch;
-		grid-template-columns: auto 1fr auto;
-		transition: height 300ms;
-
-		.container {
-			display: flex;
-			gap: 12px;
-			align-items: center;
-			justify-content: flex-start;
-			align-self: stretch;
-		}
-
-		:global(nav.tabs) {
-			width: fit-content;
-
-			// background: $c-primary;
-			@include shadow-mid;
-		}
-
-		a {
-			display: flex;
-			justify-content: center;
-			gap: $s2;
-			align-items: center;
-			text-decoration: none;
-
-			&.logo {
-				font-size: 24px;
-				letter-spacing: 0.1em;
-			}
-		}
 	}
 </style>

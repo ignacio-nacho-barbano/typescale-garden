@@ -16,19 +16,43 @@ export const generateTokens = (
 		type: 'fontFamilies'
 	};
 
-	typescale.forEach(({ name, weight, desktopSize, letterSpacing, uppercase, italics }) => {
-		tokens[name] = {
-			type: 'typography',
-			value: {
+	typescale.forEach(
+		({
+			name,
+			weight,
+			desktopSize,
+			desktopLine,
+			mobileSize,
+			mobileLine,
+			letterSpacing,
+			uppercase,
+			italics
+		}) => {
+			const base = {
 				fontFamily: `{fontFamilies.${fontId}}`,
 				fontWeight: weight,
-				fontSize: desktopSize,
 				letterSpacing: letterSpacing * 10 + '%',
 				textCase: uppercase ? 'uppercase' : '',
 				textDecoration: italics ? 'italics' : ''
-			}
-		};
-	});
+			};
+			tokens['desktop/' + name] = {
+				type: 'typography',
+				value: {
+					...base,
+					fontSize: desktopSize,
+					lineHeight: desktopLine
+				}
+			};
+			tokens['mobile/' + name] = {
+				type: 'typography',
+				value: {
+					...base,
+					fontSize: mobileSize,
+					lineHeight: mobileLine
+				}
+			};
+		}
+	);
 	return JSON.stringify(tokens, null, 4);
 };
 

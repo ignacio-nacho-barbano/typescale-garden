@@ -1,12 +1,13 @@
 <script lang="ts">
 	// based on https://dev.to/alvaromontoro/building-your-own-color-contrast-checker-4j7o
 	import Icon from 'svelte-material-icons/Pan.svelte';
-	import Input from '../../components/Input.svelte';
+	import Input from '../Input.svelte';
 	import ColorPicker from 'svelte-awesome-color-picker';
 	import type { A11yColor } from 'svelte-awesome-color-picker/type/types';
 	import { getFromLocalStorage, saveInLocalStorage } from '../../functions/localStorage';
 	import { copyToClipboard } from '../../functions';
-	import Button from '../../components/Button.svelte';
+	import Button from '../Button.svelte';
+	import { testingColors } from '../../stores/app';
 	interface RGBColor {
 		r: number;
 		g: number;
@@ -58,12 +59,12 @@
 
 	const initialValues = getFromLocalStorage('accent');
 
-	let accent = getFromLocalStorage('accent') || '#1be0ee';
-	let primary = getFromLocalStorage('primary') || '#17495e';
-	let textMainLight = getFromLocalStorage('textMainLight') || '#c6e7ec';
-	let textSecondaryLight = getFromLocalStorage('textSecondaryLight') || '#50b2b9';
+	let base = getFromLocalStorage('base') || '#f4f7cb';
+	let accent = getFromLocalStorage('accent') || '#09613f';
+	let primary = getFromLocalStorage('primary') || '#a2d765';
+	let textMainLight = getFromLocalStorage('textMainLight') || '#06331a';
+	let textSecondaryLight = getFromLocalStorage('textSecondaryLight') || '#2a594d';
 	let textDarkPrimary = getFromLocalStorage('textDarkPrimary') || '#000538';
-	let base = getFromLocalStorage('base') || '#ffffff';
 
 	//test
 
@@ -168,10 +169,9 @@
 
 		return Object.values(allColors).map(hexObj);
 	};
-	let baseThing;
 	const pickerBaseConfig = { isTextInput: true, isA11y: true, isA11yOpen: true, isAlpha: false };
 
-	const copyColors = () => {
+	const copyCssColors = () => {
 		copyToClipboard(
 			`
 		--c-base: ${base};
@@ -189,14 +189,23 @@
 			'Colors as CSS variables'
 		);
 	};
-	console.log(baseThing);
+	const copyColorTokens = () => {
+		const colors = { base, accent, primary, textMainLight, textSecondaryLight };
+		const colorTokens: Record<string, Record<string, string>> = {};
+
+		Object.keys(colors).forEach((color) => {
+			colorTokens[color] = {
+				type: 'color',
+				value: colors[color]
+			};
+		});
+		copyToClipboard(JSON.stringify(colorTokens, null, 4), 'Colors as JSON tokens');
+	};
 </script>
 
-<section class="container main-page-section">
-	<h1>Color Tests</h1>
-	<div class="color-pickers-group tooltip">
+<div class="export-block">
+	<div class="color-pickers">
 		<ColorPicker
-			color={baseThing}
 			{...pickerBaseConfig}
 			bind:hex={base}
 			label="Base color"
@@ -226,9 +235,13 @@
 			label="Secondary text"
 			a11yColors={getContrastColors('textSecondaryLight', palette)}
 		/>
-		<Button on:click={copyColors}>Copy Colors</Button>
 	</div>
-	<!-- <h2>General Tests</h2>
+	<Button cls="test-btn" type="primary" on:click={() => testingColors.update((val) => !val)}
+		>Test Colors</Button
+	>
+</div>
+
+<!-- <h2>General Tests</h2>
 	<ol>
 		{#each checks as { description, state, ratio }}
 			<li>{description} - {formatContrastRatio(ratio)} - {['❌', '🟨', '✅'][state]}</li>
@@ -240,24 +253,29 @@
 			<li>{description} - {formatContrastRatio(ratio)} - {['✅', '🟨', '❌'][state]}</li>
 		{/each}
 	</ol> -->
-</section>
 
 <style lang="scss">
-	section {
+	.export-block {
 		display: flex;
-		flex-wrap: wrap;
-		gap: $s5;
+		flex-direction: column;
+		align-items: stretch;
+		flex: 1 1;
 
-		h1,
-		h2 {
-			width: 100%;
+		:global(.test-btn) {
+			margin-top: auto;
 		}
 	}
 
-	.color-pickers-group {
+	.color-pickers {
+		padding: $s5 0;
+		background: gray;
+		border: solid $s3 black;
 		display: flex;
+		border-radius: $s4;
 		flex-direction: column;
+		align-items: flex-start;
 		gap: $s5;
+
 		:global(.wrapper *) {
 			color: $c-text-ml;
 			font-size: 12px;
@@ -269,10 +287,5 @@
 			border-radius: 0;
 			@include shadow-low;
 		}
-	}
-	.test-block {
-		padding: $s4 $s5;
-		border-style: solid;
-		border-width: $lw;
 	}
 </style>

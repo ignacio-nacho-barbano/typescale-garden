@@ -36,6 +36,7 @@
 		background-color: $c-base;
 		color: $c-accent;
 		border: solid $c-primary $lw;
+		border-radius: $s4;
 		padding: 0 $s3;
 		height: $s6;
 	}

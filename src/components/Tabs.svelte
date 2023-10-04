@@ -6,11 +6,10 @@
 	import type { Route } from '../models';
 </script>
 
-<nav class="tabs glass">
+<nav class="tabs">
 	<menu>
 		<slot />
 	</menu>
-	<!-- <div class="gradient-border" /> -->
 </nav>
 
 <style lang="scss">
@@ -25,10 +24,6 @@
 			list-style: none;
 			height: 100%;
 			justify-content: flex-start;
-		}
-		.gradient-border {
-			bottom: 1px;
-			position: absolute;
 		}
 	}
 </style>

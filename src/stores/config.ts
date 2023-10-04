@@ -76,7 +76,6 @@ const variants = [
 
 export const breakpoint = writable(currentPreset().breakpoint);
 export const fontName = writable(currentPreset().fontName);
-export const seeCode = writable(false);
 export const baseSize = writable(currentPreset().baseSize);
 export const baseUnit = writable(currentPreset().baseUnit);
 export const visibleGrid = writable(false);

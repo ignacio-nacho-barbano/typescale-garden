@@ -19,6 +19,14 @@ a:visited {
 	color: $c-accent;
 }
 
+fieldset {
+	border: none;
+	display: flex;
+	flex: 0 1 auto;
+	flex-wrap: wrap;
+	gap: $s4;
+}
+
 body {
 	min-height: 100vh;
 	display: flex;

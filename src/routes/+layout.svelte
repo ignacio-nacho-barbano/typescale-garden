@@ -1,8 +1,8 @@
 <script lang="ts">
 	import '../scss/global.scss';
 	import TopBar from '../components/TopBar.svelte';
-	import ConfigSidebar from '../components/ConfigSidebar.svelte';
-	import CodeSidebar from '../components/CodeSidebar.svelte';
+	import Sidebar from '../components/Sidebar/Sidebar.svelte';
+	import CodeSidebar from '../components/Sidebar/Export.svelte';
 	import { baseUnit, visibleGrid } from '../stores/config';
 	import NotificationsProjector from '../components/NotificationsProjector.svelte';
 </script>
@@ -10,7 +10,7 @@
 <TopBar />
 <NotificationsProjector />
 <div id="global-wrapper">
-	<ConfigSidebar />
+	<Sidebar />
 	<main id="main-content">
 		<div
 			class="grid-overlay"
@@ -21,7 +21,6 @@
 		<slot />
 	</main>
 </div>
-<CodeSidebar />
 
 <!-- <Button
 	cls="floating-cta"

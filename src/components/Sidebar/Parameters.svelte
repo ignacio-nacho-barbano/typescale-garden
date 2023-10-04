@@ -1,31 +1,28 @@
 <script lang="ts">
-	import Input from './Input.svelte';
-	import Switch from './Switch.svelte';
 	import {
+		selPresetIndex,
 		fontName,
-		seeCode,
 		baseSize,
 		baseUnit,
 		desktopRatio,
 		mobileRatio,
-		breakpoint,
-		headingsFinalWeight,
 		headingsInitialWeight,
+		availableWeights,
+		headingsFinalWeight,
+		breakpoint,
 		letterSpacingRatio,
 		useUppercaseForTitles,
 		useItallicsForTitles,
-		availableWeights,
 		randomFont,
-		presets,
-		selPresetIndex
-	} from '../stores/config';
-	import Button from './Button.svelte';
-	import Select from './Select.svelte';
+		presets
+	} from '../../stores/config';
+	import Input from '../Input.svelte';
+	import Button from '../Button.svelte';
+	import Select from '../Select.svelte';
+	import Switch from '../Switch.svelte';
 </script>
 
-<section class="side-bar glass shadow-high">
-	<h2 class="heading6">Parameters</h2>
-	<Button on:click={randomFont}>Random Font 🎲</Button>
+<div class="sidebar-parameters">
 	<Select
 		label="Preset"
 		id="preset"
@@ -80,38 +77,13 @@
 	<Input name="letterSpacing" label="letterSpacing Multiplier" bind:value={$letterSpacingRatio} />
 	<Switch name="Uppercase for Titles" bind:value={$useUppercaseForTitles} />
 	<Switch name="Itallics for Titles" bind:value={$useItallicsForTitles} />
-	<Button type="primary" cls="see-code" on:click={() => seeCode.set(!$seeCode)}
-		>{$seeCode ? 'Hide Code' : 'See Code'}</Button
-	>
-</section>
+	<Button on:click={randomFont}>Random Font 🎲</Button>
+</div>
 
 <style lang="scss">
-	section.side-bar {
-		min-width: 276px;
-		max-width: 400px;
-		height: calc(100vh - calc(98px + $s4));
-		position: sticky;
-		top: 98px;
+	.sidebar-parameters {
 		display: flex;
+		gap: $s4;
 		flex-direction: column;
-		gap: $s4;
-		padding: $s4 $s5 $s5;
-		overflow: auto;
-		margin-left: $s4;
-		border: solid $lw $c-accent;
-		// background: $c-primary;
-
-		:global(.see-code) {
-			position: sticky;
-			bottom: 0;
-		}
-	}
-
-	fieldset {
-		border: none;
-		display: flex;
-		flex: 0 1 auto;
-		flex-wrap: wrap;
-		gap: $s4;
 	}
 </style>

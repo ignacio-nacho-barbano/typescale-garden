@@ -73,6 +73,7 @@
 		gap: $s2;
 		color: currentColor;
 		display: flex;
+		border-radius: 26px;
 		text-transform: uppercase;
 		padding: 0 $s5;
 		transition: 0.2s ease-in-out;
@@ -143,8 +144,9 @@
 		&:hover:not(:active) {
 			background-color: $c-accent;
 			color: $c-base;
+			border-color: transparent;
 			transform: (translate(-2px, -2px));
-			box-shadow: 4px 4px 0 black;
+			@include shadow-high;
 		}
 
 		a {

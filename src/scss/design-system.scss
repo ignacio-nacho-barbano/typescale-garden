@@ -29,12 +29,12 @@ html {
 	// test area
 
 	--shadow-color: 65deg 31% 55%;
-	--shadow-elevation-low: 0.1px 0.1px 0.2px hsl(var(--shadow-color) / 0.09),
+	--shadow-elevation-low: 0.5px 0.5px 2px hsl(var(--shadow-color) / 0.09),
 		0.6px 0.6px 1.2px -0.4px hsl(var(--shadow-color) / 0.64);
-	--shadow-elevation-medium: 0.1px 0.1px 0.2px hsl(var(--shadow-color) / 0.39),
+	--shadow-elevation-medium: 0.5px 0.5px 2px hsl(var(--shadow-color) / 0.39),
 		0.6px 0.7px 1.1px -1.1px hsl(var(--shadow-color) / 0.42),
 		2.4px 2.6px 4.1px -2.2px hsl(var(--shadow-color) / 0.45);
-	--shadow-elevation-high: 0.1px 0.1px 0.1px hsl(var(--shadow-color) / 1),
+	--shadow-elevation-high: 0.5px 0.5px 2px hsl(var(--shadow-color) / 1),
 		0.2px 0.3px 0.3px -1px hsl(var(--shadow-color) / 0.88),
 		1.1px 1.2px 1.2px -2px hsl(var(--shadow-color) / 0.71),
 		3.3px 3.6px 3.7px -3px hsl(var(--shadow-color) / 0.53),
