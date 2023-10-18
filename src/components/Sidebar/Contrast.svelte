@@ -276,6 +276,10 @@
 		align-items: flex-start;
 		gap: $s5;
 
+		:global(> .color-picker) {
+			width: fit-content;
+		}
+
 		:global(.wrapper *) {
 			color: $c-text-ml;
 			font-size: 12px;

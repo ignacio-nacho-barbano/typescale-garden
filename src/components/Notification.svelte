@@ -16,6 +16,7 @@
 	.notification {
 		border: solid $c-primary $lw;
 		padding: $s4 $s5;
+		border-radius: $s4;
 		position: relative;
 
 		:global(.btn.icon.s) {

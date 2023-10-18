@@ -10,11 +10,6 @@ export const routes: Route[] = [
 		name: 'Your Typescale',
 		url: '/table',
 		id: 'typescale'
-	},
-	{
-		name: 'About',
-		url: '/about',
-		id: 'about'
 	}
 ];
 

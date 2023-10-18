@@ -22,7 +22,6 @@
 .glass {
 	color: $c-text-ml;
 	background-color: transparent;
-	border: solid $lw $c-primary;
 	backdrop-filter: blur(20px);
 }
 
@@ -58,11 +57,6 @@
 	&::-webkit-scrollbar-thumb:hover {
 		background: $c-accent;
 	}
-}
-
-.text-container {
-	margin: 0 auto;
-	max-width: 768px;
 }
 
 .container {

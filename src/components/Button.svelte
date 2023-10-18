@@ -9,7 +9,7 @@
 	export let to: string | null = null;
 	export let active: boolean | null = null;
 	export let alt: string | undefined = undefined;
-	export let type: 'primary' | 'outline' | 'ghost' | '' = '';
+	export let type: 'primary' | 'outline' | 'ghost' = 'outline';
 	export let size: 'm' | 's' = 'm';
 	let leadIconComp: typeof Icon;
 	let trailIconComp: typeof Icon;
@@ -81,6 +81,7 @@
 		justify-content: center;
 		color: $c-accent;
 		font-weight: 700;
+		border: none;
 
 		@media only screen and ($bp-m) {
 			font-size: 16px;
@@ -96,7 +97,8 @@
 			max-height: $s5;
 		}
 
-		&.secondary {
+		&.outline {
+			border: $lw solid $c-primary;
 			background: $c-base;
 		}
 
@@ -105,6 +107,7 @@
 		}
 
 		&.primary {
+			border: $lw solid $c-accent;
 			background: linear-gradient(60deg, $c-primary, transparent);
 		}
 

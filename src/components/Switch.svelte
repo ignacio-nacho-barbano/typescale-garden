@@ -28,6 +28,7 @@
 		}
 
 		.slider {
+			border-radius: $s4;
 			height: $s5;
 			position: relative;
 			cursor: pointer;
@@ -41,6 +42,7 @@
 		}
 
 		.slider:before {
+			border-radius: $s4;
 			position: absolute;
 			content: '';
 			height: $s4;

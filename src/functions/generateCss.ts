@@ -62,6 +62,18 @@ h6 + p,
 	margin-bottom: var(--paragraph-space);
 }
 
+p,
+span,
+.body-1,
+.body-2 {
+	&.bold,
+	.bold,
+	b,
+	strong {
+		font-weight: 700;
+	}
+}
+
 ${typescale
 	.filter(({ isHeading }) => isHeading)
 	.map(({ name, mapsTo }) => (mapsTo ? `${mapsTo}, .${name} ` : `.${name} `))} {

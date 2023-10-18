@@ -22,14 +22,27 @@
 	import Select from '../Select.svelte';
 	import Tabs from '../Tabs.svelte';
 	import Tab from '../Tab.svelte';
-	import { secondaryNav } from '../../stores/app';
+	import { accordionStates, secondaryNav } from '../../stores/app';
 	import Parameters from './Parameters.svelte';
 	import Export from './Export.svelte';
 	import Contrast from './Contrast.svelte';
+	import Accordion from '../Accordion.svelte';
 </script>
 
-<section class="side-bar glass shadow-high">
-	<Tabs>
+<section class="side-bar glass">
+	<Accordion bind:open={$accordionStates.parameters}>
+		<span slot="title">Parameters</span>
+		<Parameters slot="content" />
+	</Accordion>
+	<Accordion bind:open={$accordionStates.contrast}>
+		<span slot="title">Contrast</span>
+		<Contrast slot="content" />
+	</Accordion>
+	<Accordion bind:open={$accordionStates.export}>
+		<span slot="title">Export</span>
+		<Export slot="content" />
+	</Accordion>
+	<!-- <Tabs>
 		<Tab active={$secondaryNav === 'parameters'}
 			><button on:click={() => secondaryNav.set('parameters')}>Parameters</button></Tab
 		>
@@ -46,23 +59,22 @@
 		<Contrast />
 	{:else}
 		<Export />
-	{/if}
+	{/if} -->
 </section>
 
 <style lang="scss">
 	section.side-bar {
-		min-width: 276px;
-		height: calc(100vh - calc(98px + $s4));
+		min-width: 256px;
+		max-width: 440px;
+		height: calc(100vh - $s6);
 		position: sticky;
-		top: 98px;
+		top: $s6;
 		display: flex;
 		flex-direction: column;
 		gap: $s4;
-		padding: $s4 $s5 $s5;
+		padding: $s4 0 $s5;
 		overflow: auto;
-		border-radius: $s4;
-		margin-left: $s5;
-		border: solid $lw $c-accent;
+		border-right: solid $lw $c-primary;
 		// background: $c-primary;
 	}
 </style>

@@ -9,7 +9,7 @@
 	import Tab from './Tab.svelte';
 </script>
 
-<div class="top-bar glass shadow-mid">
+<div class="top-bar glass">
 	<Tabs>
 		{#each routes as { name, url, id }, i}
 			<Tab active={$page.route.id === url}>
@@ -19,24 +19,32 @@
 			</Tab>
 		{/each}
 	</Tabs>
-	<h1 class="logo body-1">Typescale Garden</h1>
+	<h1 class="logo body-1">Typescale Garden <span class="tooltip secondary">(beta)</span></h1>
 </div>
 
 <style lang="scss">
 	.logo {
-		margin-left: $sd6;
 	}
 	.top-bar {
 		z-index: 4;
-		border-radius: $s4;
-		padding: $s2 $sd5 0;
+		// border-radius: $s4;
+		padding: $s2 0;
 		height: $s6;
 		color: var(--green-1);
-		width: fit-content;
+		width: auto;
 		position: sticky;
-		top: $s4;
+		border-bottom: solid $lw $c-primary;
 		left: $s5;
-		align-items: baseline;
+		right: $s5;
+		top: 0;
+		justify-content: center;
+		align-items: center;
 		display: flex;
+
+		:global(nav.tabs) {
+			position: absolute;
+			left: $sd5;
+			top: 0;
+		}
 	}
 </style>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { json } from '@sveltejs/kit';
 	import { copyToClipboard } from '../../functions';
 	import { cssCode, designTokens } from '../../stores/config';
 	import Button from '../Button.svelte';
@@ -10,44 +9,33 @@
 	const tabs: Option[] = ['CSS', 'Design Tokens'];
 </script>
 
-<Tabs>
+<!-- <Tabs>
 	{#each tabs as tab}
 		<Tab active={currentView === tab}>
 			<button on:click={() => (currentView = tab)}>{tab}</button>
 		</Tab>
 	{/each}
-</Tabs>
+</Tabs> -->
 
-{#if currentView === tabs[0]}
-	<code class="tooltip">
-		{$cssCode}
-	</code>
-	<Button on:click={() => copyToClipboard($cssCode, 'CSS Code')} cls="copy-btn">Copy Code!</Button>
-{:else}
-	<code class="tooltip">
-		{$designTokens}
-		<Button on:click={() => copyToClipboard($designTokens, 'Design Tokens')} cls="copy-btn"
-			>Copy Tokens!</Button
-		>
-	</code>
-{/if}
+<div class="export-block">
+	<Button>See Tokens</Button>
+	<Button>See Code</Button>
+	<Button type="primary" on:click={() => copyToClipboard($cssCode, 'CSS Code')} cls="copy-btn"
+		>Copy Styles</Button
+	>
+	<Button
+		type="primary"
+		on:click={() => copyToClipboard($designTokens, 'Design Tokens')}
+		cls="copy-btn">Copy Tokens</Button
+	>
+</div>
 
 <style lang="scss">
 	.export-block {
-		z-index: 4;
-		position: fixed;
-		right: 100vw;
-		background: $c-primary;
-		top: 0;
-		bottom: 0;
-		max-width: 50vw;
-		width: 50vw;
-		padding: $s6 $s6 $s5 $s5;
-		height: 100vh;
-		overflow: auto;
-		display: flex;
-		flex-direction: column;
-		border-left: solid 1px $c-accent;
+		display: grid;
+		gap: $s3 $s2;
+		grid-template-columns: auto auto;
+		grid-template-rows: auto auto;
 
 		code {
 			white-space: break-spaces;

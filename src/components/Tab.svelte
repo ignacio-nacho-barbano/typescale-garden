@@ -30,6 +30,7 @@
 			left: $s2;
 			width: $s2;
 			height: $s2;
+			border-radius: 50%;
 			top: calc(50% + 2px);
 			transform: translate(0, -50%);
 			content: '';
