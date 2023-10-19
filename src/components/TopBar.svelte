@@ -1,12 +1,8 @@
 <script lang="ts">
-	import Logo from '../../static/logo.svg';
-	import LogoIso from '../../static/nacho-barbano.svg';
-	import { getInTouch, routes } from '../routes/routes';
-	import Button from './Button.svelte';
-	import Tabs from './Tabs.svelte';
 	import { page } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { routes } from '../routes/routes';
 	import Tab from './Tab.svelte';
+	import Tabs from './Tabs.svelte';
 </script>
 
 <div class="top-bar glass">

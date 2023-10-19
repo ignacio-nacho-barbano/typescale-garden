@@ -3,7 +3,7 @@
 	export let viewing: string;
 </script>
 
-<div class="chars-chart-wrapper">
+<div class="chars-chart-wrapper shadow-mid">
 	{#each $typescale as { weight, name, desktopSize, desktopLine, mobileLine, mobileSize }}
 		<span
 			class={'letter-example ' + name}
@@ -21,12 +21,17 @@
 <style lang="scss">
 	.chars-chart-wrapper {
 		justify-content: center;
-		padding: $s4 $sd5 $s6;
+		padding: $s4 $sd5 $s8;
+		flex: 1 1;
+		border-radius: $s4;
+		min-width: 256px;
 
 		background-color: $c-primary;
 		display: flex;
-		gap: $s3;
+		gap: $sd5;
+		justify-content: space-between;
 		align-items: flex-end;
+		overflow: auto;
 	}
 
 	.letter-example {

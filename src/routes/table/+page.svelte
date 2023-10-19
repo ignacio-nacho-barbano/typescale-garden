@@ -115,23 +115,27 @@
 
 	.device {
 		&.mobile {
+			position: relative;
 			background: black;
-
 			padding: $s6 0;
+			border-radius: $s5;
 			margin-left: auto;
 			margin-right: auto;
 			max-width: 360px;
-			position: relative;
+			color: rgb(203, 203, 203);
+			aspect-ratio: 9/16;
+			overflow: auto;
 
 			&::after {
 				content: '';
 				position: absolute;
 				left: 50%;
 				top: $s5;
+				border-radius: 50%;
 				width: $s3;
 				height: $s3;
 				border: gray solid 1px;
-				background: radial-gradient(circle at 75% 25%, transparent, $c-primary);
+				background: radial-gradient(circle at 75% 25%, transparent, gray);
 
 				transform: translate(-50%, -50%);
 			}
@@ -156,11 +160,18 @@
 		justify-content: center;
 
 		&.mobile {
-			flex-direction: row;
+			flex-direction: column;
+			flex-wrap: wrap;
+			flex: 1 1;
+			align-items: center;
 
 			:global(.chars-chart-wrapper) {
 				order: 1;
 				height: fit-content;
+			}
+
+			@media ($bp-l) {
+				flex-direction: row;
 			}
 		}
 		table {
