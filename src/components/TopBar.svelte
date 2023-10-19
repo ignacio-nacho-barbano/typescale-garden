@@ -27,7 +27,6 @@
 	}
 	.top-bar {
 		z-index: 4;
-		// border-radius: $s4;
 		padding: $s2 0;
 		height: $s6;
 		color: var(--green-1);
@@ -41,10 +40,12 @@
 		align-items: center;
 		display: flex;
 
-		:global(nav.tabs) {
-			position: absolute;
-			left: $sd5;
-			top: 0;
+		@media ($bp-l) {
+			:global(nav.tabs) {
+				position: absolute;
+				left: $sd5;
+				top: 0;
+			}
 		}
 	}
 </style>

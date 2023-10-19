@@ -164,7 +164,7 @@ export const typescale = derived(
 				.reverse();
 			sortedWeights[0] = 400;
 			const desktopSizeMultiplier = Math.pow($desktopRatio, location);
-			const mobileSizeMultiplier = Math.pow($mobileRatio, location);
+			const mobileSizeMultiplier = Math.pow($mobileRatio, location - 1);
 			const weight = isHeading
 				? $distributedWeights[i]
 				: sortedWeights.at(location) || sortedWeights[0];
@@ -185,6 +185,8 @@ export const typescale = derived(
 						weight! / 360000)
 				).toFixed(3)
 			);
+
+			console.log({ name, desktopSize, mobileSize });
 
 			return {
 				name,

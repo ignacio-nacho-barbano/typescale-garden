@@ -18,7 +18,7 @@ export const generateCss = (
 	)}&display=swap');
 
 body {
-	font-size: ${typescale.find(({ name }) => name === 'body-1')?.desktopSize}px;
+	font-size: ${typescale.find(({ name }) => name === 'body-1')?.mobileSize}px;
     font-family: "${font.family}", ${font.category};
 	--paragraph-space: 2rem;
 	--title-space: 1rem;
@@ -62,17 +62,25 @@ h6 + p,
 	margin-bottom: var(--paragraph-space);
 }
 
-p,
-span,
-.body-1,
-.body-2 {
-	&.bold,
-	.bold,
-	b,
-	strong {
+p.bold,
+span.bold,
+.body-1.bold,
+.body-2.bold,
+p .bold,
+span .bold,
+.body-1 .bold,
+.body-2 .bold,
+p strong,
+span strong,
+.body-1 strong,
+.body-2 strong,
+p b,
+span b,
+.body-1 b,
+.body-2 b {
 		font-weight: 700;
 	}
-}
+
 
 ${typescale
 	.filter(({ isHeading }) => isHeading)
@@ -100,6 +108,10 @@ ${mapsTo ? `${mapsTo}, .${name}` : `.${name}`} {
 	.join('')}
     
     @media (min-width: ${breakpoint}px) {
+		body {
+			font-size: ${typescale.find(({ name }) => name === 'body-1')?.desktopSize}px;
+		}
+
         ${typescale
 					.map(
 						({ desktopSize, desktopLine, name, mapsTo }) => `${
