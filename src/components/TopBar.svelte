@@ -36,15 +36,16 @@
 		left: $s5;
 		right: $s5;
 		top: 0;
-		justify-content: center;
+		justify-content: flex-start;
 		align-items: center;
 		display: flex;
 
 		@media ($bp-l) {
-			:global(nav.tabs) {
+			:global(.logo) {
 				position: absolute;
-				left: $sd5;
-				top: 0;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
 			}
 		}
 	}
