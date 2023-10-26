@@ -9,7 +9,7 @@
 
 	let tableStyles = '';
 	const unsubscribe = cssCode.subscribe((code) => {
-		tableStyles = code.replace('body', '.table-page.main-page-section');
+		tableStyles = code.replaceAll('body', '.table-page.main-page-section');
 		tableStyles = tableStyles.replace($breakpoint + '', $breakpoint + 360 + '');
 	});
 	type Option = 'Desktop' | 'Mobile' | 'Both';

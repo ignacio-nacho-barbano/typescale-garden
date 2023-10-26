@@ -7,7 +7,7 @@
 
 	let tableStyles = '';
 	const unsubscribe = cssCode.subscribe((code) => {
-		tableStyles = code.replace('body', '.how-it-works-page.main-page-section');
+		tableStyles = code.replaceAll('body', '.how-it-works-page.main-page-section');
 		tableStyles = tableStyles.replaceAll(
 			'(min-width: ' + $breakpoint,
 			'(min-width: ' + ($breakpoint + 380)
@@ -21,7 +21,8 @@
 	{@html `<style>
 			${tableStyles}
 		</style>`}
-	<h1 class="heading1 space-text-below">Typescale Garden<br /> a Typescale Creation Tool</h1>
+	<span class="eyebrow">Typescale Garden</span>
+	<h1 class="heading1 space-text-below">A Typescale Creation Tool</h1>
 	<div class="text-and-image space-text-below">
 		<div>
 			<h2>What is a Typescale</h2>
@@ -32,8 +33,8 @@
 		</div>
 		<figure>
 			<img src={typescale3d} alt="a nice 3d typography by Alexander Andrews from Unsplash" />
-			<figcaption class="body-2">
-				Foto de <a
+			<figcaption class="tooltip secondary">
+				Picture by <a
 					href="https://unsplash.com/es/@alex_andrews?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
 					>Alexander Andrews</a
 				>

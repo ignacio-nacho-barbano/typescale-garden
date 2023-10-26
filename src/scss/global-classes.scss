@@ -19,6 +19,14 @@
 .secondary-light {
 }
 
+.eyebrow {
+	text-transform: uppercase;
+	background-color: $c-text-sl;
+	color: $c-base;
+	padding: 0 $s2;
+	@extend .tooltip, .secondary;
+}
+
 .glass {
 	color: $c-text-ml;
 	background-color: transparent;
