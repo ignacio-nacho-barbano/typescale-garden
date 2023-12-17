@@ -22,6 +22,7 @@ body {
     font-family: "${font.family}", ${font.category};
 	--paragraph-space: 2rem;
 	--title-space: 1rem;
+	font-weight: ${weights[0]};
 }
 
 .space-text-above,

@@ -235,7 +235,7 @@ export const randomFont = () => {
 export const designTokens = derived(
 	[typescale, breakpoint, currentFont, weightSteps],
 	([$typescale, $breakpoint, $currentFont, $weightSteps]) =>
-		generateTokens($typescale, $breakpoint, $currentFont, $weightSteps)
+		generateTokens($typescale, $breakpoint, $currentFont, [400, ...$weightSteps])
 );
 
 fontName.subscribe(console.log);

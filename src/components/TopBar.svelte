@@ -3,6 +3,7 @@
 	import { routes } from '../routes/routes';
 	import Tab from './Tab.svelte';
 	import Tabs from './Tabs.svelte';
+	import Logo from '../../static/logo.svg';
 </script>
 
 <div class="top-bar glass">
@@ -15,11 +16,22 @@
 			</Tab>
 		{/each}
 	</Tabs>
-	<h1 class="logo body-1">Typescale Garden <span class="tooltip secondary">(beta)</span></h1>
+	<div class="logo-wrapper">
+		<Logo id="logo" aria-hidden />
+		<h1 class="logo body-1">
+			Typescale Garden <span class="tooltip secondary">(beta)</span>
+		</h1>
+	</div>
 </div>
 
 <style lang="scss">
-	.logo {
+	.logo-wrapper {
+		display: flex;
+		gap: $s3;
+	}
+	:global(#logo) {
+		height: $s5;
+		width: fit-content;
 	}
 	.top-bar {
 		z-index: 4;
@@ -37,7 +49,7 @@
 		display: flex;
 
 		@media ($bp-l) {
-			:global(.logo) {
+			:global(.logo-wrapper) {
 				position: absolute;
 				left: 50%;
 				top: 50%;
