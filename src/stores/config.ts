@@ -20,7 +20,7 @@ export const presets: TypePreset[] = [
 		desktopRatio: 1.2,
 		mobileRatio: 1.15,
 		useUppercaseForTitles: false,
-		useItallicsForTitles: false,
+		useItalicsForTitles: false,
 		headingsInitialWeight: 700,
 		headingsFinalWeight: 500
 	},
@@ -35,7 +35,7 @@ export const presets: TypePreset[] = [
 		mobileRatio: 1.15,
 		letterSpacingRatio: 1.2,
 		useUppercaseForTitles: false,
-		useItallicsForTitles: false,
+		useItalicsForTitles: false,
 		headingsInitialWeight: 200,
 		headingsFinalWeight: 400
 	},
@@ -50,7 +50,7 @@ export const presets: TypePreset[] = [
 		mobileRatio: 1.15,
 		letterSpacingRatio: 1.7,
 		useUppercaseForTitles: false,
-		useItallicsForTitles: false,
+		useItalicsForTitles: false,
 		headingsInitialWeight: 200,
 		headingsFinalWeight: 600
 	}
@@ -83,7 +83,7 @@ export const desktopRatio = writable(currentPreset().desktopRatio);
 export const mobileRatio = writable(currentPreset().mobileRatio);
 export const letterSpacingRatio = writable(currentPreset().letterSpacingRatio);
 export const useUppercaseForTitles = writable(currentPreset().useUppercaseForTitles);
-export const useItallicsForTitles = writable(currentPreset().useItallicsForTitles);
+export const useItalicsForTitles = writable(currentPreset().useItalicsForTitles);
 
 // deriveds
 
@@ -144,7 +144,7 @@ export const typescale = derived(
 		mobileRatio,
 		letterSpacingRatio,
 		useUppercaseForTitles,
-		useItallicsForTitles,
+		useItalicsForTitles,
 		distributedWeights
 	],
 	([
@@ -154,7 +154,7 @@ export const typescale = derived(
 		$mobileRatio,
 		$letterSpacingRatio,
 		$useUppercaseForTitles,
-		$useItallicsForTitles,
+		$useItalicsForTitles,
 		$distributedWeights
 	]) =>
 		variants.map(({ location, name, mapsTo, isHeading }, i) => {
@@ -186,8 +186,6 @@ export const typescale = derived(
 				).toFixed(3)
 			);
 
-			console.log({ name, desktopSize, mobileSize });
-
 			return {
 				name,
 				isHeading,
@@ -199,7 +197,7 @@ export const typescale = derived(
 				mapsTo,
 				weight,
 				uppercase: isHeading ? $useUppercaseForTitles : false,
-				italics: isHeading ? $useItallicsForTitles : false
+				italics: isHeading ? $useItalicsForTitles : false
 			} as TypeVariant;
 		})
 );
@@ -215,7 +213,7 @@ selPresetIndex.subscribe((i) => {
 	desktopRatio.set(p.desktopRatio);
 	mobileRatio.set(p.mobileRatio);
 	useUppercaseForTitles.set(p.useUppercaseForTitles);
-	useItallicsForTitles.set(p.useItallicsForTitles);
+	useItalicsForTitles.set(p.useItalicsForTitles);
 	headingsInitialWeight.set(p.headingsInitialWeight);
 	headingsFinalWeight.set(p.headingsFinalWeight);
 });
