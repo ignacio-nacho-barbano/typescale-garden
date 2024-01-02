@@ -13,6 +13,7 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
+		"@figma/plugin-typings": "^1.82.0",
 		"@sveltejs/adapter-auto": "^2.1.1",
 		"@sveltejs/adapter-netlify": "^1.0.5",
 		"@sveltejs/kit": "^1.30.3",

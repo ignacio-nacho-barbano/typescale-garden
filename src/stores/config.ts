@@ -20,7 +20,7 @@ export const presets: TypePreset[] = [
 		desktopRatio: 1.2,
 		mobileRatio: 1.15,
 		useUppercaseForTitles: false,
-		useItalicsForTitles: false,
+		useItallicsForTitles: false,
 		headingsInitialWeight: 700,
 		headingsFinalWeight: 500
 	},
@@ -35,7 +35,7 @@ export const presets: TypePreset[] = [
 		mobileRatio: 1.15,
 		letterSpacingRatio: 1.2,
 		useUppercaseForTitles: false,
-		useItalicsForTitles: false,
+		useItallicsForTitles: false,
 		headingsInitialWeight: 200,
 		headingsFinalWeight: 400
 	},
@@ -50,7 +50,7 @@ export const presets: TypePreset[] = [
 		mobileRatio: 1.15,
 		letterSpacingRatio: 1.7,
 		useUppercaseForTitles: false,
-		useItalicsForTitles: false,
+		useItallicsForTitles: false,
 		headingsInitialWeight: 200,
 		headingsFinalWeight: 600
 	}
@@ -83,7 +83,7 @@ export const desktopRatio = writable(currentPreset().desktopRatio);
 export const mobileRatio = writable(currentPreset().mobileRatio);
 export const letterSpacingRatio = writable(currentPreset().letterSpacingRatio);
 export const useUppercaseForTitles = writable(currentPreset().useUppercaseForTitles);
-export const useItalicsForTitles = writable(currentPreset().useItalicsForTitles);
+export const useItallicsForTitles = writable(currentPreset().useItallicsForTitles);
 
 // deriveds
 
@@ -144,7 +144,7 @@ export const typescale = derived(
 		mobileRatio,
 		letterSpacingRatio,
 		useUppercaseForTitles,
-		useItalicsForTitles,
+		useItallicsForTitles,
 		distributedWeights
 	],
 	([
@@ -154,7 +154,7 @@ export const typescale = derived(
 		$mobileRatio,
 		$letterSpacingRatio,
 		$useUppercaseForTitles,
-		$useItalicsForTitles,
+		$useItallicsForTitles,
 		$distributedWeights
 	]) =>
 		variants.map(({ location, name, mapsTo, isHeading }, i) => {
@@ -199,7 +199,7 @@ export const typescale = derived(
 				mapsTo,
 				weight,
 				uppercase: isHeading ? $useUppercaseForTitles : false,
-				italics: isHeading ? $useItalicsForTitles : false
+				italics: isHeading ? $useItallicsForTitles : false
 			} as TypeVariant;
 		})
 );
@@ -215,7 +215,7 @@ selPresetIndex.subscribe((i) => {
 	desktopRatio.set(p.desktopRatio);
 	mobileRatio.set(p.mobileRatio);
 	useUppercaseForTitles.set(p.useUppercaseForTitles);
-	useItalicsForTitles.set(p.useItalicsForTitles);
+	useItallicsForTitles.set(p.useItallicsForTitles);
 	headingsInitialWeight.set(p.headingsInitialWeight);
 	headingsFinalWeight.set(p.headingsFinalWeight);
 });
@@ -233,15 +233,8 @@ export const randomFont = () => {
 };
 
 export const designTokens = derived(
-	[typescale, breakpoint, currentFont, useItalicsForTitles, useUppercaseForTitles],
-	([$typescale, $breakpoint, $currentFont, $useItalicsForTitles, $useUppercaseForTitles]) =>
-		generateTokens(
-			$typescale,
-			$breakpoint,
-			$currentFont,
-			$useItalicsForTitles,
-			$useUppercaseForTitles
-		)
+	[typescale, breakpoint, currentFont],
+	([$typescale, $breakpoint, $currentFont]) => generateTokens($typescale, $breakpoint, $currentFont)
 );
 
 fontName.subscribe(console.log);

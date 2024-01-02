@@ -1,19 +1,17 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { TypeVariant, ApiFont } from '../models';
 
 export const generateTokens = (
 	typescale: TypeVariant[],
 	breakpoint: number,
-	font: ApiFont,
-	isItalics: boolean,
-	isUppercase: boolean
+	font: ApiFont
 ): string => {
-	const tokens: Record<string, Record<string, any>> = {};
+	const tokens: Record<string, TextStyle> = {};
 
 	typescale.forEach(
 		({
 			name,
 			weight,
-			isHeading,
 			desktopSize,
 			desktopLine,
 			mobileSize,
@@ -22,20 +20,21 @@ export const generateTokens = (
 			uppercase,
 			italics
 		}) => {
-			const base = {
+			const base: Partial<TextStyle> = {
 				type: 'TEXT',
-				fontName: { family: font.family, style: isHeading && isItalics ? 'italics' : 'Regular' },
-				textCase: isHeading && isUppercase ? 'UPPER' : 'ORIGINAL',
-				fontWeight: weight,
-				letterSpacing: { value: letterSpacing * 10, unit: 'PERCENT' },
-				textDecoration: italics ? 'italics' : ''
+				fontName: { family: font.family, style: italics ? 'Italics' : 'Regular' },
+				textCase: uppercase ? 'UPPER' : 'ORIGINAL',
+				// fontWeight: weight,
+				letterSpacing: { value: letterSpacing * 10, unit: 'PERCENT' }
 			};
+			// @ts-ignore
 			tokens['desktop/' + name] = {
 				...base,
 				name: 'desktop/' + name,
 				fontSize: desktopSize,
 				lineHeight: { value: desktopLine, unit: 'PIXELS' }
 			};
+			// @ts-ignore
 			tokens['mobile/' + name] = {
 				...base,
 				name: 'mobile/' + name,
