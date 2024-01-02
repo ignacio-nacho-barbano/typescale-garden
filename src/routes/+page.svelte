@@ -32,7 +32,7 @@
 		</div>
 		<figure>
 			<img
-				src="https://typescale-garden.netlify.app/.netlify/images?url=/images/typescale-3d.jpg&w=800&h=600"
+				src="/.netlify/images?url=/images/typescale-3d.jpg&w=800&h=600"
 				alt="a nice 3d typography by Alexander Andrews from Unsplash"
 			/>
 			<figcaption class="tooltip secondary">
