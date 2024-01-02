@@ -13,30 +13,31 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^2.0.0",
-		"@sveltejs/adapter-netlify": "^1.0.0-next.88",
-		"@sveltejs/kit": "^1.5.0",
-		"@types/rollup-plugin-svelte-svg": "^1.0.3",
-		"@typescript-eslint/eslint-plugin": "^5.45.0",
-		"@typescript-eslint/parser": "^5.45.0",
-		"eslint": "^8.28.0",
-		"eslint-config-prettier": "^8.5.0",
+		"@sveltejs/adapter-auto": "^2.1.1",
+		"@sveltejs/adapter-netlify": "^1.0.5",
+		"@sveltejs/kit": "^1.30.3",
+		"@types/rollup-plugin-svelte-svg": "^1.0.6",
+		"@typescript-eslint/eslint-plugin": "^5.62.0",
+		"@typescript-eslint/parser": "^5.62.0",
+		"eslint": "^8.56.0",
+		"eslint-config-prettier": "^8.10.0",
 		"eslint-plugin-svelte3": "^4.0.0",
-		"prettier": "^2.8.0",
-		"prettier-plugin-svelte": "^2.8.1",
+		"prettier": "^2.8.8",
+		"prettier-plugin-svelte": "^2.10.1",
 		"rollup-plugin-svelte-svg": "^1.0.0-beta.6",
-		"sass": "^1.63.3",
-		"svelte": "^3.54.0",
-		"svelte-awesome-color-picker": "^2.4.7",
-		"svelte-check": "^3.0.1",
-		"tslib": "^2.4.1",
-		"typescript": "^5.0.0",
-		"vite": "^4.2.0",
-		"vite-imagetools": "^5.0.4",
-		"vitest": "^0.25.3"
+		"sass": "^1.69.6",
+		"svelte": "^3.59.2",
+		"svelte-awesome-color-picker": "^2.4.8",
+		"svelte-check": "^3.6.2",
+		"tslib": "^2.6.2",
+		"typescript": "^5.3.3",
+		"vite": "^4.5.1",
+		"vite-imagetools": "^5.1.2",
+		"vitest": "^0.25.8"
 	},
 	"type": "module",
 	"dependencies": {
-		"svelte-material-icons": "^3.0.4"
+		"blurhash": "^2.0.5",
+		"svelte-material-icons": "^3.0.5"
 	}
 }

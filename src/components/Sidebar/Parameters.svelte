@@ -12,7 +12,7 @@
 		breakpoint,
 		letterSpacingRatio,
 		useUppercaseForTitles,
-		useItallicsForTitles,
+		useItalicsForTitles,
 		randomFont,
 		presets
 	} from '../../stores/config';
@@ -76,7 +76,7 @@
 	<Input name="breakpoint" label="Breakpoint (px)" bind:value={$breakpoint} />
 	<Input name="letterSpacing" label="letterSpacing Multiplier" bind:value={$letterSpacingRatio} />
 	<Switch name="Uppercase for Titles" bind:value={$useUppercaseForTitles} />
-	<Switch name="Itallics for Titles" bind:value={$useItallicsForTitles} />
+	<Switch name="Italics for Titles" bind:value={$useItalicsForTitles} />
 	<Button on:click={randomFont}>Random Font 🎲</Button>
 </div>
 

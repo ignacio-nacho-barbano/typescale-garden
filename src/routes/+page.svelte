@@ -3,7 +3,6 @@
 	import { typescale, cssCode, currentFont, breakpoint } from '../stores/config';
 	import { onDestroy } from 'svelte';
 	import { routes } from './routes';
-	import typescale3d from '../../raw-assets/typescale-3d.jpg?w=500&format=webp';
 
 	let tableStyles = '';
 	const unsubscribe = cssCode.subscribe((code) => {
@@ -32,7 +31,10 @@
 			</p>
 		</div>
 		<figure>
-			<img src={typescale3d} alt="a nice 3d typography by Alexander Andrews from Unsplash" />
+			<img
+				src="https://typescale-garden.netlify.app/.netlify/images?url=/images/typescale-3d.jpg&w=800&h=600"
+				alt="a nice 3d typography by Alexander Andrews from Unsplash"
+			/>
 			<figcaption class="tooltip secondary">
 				Picture by <a
 					href="https://unsplash.com/es/@alex_andrews?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"

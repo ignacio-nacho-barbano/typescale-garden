@@ -38,7 +38,7 @@ export interface TypeConfigOptions {
 	mobileRatio: number;
 	letterSpacingRatio: number;
 	useUppercaseForTitles: boolean;
-	useItallicsForTitles: boolean;
+	useItalicsForTitles: boolean;
 	headingsInitialWeight: number;
 	headingsFinalWeight: number;
 }

@@ -12,7 +12,7 @@
 		headingsInitialWeight,
 		letterSpacingRatio,
 		useUppercaseForTitles,
-		useItallicsForTitles,
+		useItalicsForTitles,
 		availableWeights,
 		randomFont,
 		presets,
