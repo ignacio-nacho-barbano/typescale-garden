@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@500;600;700&display=swap');
 
 body {
-	font-size: 22px;
+	font-size: 20px;
 	font-family: 'Red Hat Text', sans-serif;
 	--paragraph-space: 2rem;
 	--title-space: 1rem;
+	font-weight: 500;
 }
 
 .space-text-above,
@@ -87,48 +88,48 @@ p {
 
 h1,
 .heading1 {
-	font-size: 58px;
-	line-height: 64px;
+	font-size: 50px;
+	line-height: 56px;
 	font-weight: 500;
 	letter-spacing: -0.003em;
 }
 
 h2,
 .heading2 {
-	font-size: 50px;
-	line-height: 60px;
+	font-size: 44px;
+	line-height: 52px;
 	font-weight: 500;
 	letter-spacing: -0.002em;
 }
 
 h3,
 .heading3 {
-	font-size: 44px;
-	line-height: 60px;
+	font-size: 38px;
+	line-height: 52px;
 	font-weight: 600;
 	letter-spacing: -0.001em;
 }
 
 h4,
 .heading4 {
-	font-size: 38px;
-	line-height: 56px;
+	font-size: 34px;
+	line-height: 48px;
 	font-weight: 600;
 	letter-spacing: 0em;
 }
 
 h5,
 .heading5 {
-	font-size: 34px;
-	line-height: 56px;
+	font-size: 30px;
+	line-height: 48px;
 	font-weight: 700;
 	letter-spacing: 0.001em;
 }
 
 h6,
 .heading6 {
-	font-size: 30px;
-	line-height: 52px;
+	font-size: 26px;
+	line-height: 48px;
 	font-weight: 700;
 	letter-spacing: 0.001em;
 }
@@ -136,7 +137,7 @@ h6,
 p,
 button,
 .body-1 {
-	font-size: 22px;
+	font-size: 20px;
 	line-height: 32px;
 	font-weight: 400;
 	letter-spacing: 0.001em;
@@ -146,20 +147,24 @@ label,
 figcaption,
 input,
 .body-2 {
-	font-size: 20px;
-	line-height: 32px;
+	font-size: 16px;
+	line-height: 24px;
 	font-weight: 500;
 	letter-spacing: 0.043em;
 }
 
 .tooltip {
-	font-size: 16px;
-	line-height: 24px;
+	font-size: 14px;
+	line-height: 20px;
 	font-weight: 600;
 	letter-spacing: 0.063em;
 }
 
 @media (min-width: 768px) {
+	body {
+		font-size: 22px;
+	}
+
 	h1,
 	.heading1 {
 		font-size: 78px;

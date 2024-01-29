@@ -22,7 +22,7 @@
 	import Select from '../Select.svelte';
 	import Tabs from '../Tabs.svelte';
 	import Tab from '../Tab.svelte';
-	import { accordionStates, secondaryNav } from '../../stores/app';
+	import { accordionStates } from '../../stores/app';
 	import Parameters from './Parameters.svelte';
 	import Export from './Export.svelte';
 	import Contrast from './Contrast.svelte';
@@ -34,32 +34,17 @@
 		<span slot="title">Parameters</span>
 		<Parameters slot="content" />
 	</Accordion>
-	<Accordion bind:open={$accordionStates.contrast}>
-		<span slot="title">Contrast</span>
-		<Contrast slot="content" />
-	</Accordion>
+	<!-- experimental feature, needs development -->
+	{#if false}
+		<Accordion bind:open={$accordionStates.contrast}>
+			<span slot="title">Contrast</span>
+			<Contrast slot="content" />
+		</Accordion>
+	{/if}
 	<Accordion bind:open={$accordionStates.export}>
 		<span slot="title">Export</span>
 		<Export slot="content" />
 	</Accordion>
-	<!-- <Tabs>
-		<Tab active={$secondaryNav === 'parameters'}
-			><button on:click={() => secondaryNav.set('parameters')}>Parameters</button></Tab
-		>
-		<Tab active={$secondaryNav === 'contrast'}
-			><button on:click={() => secondaryNav.set('contrast')}>Contrast</button></Tab
-		>
-		<Tab active={$secondaryNav === 'export'}
-			><button on:click={() => secondaryNav.set('export')}>Export</button></Tab
-		>
-	</Tabs>
-	{#if $secondaryNav === 'parameters'}
-		<Parameters />
-	{:else if $secondaryNav === 'contrast'}
-		<Contrast />
-	{:else}
-		<Export />
-	{/if} -->
 </section>
 
 <style lang="scss">
@@ -75,6 +60,5 @@
 		padding: $s4 0 $s5;
 		overflow: auto;
 		border-right: solid $lw $c-primary;
-		// background: $c-primary;
 	}
 </style>

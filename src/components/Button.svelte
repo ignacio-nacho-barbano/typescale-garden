@@ -3,12 +3,13 @@
 	import type Icon from 'svelte-material-icons/Pan.svelte';
 	import Tooltip from './Tooltip.svelte';
 
+	// add mandatory alt in the future for icon buttons
+	export const alt: string | undefined = undefined;
 	export let leadIcon: string | null = null;
 	export let trailIcon: string | null = null;
 	export let cls: string | null = '';
 	export let to: string | null = null;
 	export let active: boolean | null = null;
-	export let alt: string | undefined = undefined;
 	export let type: 'primary' | 'outline' | 'ghost' = 'outline';
 	export let size: 'm' | 's' = 'm';
 	let leadIconComp: typeof Icon;

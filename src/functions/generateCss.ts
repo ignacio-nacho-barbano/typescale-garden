@@ -6,11 +6,7 @@ export const generateCss = (
 	font: ApiFont,
 	weights: number[]
 ) => {
-	// 	<style>
-	//   @import url('https://fonts.googleapis.com/css2?family=Indie+Flower&family=Roboto:ital,wght@0,700;1,900&display=swap');
-	// </style>
-	return `
-@import url('https://fonts.googleapis.com/css2?family=${font.family.replaceAll(
+	return `@import url('https://fonts.googleapis.com/css2?family=${font.family.replaceAll(
 		' ',
 		'+'
 	)}:wght@${Array.from(new Set(weights.sort((a, b) => (a >= b ? 1 : -1)))).join(

@@ -7,6 +7,17 @@ export const generateTokens = (
 	font: ApiFont
 ): string => {
 	const tokens: Record<string, TextStyle> = {};
+	const weightsMap = {
+		100: 'Thin',
+		200: 'ExtraLight',
+		300: 'Light',
+		400: 'Regular',
+		500: 'Medium',
+		600: 'SemiBold',
+		700: 'Bold',
+		800: 'ExtraBold',
+		900: 'Black'
+	};
 
 	typescale.forEach(
 		({
@@ -22,7 +33,7 @@ export const generateTokens = (
 		}) => {
 			const base: Partial<TextStyle> = {
 				type: 'TEXT',
-				fontName: { family: font.family, style: italics ? 'Italics' : 'Regular' },
+				fontName: { family: font.family, style: weightsMap[weight] + (italics ? ' Italic' : '') },
 				textCase: uppercase ? 'UPPER' : 'ORIGINAL',
 				// fontWeight: weight,
 				letterSpacing: { value: letterSpacing * 10, unit: 'PERCENT' }

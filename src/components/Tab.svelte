@@ -1,10 +1,13 @@
 <script lang="ts">
 	export let active = false;
+	export let click: ((e: Event) => void) | undefined = undefined;
 </script>
 
 <div class="tab body-2" class:active>
 	<li>
-		<slot />
+		<button on:click={click}>
+			<slot />
+		</button>
 	</li>
 </div>
 
