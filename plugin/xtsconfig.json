@@ -1,9 +1,0 @@
-// should not be in use
-{
-  "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["ES2023"],
-    "strict": true,
-    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
-  }
-}

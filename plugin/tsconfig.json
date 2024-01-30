@@ -1,0 +1,9 @@
+{
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"target": "ESNext",
+		"lib": ["ES2023"],
+		"strict": true
+	}
+}
