@@ -1,44 +1,35 @@
 {
-	"name": "portfolio",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "vite dev --host",
-		"build": "vite build",
-		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"test": "vitest",
-		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
-	},
-	"devDependencies": {
-		"@figma/plugin-typings": "^1.82.0",
-		"@sveltejs/adapter-auto": "^2.1.1",
-		"@sveltejs/adapter-netlify": "^1.0.5",
-		"@sveltejs/kit": "^1.30.3",
-		"@types/rollup-plugin-svelte-svg": "^1.0.6",
-		"@typescript-eslint/eslint-plugin": "^5.62.0",
-		"@typescript-eslint/parser": "^5.62.0",
-		"eslint": "^8.56.0",
-		"eslint-config-prettier": "^8.10.0",
-		"eslint-plugin-svelte3": "^4.0.0",
-		"prettier": "^2.8.8",
-		"prettier-plugin-svelte": "^2.10.1",
-		"rollup-plugin-svelte-svg": "^1.0.0-beta.6",
-		"sass": "^1.69.6",
-		"svelte": "^3.59.2",
-		"svelte-awesome-color-picker": "^2.4.8",
-		"svelte-check": "^3.6.2",
-		"tslib": "^2.6.2",
-		"typescript": "^5.3.3",
-		"vite": "^4.5.1",
-		"vite-imagetools": "^5.1.2",
-		"vitest": "^0.25.8"
-	},
-	"type": "module",
-	"dependencies": {
-		"blurhash": "^2.0.5",
-		"svelte-material-icons": "^3.0.5"
-	}
+  "name": "typescale-garden",
+  "version": "1.0.0",
+  "description": "a monorepo for all of typescale-garden pieces, a project meant to aid designers working on creating typescales as part of a design system",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ignacio-nacho-barbano/typescale-garden.git"
+  },
+  "workspaces": [
+    "./client",
+    "./plugin"
+  ],
+  "keywords": [
+    "svelte",
+    "svelteKit",
+    "node",
+    "plugin",
+    "figma",
+    "design",
+    "typography",
+    "typographic",
+    "scale"
+  ],
+  "author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ignacio-nacho-barbano/typescale-garden/issues"
+  },
+  "homepage": "https://github.com/ignacio-nacho-barbano/typescale-garden#readme"
 }
