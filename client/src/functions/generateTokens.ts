@@ -7,7 +7,7 @@ export const generateTokens = (
 	font: ApiFont
 ): string => {
 	const tokens: Record<string, TextStyle> = {};
-	const weightsMap = {
+	const weightsMap: Record<number, string> = {
 		100: 'Thin',
 		200: 'ExtraLight',
 		300: 'Light',
