@@ -1,22 +1,28 @@
 <script lang="ts">
+	import { toggle_class } from "svelte/internal";
 	import Button from "./Button.svelte";
 
 	export let title = "";
 	export let open = false;
 	let dialog: HTMLDialogElement;
+	let body: HTMLElement;
 
 	$: {
-		if (dialog) {
+		if (dialog && body) {
 			if (open) {
 				dialog.showModal();
+				body.classList.add("dialog-open");
 			} else {
 				dialog.close();
+				body.classList.remove("dialog-open");
 			}
 		}
 	}
 
 	$: {
 		if (dialog) {
+			body = document.body;
+
 			dialog.addEventListener("close", () => {
 				console.log("close event", { open });
 				open = false;
@@ -27,7 +33,7 @@
 
 <dialog bind:this={dialog} class:open class=" modal glass shadow-high">
 	<div class="title-bar">
-		<h1>{title}</h1>
+		<h1 class="heading3">{title}</h1>
 		<Button leadIcon="Close" on:click={() => (open = false)} />
 	</div>
 	<div class="content">
@@ -37,17 +43,15 @@
 
 <style lang="scss">
 	.modal {
-		top: 5vh;
-		bottom: 5vh;
-		right: 5vh;
-		left: 5vh;
-		width: auto;
-		height: auto;
+		margin: auto;
+		height: calc(100vh - 10vh);
 		flex-direction: column;
 		padding: $s5;
 		border-radius: $s5;
 		background-color: $c-base;
 		overflow: hidden;
+		width: calc(100vw - 10vh);
+		max-width: 1000px;
 
 		&.open {
 			display: flex;
@@ -63,11 +67,12 @@
 		display: flex;
 		flex: 1 1;
 		justify-content: space-between;
-		margin-bottom: $s5;
+		margin-bottom: $s4;
+		gap: $s6;
 	}
-
 	.content {
-		position: relative;
-		overflow: auto;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
 	}
 </style>

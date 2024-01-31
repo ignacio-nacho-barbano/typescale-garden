@@ -2,7 +2,7 @@
 </script>
 
 <div class="code-block">
-	<div class="code-wrapper body-2">
+	<div class="code-wrapper tooltip">
 		<code>
 			<slot />
 		</code>
@@ -25,5 +25,6 @@
 	code {
 		white-space: break-spaces;
 		line-break: anywhere;
+		font-weight: 400;
 	}
 </style>

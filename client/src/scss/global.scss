@@ -34,6 +34,10 @@ body {
 	color: $c-text-ml;
 	line-height: 1.5;
 	background-color: $c-base;
+
+	&.dialog-open {
+		overflow: hidden !important;
+	}
 }
 
 legend,

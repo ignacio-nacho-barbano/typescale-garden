@@ -19,7 +19,6 @@ figma.ui.onmessage = async (msg) => {
 			await Promise.all(
 				Array.from(fontsToLoad.values()).map((font) => figma.loadFontAsync(JSON.parse(font)))
 			);
-			// await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
 		} catch (error) {
 			const message = `Unable to load font: ${fontsToLoad}`;
 			figma.notify(message, { error: true });
@@ -44,12 +43,12 @@ figma.ui.onmessage = async (msg) => {
 					}
 				});
 
-				figma.notify("Styles imported! 🌳 😄");
+				figma.notify("Styles imported! ✅");
 			});
 		} catch (error) {
 			const message = "Unable to import styles 🙁";
 			figma.notify(message, { error: true });
-			console.error(message, fonts, error);
+			console.error(message, fontsToLoad, error);
 		}
 	} else if (msg.type === "cancel") {
 		figma.closePlugin();

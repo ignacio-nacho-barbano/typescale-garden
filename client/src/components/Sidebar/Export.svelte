@@ -30,6 +30,10 @@
 
 <Modal bind:open={modalOpen} title="Generated typescale CSS">
 	<div class="modal-content">
+		<p class="body-2">
+			You're almost setup to use your new typescale, you'll need to use this css file in your code,
+			as well as to import the design tokens into Figma trough our plugin.
+		</p>
 		<Tabs
 			><Tab active={activeTab === "css"} click={() => (activeTab = "css")}>{fileNames.css}</Tab><Tab
 				active={activeTab === "json"}
@@ -64,14 +68,26 @@
 
 <style lang="scss">
 	:global(.modal-content) {
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		flex: 1 1;
+
+		p {
+			margin-bottom: $s4;
+		}
+
 		:global(.buttons) {
 			display: flex;
 			gap: $s4;
-			position: sticky !important;
-			bottom: 0;
 			width: fit-content;
 			margin-top: $s5;
 			margin-left: auto;
+		}
+
+		:global(.code-block) {
+			flex: 1 1;
+			overflow: auto;
 		}
 
 		// making it look lit file tabs
