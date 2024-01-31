@@ -10,7 +10,7 @@ This serves as the starting point for the entire process. Utilizing various cont
 
 ## The Plugin
 
-The plugin facilitates the direct importation of the typographic scale into Figma, streamlining the often tedious process of manually creating design tokens.
+The plugin facilitates the direct importation of the typographic scale into Figma, streamlining the often tedious process of manually creating design tokens. You can find it [here](https://www.figma.com/community/plugin/1318298863966194157/typescale-garden-import-tool).
 
 ## The Server (Upcoming)
 

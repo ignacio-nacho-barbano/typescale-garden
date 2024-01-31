@@ -50,19 +50,24 @@
 		<div class="buttons">
 			<Button cls="copy-btn" on:click={onDownload}>Download {activeTab} file</Button>
 			<Button cls="copy-btn" on:click={onCopy}>Copy Styles</Button>
+			<Button
+				cls="copy-btn"
+				to="https://www.figma.com/community/plugin/1318298863966194157/typescale-garden-import-tool"
+				>Use Figma Plugin</Button
+			>
 		</div>
 	</div>
 </Modal>
 
 <div class="export-block">
 	<Button on:click={() => (modalOpen = true)}>See Result</Button>
-	<Button type="primary" on:click={() => copyToClipboard($cssCode, "CSS Code")} cls="copy-btn"
-		>Copy Styles</Button
+	<Button on:click={() => copyToClipboard($cssCode, "CSS Code")} cls="copy-btn">Copy Styles</Button>
+	<Button on:click={() => copyToClipboard($designTokens, "Design Tokens")} cls="copy-btn"
+		>Copy Tokens</Button
 	>
 	<Button
-		type="primary"
-		on:click={() => copyToClipboard($designTokens, "Design Tokens")}
-		cls="copy-btn">Copy Tokens</Button
+		to="https://www.figma.com/community/plugin/1318298863966194157/typescale-garden-import-tool"
+		cls="copy-btn">Use Figma Plugin</Button
 	>
 </div>
 
@@ -119,6 +124,7 @@
 		grid-template-columns: auto auto;
 		grid-template-rows: auto auto;
 
+		:global(button:last-child),
 		:global(button:first-child) {
 			grid-column: span 2;
 		}

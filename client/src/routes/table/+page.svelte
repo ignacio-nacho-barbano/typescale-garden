@@ -62,7 +62,7 @@
 											? desktopLine
 											: mobileLine}px;"
 									>
-										{isHeading ? `Why is it Good to Use TypeDrift?` : lorem}</span
+										{isHeading ? `Why is it Good to Use Typescale Garden?` : lorem}</span
 									>
 								</p>
 							</li>
@@ -80,11 +80,13 @@
 								{name}
 							</td>
 							<td>
-								<span class={name}> {isHeading ? `Why is it Good to Use TypeDrift?` : lorem}</span>
+								<span class={name}>
+									{isHeading ? `Why is it Good to Use Typescale Garden?` : lorem}</span
+								>
 							</td>
 							<td>
 								<span class={name} style="font-size: {mobileSize}px;  line-height: {mobileLine}px;">
-									{isHeading ? `Why is it Good to Use TypeDrift?` : lorem}</span
+									{isHeading ? `Why is it Good to Use Typescale Garden?` : lorem}</span
 								>
 							</td>
 						</tr>
