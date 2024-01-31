@@ -21,8 +21,8 @@
 	{@html `<style>
 			${tableStyles}
 		</style>`}
-	<!-- <span class="eyebrow">Typescale Garden</span> -->
 	<h1 class="heading1 space-text-below">A Typescale Creation Tool</h1>
+
 	<div class="text-and-image space-text-below">
 		<div>
 			<h2>What is a Typescale</h2>
