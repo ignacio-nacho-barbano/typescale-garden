@@ -1,9 +1,13 @@
 {
 	"extends": "../tsconfig.json",
+	"include": ["./code.ts"],
 	"compilerOptions": {
-		"baseUrl": ".",
 		"target": "ESNext",
 		"lib": ["ES2023"],
-		"strict": true
+		"strict": true,
+		"esModuleInterop": true
+	},
+	"typeAcquisition": {
+		"include": ["@types/node"]
 	}
 }

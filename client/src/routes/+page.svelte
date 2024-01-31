@@ -38,7 +38,7 @@
 					href="https://unsplash.com/es/@alex_andrews?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
 					>Alexander Andrews</a
 				>
-				en
+				in
 				<a
 					href="https://unsplash.com/es/fotos/zw07kVDaHPw?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"
 					>Unsplash</a

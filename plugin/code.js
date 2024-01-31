@@ -1,21 +1,23 @@
 "use strict";
-figma.showUI(__html__, { themeColors: true, width: 450, height: 400 });
+figma.showUI(__html__, { themeColors: true, width: 450, height: 500 });
 figma.ui.onmessage = async (msg) => {
     figma.notify("Starting Plugin");
     let currentStyles = figma.getLocalTextStyles();
-    console.log(currentStyles);
     if (msg.type === "import-styles") {
         const jsonStyles = msg.jsonStyles;
-        const fonts = [...new Set(await Object.keys(jsonStyles).map((textName) => jsonStyles[textName]).map(({ fontName }) => fontName))];
-        console.log(fonts);
+        let fontsToLoad = new Set();
+        Object.keys(jsonStyles).forEach((textName) => {
+            const { fontName } = jsonStyles[textName];
+            fontsToLoad.add(JSON.stringify(fontName));
+        });
         try {
-            await fonts;
-            await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+            await Promise.all(Array.from(fontsToLoad.values()).map((font) => figma.loadFontAsync(JSON.parse(font))));
+            // await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
         }
         catch (error) {
-            const message = `Unable to load font: ${fonts}`;
+            const message = `Unable to load font: ${fontsToLoad}`;
             figma.notify(message, { error: true });
-            console.error(message, fonts, error);
+            console.error(message, fontsToLoad, error);
         }
         try {
             Object.keys(jsonStyles).forEach((styleName) => {

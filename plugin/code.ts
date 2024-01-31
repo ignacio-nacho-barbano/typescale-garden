@@ -1,28 +1,29 @@
-figma.showUI(__html__, { themeColors: true, width: 450, height: 400 });
+figma.showUI(__html__, { themeColors: true, width: 450, height: 500 });
 
 figma.ui.onmessage = async (msg) => {
-	figma.notify('Starting Plugin');
+	figma.notify("Starting Plugin");
 	let currentStyles = figma.getLocalTextStyles();
-	console.log(currentStyles);
 
-	if (msg.type === 'import-styles') {
+	if (msg.type === "import-styles") {
 		const jsonStyles = msg.jsonStyles as Record<string, any>;
-		const fonts = [
-			...new Set(
-				await Object.keys(jsonStyles)
-					.map((textName) => jsonStyles[textName])
-					.map(({ fontName }) => fontName)
-			)
-		];
-		console.log(fonts);
+
+		let fontsToLoad = new Set<string>();
+
+		Object.keys(jsonStyles).forEach((textName) => {
+			const { fontName } = jsonStyles[textName];
+
+			fontsToLoad.add(JSON.stringify(fontName));
+		});
 
 		try {
-			await fonts;
-			await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+			await Promise.all(
+				Array.from(fontsToLoad.values()).map((font) => figma.loadFontAsync(JSON.parse(font)))
+			);
+			// await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
 		} catch (error) {
-			const message = `Unable to load font: ${fonts}`;
+			const message = `Unable to load font: ${fontsToLoad}`;
 			figma.notify(message, { error: true });
-			console.error(message, fonts, error);
+			console.error(message, fontsToLoad, error);
 		}
 
 		try {
@@ -36,21 +37,21 @@ figma.ui.onmessage = async (msg) => {
 				}
 
 				Object.keys(styleProps).forEach((property) => {
-					const avoidedProps = ['type', 'fontWeight'];
+					const avoidedProps = ["type", "fontWeight"];
 					if (!avoidedProps.includes(property)) {
 						// @ts-ignore
 						style[property] = styleProps[property];
 					}
 				});
 
-				figma.notify('Styles imported! 🌳 😄');
+				figma.notify("Styles imported! 🌳 😄");
 			});
 		} catch (error) {
-			const message = 'Unable to import styles 🙁';
+			const message = "Unable to import styles 🙁";
 			figma.notify(message, { error: true });
 			console.error(message, fonts, error);
 		}
-	} else if (msg.type === 'cancel') {
+	} else if (msg.type === "cancel") {
 		figma.closePlugin();
 	}
 };
