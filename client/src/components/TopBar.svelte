@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { routes } from '../routes/routes';
-	import Tab from './Tab.svelte';
-	import Tabs from './Tabs.svelte';
-	import Logo from '../../static/logo.svg';
+	import { page } from "$app/stores";
+	import { routes } from "../routes/routes";
+	import Tab from "./Tab.svelte";
+	import Tabs from "./Tabs.svelte";
+	import Logo from "../../static/logo.svg";
 </script>
 
 <div class="top-bar glass">

@@ -1,1 +1,1 @@
-declare module 'src/client/images/*&format=webp';
+declare module "src/client/images/*&format=webp";

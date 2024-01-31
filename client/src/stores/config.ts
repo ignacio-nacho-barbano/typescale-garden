@@ -1,19 +1,19 @@
-import { derived, writable, type Readable, type Writable, get } from 'svelte/store';
-import type { ApiFont, TypePreset, TypeVariant } from '../models';
-import { mockFontsApi } from '../constants/mockFontsApi';
+import { derived, writable, type Readable, type Writable, get } from "svelte/store";
+import type { ApiFont, TypePreset, TypeVariant } from "../models";
+import { mockFontsApi } from "../constants/mockFontsApi";
 import {
 	calculateDistributeWeights,
 	expectedRange,
 	generateCss,
 	generateTokens
-} from '../functions';
+} from "../functions";
 
 export const presets: TypePreset[] = [
 	{
 		id: 0,
-		name: 'Typescale Garden',
+		name: "Typescale Garden",
 		breakpoint: 768,
-		fontName: 'Red Hat Text',
+		fontName: "Red Hat Text",
 		baseSize: 22,
 		baseUnit: 4,
 		letterSpacingRatio: 1.5,
@@ -26,9 +26,9 @@ export const presets: TypePreset[] = [
 	},
 	{
 		id: 1,
-		name: 'IBM Carbon Design',
+		name: "IBM Carbon Design",
 		breakpoint: 768,
-		fontName: 'IBM Plex Sans',
+		fontName: "IBM Plex Sans",
 		baseSize: 16,
 		baseUnit: 4,
 		desktopRatio: 1.29,
@@ -41,9 +41,9 @@ export const presets: TypePreset[] = [
 	},
 	{
 		id: 2,
-		name: 'Material Design 2',
+		name: "Material Design 2",
 		breakpoint: 768,
-		fontName: 'Roboto',
+		fontName: "Roboto",
 		baseSize: 16,
 		baseUnit: 4,
 		desktopRatio: 1.29,
@@ -61,15 +61,15 @@ const currentPreset = () => presets[get(selPresetIndex)];
 
 // constants
 const variants = [
-	{ isHeading: true, location: 7, name: 'heading1', mapsTo: 'h1' },
-	{ isHeading: true, location: 6, name: 'heading2', mapsTo: 'h2' },
-	{ isHeading: true, location: 5, name: 'heading3', mapsTo: 'h3' },
-	{ isHeading: true, location: 4, name: 'heading4', mapsTo: 'h4' },
-	{ isHeading: true, location: 3, name: 'heading5', mapsTo: 'h5' },
-	{ isHeading: true, location: 2, name: 'heading6', mapsTo: 'h6' },
-	{ isHeading: false, location: 0, name: 'body-1', mapsTo: 'p, button' },
-	{ isHeading: false, location: -1, name: 'body-2', mapsTo: 'label, figcaption, input' },
-	{ isHeading: false, location: -2, name: 'tooltip' }
+	{ isHeading: true, location: 7, name: "heading1", mapsTo: "h1" },
+	{ isHeading: true, location: 6, name: "heading2", mapsTo: "h2" },
+	{ isHeading: true, location: 5, name: "heading3", mapsTo: "h3" },
+	{ isHeading: true, location: 4, name: "heading4", mapsTo: "h4" },
+	{ isHeading: true, location: 3, name: "heading5", mapsTo: "h5" },
+	{ isHeading: true, location: 2, name: "heading6", mapsTo: "h6" },
+	{ isHeading: false, location: 0, name: "body-1", mapsTo: "p, button" },
+	{ isHeading: false, location: -1, name: "body-2", mapsTo: "label, figcaption, input" },
+	{ isHeading: false, location: -2, name: "tooltip" }
 ];
 
 // writables
@@ -96,8 +96,8 @@ export const currentFont = derived(fontName, ($fontName: string): ApiFont => {
 export const availableWeights = derived(currentFont, ($currentFont) => {
 	const fontVariants = [...$currentFont.variants];
 
-	const regularIndex = fontVariants.findIndex((variant) => variant === 'regular');
-	fontVariants[regularIndex] = '400';
+	const regularIndex = fontVariants.findIndex((variant) => variant === "regular");
+	fontVariants[regularIndex] = "400";
 	const variants = Array.from(
 		new Set(fontVariants.map((variant) => parseInt(variant)).filter((variant) => variant))
 	);

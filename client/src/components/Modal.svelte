@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Button from './Button.svelte';
+	import Button from "./Button.svelte";
 
-	export let title = '';
+	export let title = "";
 	export let open = false;
 	let dialog: HTMLDialogElement;
 
@@ -17,8 +17,8 @@
 
 	$: {
 		if (dialog) {
-			dialog.addEventListener('close', () => {
-				console.log('close event', { open });
+			dialog.addEventListener("close", () => {
+				console.log("close event", { open });
 				open = false;
 			});
 		}

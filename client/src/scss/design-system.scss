@@ -1,11 +1,11 @@
-@forward './animations.scss';
+@forward "./animations.scss";
 
-$bp-s: 'min-width: 568px';
-$bp-m: 'min-width: 768px';
-$bp-l: 'min-width: 900px';
-$bp-xl: 'min-width: 1200px';
-$bp-xxl: 'min-width: 1400px';
-$bp-xxxl: 'min-width: 1920px';
+$bp-s: "min-width: 568px";
+$bp-m: "min-width: 768px";
+$bp-l: "min-width: 900px";
+$bp-xl: "min-width: 1200px";
+$bp-xxl: "min-width: 1400px";
+$bp-xxxl: "min-width: 1920px";
 
 html {
 	--size-1: 2px;

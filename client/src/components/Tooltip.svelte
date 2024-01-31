@@ -1,6 +1,6 @@
 <script lang="ts">
 	export let alt: string | undefined = undefined;
-	export let cls: string = '';
+	export let cls: string = "";
 </script>
 
 {#if alt}

@@ -44,7 +44,7 @@
 		.slider:before {
 			border-radius: $s4;
 			position: absolute;
-			content: '';
+			content: "";
 			height: $s4;
 			width: $s4;
 			left: $s1;

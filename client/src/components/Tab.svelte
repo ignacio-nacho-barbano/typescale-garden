@@ -36,7 +36,7 @@
 			border-radius: 50%;
 			top: calc(50% + 2px);
 			transform: translate(0, -50%);
-			content: '';
+			content: "";
 			display: block;
 			pointer-events: none;
 			transition: 200ms ease-in-out, transform 200ms ease-in-out;

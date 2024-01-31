@@ -1,29 +1,29 @@
 <script lang="ts">
-	import { copyToClipboard, downloadFile } from '../../functions';
-	import { cssCode, designTokens } from '../../stores/config';
-	import Button from '../Button.svelte';
-	import Code from '../Code.svelte';
-	import Modal from '../Modal.svelte';
-	import Tab from '../Tab.svelte';
-	import Tabs from '../Tabs.svelte';
+	import { copyToClipboard, downloadFile } from "../../functions";
+	import { cssCode, designTokens } from "../../stores/config";
+	import Button from "../Button.svelte";
+	import Code from "../Code.svelte";
+	import Modal from "../Modal.svelte";
+	import Tab from "../Tab.svelte";
+	import Tabs from "../Tabs.svelte";
 
-	const fileNames = { css: 'typography.css', json: 'typography-tokens.json' };
+	const fileNames = { css: "typography.css", json: "typography-tokens.json" };
 
 	let modalOpen = false;
-	let activeTab: 'css' | 'json' = 'css';
+	let activeTab: "css" | "json" = "css";
 
 	const onDownload = () => {
-		if (activeTab === 'css') {
+		if (activeTab === "css") {
 			downloadFile(fileNames.css, $cssCode);
 		} else {
 			downloadFile(fileNames.json, $cssCode);
 		}
 	};
 	const onCopy = () => {
-		if (activeTab === 'css') {
-			copyToClipboard($cssCode, 'CSS Code');
+		if (activeTab === "css") {
+			copyToClipboard($cssCode, "CSS Code");
 		} else {
-			copyToClipboard($designTokens, 'Design Tokens');
+			copyToClipboard($designTokens, "Design Tokens");
 		}
 	};
 </script>
@@ -31,13 +31,13 @@
 <Modal bind:open={modalOpen} title="Generated typescale CSS">
 	<div class="modal-content">
 		<Tabs
-			><Tab active={activeTab === 'css'} click={() => (activeTab = 'css')}>{fileNames.css}</Tab><Tab
-				active={activeTab === 'json'}
-				click={() => (activeTab = 'json')}>{fileNames.json}</Tab
+			><Tab active={activeTab === "css"} click={() => (activeTab = "css")}>{fileNames.css}</Tab><Tab
+				active={activeTab === "json"}
+				click={() => (activeTab = "json")}>{fileNames.json}</Tab
 			></Tabs
 		>
 		<Code>
-			{#if activeTab === 'css'}
+			{#if activeTab === "css"}
 				{$cssCode}
 			{:else}
 				{$designTokens}
@@ -52,12 +52,12 @@
 
 <div class="export-block">
 	<Button on:click={() => (modalOpen = true)}>See Result</Button>
-	<Button type="primary" on:click={() => copyToClipboard($cssCode, 'CSS Code')} cls="copy-btn"
+	<Button type="primary" on:click={() => copyToClipboard($cssCode, "CSS Code")} cls="copy-btn"
 		>Copy Styles</Button
 	>
 	<Button
 		type="primary"
-		on:click={() => copyToClipboard($designTokens, 'Design Tokens')}
+		on:click={() => copyToClipboard($designTokens, "Design Tokens")}
 		cls="copy-btn">Copy Tokens</Button
 	>
 </div>

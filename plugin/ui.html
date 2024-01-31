@@ -1,151 +1,146 @@
 <div class="wrapper">
-    <h2 class="title">Typescale Garden <br />Token Import Tool</h2>
-    <label for="jsonStyles">Paste your JSON styles below:</label>
-    <textarea type="text" rows="5" id="jsonStyles"></textarea>
+	<h2 class="title">Typescale Garden <br />Token Import Tool</h2>
+	<label for="jsonStyles">Paste your JSON styles below:</label>
+	<textarea type="text" rows="5" id="jsonStyles"></textarea>
 
-    <div id="about-tsg">
-        <button id="about-tsg-btn">
-            <span class="btn-text-closed">What is This? 🔽</span>
-            <span class="btn-text-open">Thanks! ⬆️</span>
+	<div id="about-tsg">
+		<button id="about-tsg-btn">
+			<span class="btn-text-closed">What is This? 🔽</span>
+			<span class="btn-text-open">Thanks! ⬆️</span>
+		</button>
+		<div class="content">
+			<p>
+				This is the Typescale Garden official plugin; if you don't know what Typescale Garden is,
+				maybe check it out at
+				<a target="_blank" href="https://typescale-garden.netlify.app"
+					>typescale-garden.netlify.app</a
+				>
+				and come back 😄.
+			</p>
+		</div>
+	</div>
+	<p>
+		Typescale Garden is an Open Source project, please consider supporting! You can do it through:
+		<a href="https://github.com/sponsors/ignacio-nacho-barbano">GitHub Sponsors</a> or
+		<a href="https://paypal.me/IgnacioRBarbano?country.x=UY&locale.x=es_XC">PayPal</a>
+	</p>
 
-        </button>
-        <div class="content">
-            <p>This is the Typescale Garden official plugin; if you don't know what Typescale Garden is, maybe check it
-                out
-                at
-                <a target="_blank" href="https://typescale-garden.netlify.app">typescale-garden.netlify.app</a> and come
-                back
-                😄.
-            </p>
-        </div>
-    </div>
-    <p>Typescale Garden is an Open Source project, please consider supporting! You can do it through: <a
-            href="https://github.com/sponsors/ignacio-nacho-barbano">GitHub Sponsors</a> or <a
-            href="https://paypal.me/IgnacioRBarbano?country.x=UY&locale.x=es_XC">PayPal</a></p>
-
-
-
-    <div class="btns-group">
-        <button id="cancel">Cancel</button>
-        <button id="import">Import</button>
-
-    </div>
+	<div class="btns-group">
+		<button id="cancel">Cancel</button>
+		<button id="import">Import</button>
+	</div>
 </div>
 <script>
-    const aboutSection = document.getElementById('about-tsg')
+	const aboutSection = document.getElementById("about-tsg");
 
-    document.getElementById('import').onclick = () => {
-        const textbox = document.getElementById('jsonStyles');
-        let jsonStyles
-        try {
-            jsonStyles = JSON.parse(textbox.value);
+	document.getElementById("import").onclick = () => {
+		const textbox = document.getElementById("jsonStyles");
+		let jsonStyles;
+		try {
+			jsonStyles = JSON.parse(textbox.value);
+		} catch (error) {
+			console.log("Error when parsing JSON");
+		}
+		parent.postMessage({ pluginMessage: { type: "import-styles", jsonStyles } }, "*");
+	};
 
-        } catch (error) {
-            console.log('Error when parsing JSON');
-        }
-        parent.postMessage({ pluginMessage: { type: 'import-styles', jsonStyles } }, '*')
-    }
+	document.getElementById("cancel").onclick = () => {
+		parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+	};
 
-    document.getElementById('cancel').onclick = () => {
-        parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
-    }
-
-    document.getElementById('about-tsg-btn').onclick = () => {
-        aboutSection.classList.toggle('open')
-    }
-
+	document.getElementById("about-tsg-btn").onclick = () => {
+		aboutSection.classList.toggle("open");
+	};
 </script>
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@500;600;700&display=swap');
+	@import url("https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@500;600;700&display=swap");
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
 
-    body,
-    button {
-        font-family: 'Red Hat Text', sans-serif;
-    }
+	body,
+	button {
+		font-family: "Red Hat Text", sans-serif;
+	}
 
-    h2,
-    h3,
-    label,
-    p {
-        color: var(--figma-color-text);
-    }
+	h2,
+	h3,
+	label,
+	p {
+		color: var(--figma-color-text);
+	}
 
-    label {
-        font-weight: 600;
-        font-size: 16px;
-    }
+	label {
+		font-weight: 600;
+		font-size: 16px;
+	}
 
-    .wrapper {
-        padding: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        height: 100%;
-    }
+	.wrapper {
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		height: 100%;
+	}
 
-    a,
-    a:visited {
-        color: var(--figma-color-bg-selected-strong);
-    }
+	a,
+	a:visited {
+		color: var(--figma-color-bg-selected-strong);
+	}
 
-    button {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 20px;
-        font-weight: 600;
-    }
+	button {
+		padding: 12px 20px;
+		border: none;
+		border-radius: 20px;
+		font-weight: 600;
+	}
 
-    #import {
-        color: var(--figma-color-text);
-        background-color: var(--figma-color-bg-brand);
-    }
+	#import {
+		color: var(--figma-color-text);
+		background-color: var(--figma-color-bg-brand);
+	}
 
-    #import:hover {
-        background-color: var(--figma-color-bg-brand-hover);
-    }
+	#import:hover {
+		background-color: var(--figma-color-bg-brand-hover);
+	}
 
+	textarea#jsonStyles {
+		height: 136px;
+		resize: none;
+	}
 
-    textarea#jsonStyles {
-        height: 136px;
-        resize: none;
+	#about-tsg .btn-text-open {
+		display: none;
+	}
 
-    }
+	#about-tsg.open .btn-text-open {
+		display: unset;
+	}
 
-    #about-tsg .btn-text-open {
-        display: none;
-    }
+	#about-tsg.open .btn-text-closed {
+		display: none;
+	}
 
-    #about-tsg.open .btn-text-open {
-        display: unset;
-    }
+	#about-tsg .content {
+		padding-top: 20px;
+		overflow: hidden;
+		height: 0;
+	}
 
-    #about-tsg.open .btn-text-closed {
-        display: none;
-    }
+	#about-tsg.open .content {
+		height: unset;
+	}
 
-    #about-tsg .content {
-        padding-top: 20px;
-        overflow: hidden;
-        height: 0;
-    }
-
-    #about-tsg.open .content {
-        height: unset;
-    }
-
-    .btns-group {
-        margin-top: auto;
-        align-self: flex-end;
-        display: flex;
-        justify-self: stretch;
-        gap: 20px;
-        justify-content: flex-end;
-    }
+	.btns-group {
+		margin-top: auto;
+		align-self: flex-end;
+		display: flex;
+		justify-self: stretch;
+		gap: 20px;
+		justify-content: flex-end;
+	}
 </style>

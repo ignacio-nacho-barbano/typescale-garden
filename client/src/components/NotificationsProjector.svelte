@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { notificationsQueue } from '../stores/notifications';
-	import Notification from './Notification.svelte';
+	import { notificationsQueue } from "../stores/notifications";
+	import Notification from "./Notification.svelte";
 </script>
 
 <div class="notifications-projector">

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Notification } from '../models';
-	import { removeNotification } from '../stores/notifications';
-	import Button from './Button.svelte';
+	import type { Notification } from "../models";
+	import { removeNotification } from "../stores/notifications";
+	import Button from "./Button.svelte";
 
 	export let data: Notification;
 </script>

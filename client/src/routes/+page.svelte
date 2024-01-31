@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { lorem } from '../constants';
-	import { typescale, cssCode, currentFont, breakpoint } from '../stores/config';
-	import { onDestroy } from 'svelte';
-	import { routes } from './routes';
-	import typescale3d from '../../images/typescale-3d.jpg?w=500&format=webp';
+	import { lorem } from "../constants";
+	import { typescale, cssCode, currentFont, breakpoint } from "../stores/config";
+	import { onDestroy } from "svelte";
+	import { routes } from "./routes";
+	import typescale3d from "../../images/typescale-3d.jpg?w=500&format=webp";
 
-	let tableStyles = '';
+	let tableStyles = "";
 	const unsubscribe = cssCode.subscribe((code) => {
-		tableStyles = code.replaceAll('body', '.how-it-works-page.main-page-section');
+		tableStyles = code.replaceAll("body", ".how-it-works-page.main-page-section");
 		tableStyles = tableStyles.replaceAll(
-			'(min-width: ' + $breakpoint,
-			'(min-width: ' + ($breakpoint + 380)
+			"(min-width: " + $breakpoint,
+			"(min-width: " + ($breakpoint + 380)
 		);
 	});
 

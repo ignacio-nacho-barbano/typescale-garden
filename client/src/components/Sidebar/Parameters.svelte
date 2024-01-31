@@ -15,11 +15,11 @@
 		useItalicsForTitles,
 		randomFont,
 		presets
-	} from '../../stores/config';
-	import Input from '../Input.svelte';
-	import Button from '../Button.svelte';
-	import Select from '../Select.svelte';
-	import Switch from '../Switch.svelte';
+	} from "../../stores/config";
+	import Input from "../Input.svelte";
+	import Button from "../Button.svelte";
+	import Select from "../Select.svelte";
+	import Switch from "../Switch.svelte";
 </script>
 
 <div class="sidebar-parameters">

@@ -1,9 +1,9 @@
-import { writable, type Writable } from 'svelte/store';
-import { showNotification } from './notifications';
+import { writable, type Writable } from "svelte/store";
+import { showNotification } from "./notifications";
 
-export const secondaryNav: Writable<'parameters' | 'contrast' | 'export'> = writable('parameters');
+export const secondaryNav: Writable<"parameters" | "contrast" | "export"> = writable("parameters");
 export const testingColors = writable(false);
-export const exportNav: Writable<'css' | 'tokens'> = writable('css');
+export const exportNav: Writable<"css" | "tokens"> = writable("css");
 
 export const accordionStates = writable({
 	parameters: true,
@@ -12,5 +12,5 @@ export const accordionStates = writable({
 });
 
 testingColors.subscribe((value) => {
-	if (value) showNotification('Testing Colors');
+	if (value) showNotification("Testing Colors");
 });

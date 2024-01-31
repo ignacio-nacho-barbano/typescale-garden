@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Icon from 'svelte-material-icons/MenuDown.svelte';
+	import Icon from "svelte-material-icons/MenuDown.svelte";
 
 	export let open = true;
 </script>

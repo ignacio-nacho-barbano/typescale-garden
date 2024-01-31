@@ -1,5 +1,5 @@
-import { derived, writable, type Writable } from 'svelte/store';
-import type { Notification } from '../models';
+import { derived, writable, type Writable } from "svelte/store";
+import type { Notification } from "../models";
 
 const notifications: Writable<Notification[]> = writable([]);
 const deleteById = (id: string) =>

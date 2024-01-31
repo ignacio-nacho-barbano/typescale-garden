@@ -1,11 +1,11 @@
 {
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
-  },
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[svg]": {
-    "editor.defaultFormatter": "jock.svg"
-  },
-  "cSpell.words": ["barbano", "Panisello", "typescale", "typescales", "wght"]
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "explicit"
+	},
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[svg]": {
+		"editor.defaultFormatter": "jock.svg"
+	},
+	"cSpell.words": ["barbano", "Panisello", "typescale", "typescales", "wght"]
 }

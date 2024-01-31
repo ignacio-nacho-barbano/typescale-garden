@@ -1,16 +1,16 @@
 {
-  "name": "typescale-garden-plugin",
-  "version": "1.0.0",
-  "description": "An import tool for typescale-garden",
-  "main": "code.js",
-  "scripts": {
-    "build": "tsc -p ./tsconfig.json",
-    "watch": "npm run build -- --watch"
-  },
-  "author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
-  "license": "GPL-3.0",
-  "devDependencies": {
-    "@figma/plugin-typings": "^1.82.0",
-    "typescript": "*"
-  }
+	"name": "typescale-garden-plugin",
+	"version": "1.0.0",
+	"description": "An import tool for typescale-garden",
+	"main": "code.js",
+	"scripts": {
+		"build": "tsc -p ./tsconfig.json",
+		"watch": "npm run build -- --watch"
+	},
+	"author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
+	"license": "GPL-3.0",
+	"devDependencies": {
+		"@figma/plugin-typings": "^1.82.0",
+		"typescript": "*"
+	}
 }

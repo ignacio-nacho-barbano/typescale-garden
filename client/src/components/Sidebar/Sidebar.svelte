@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Input from '../Input.svelte';
-	import Switch from '../Switch.svelte';
+	import Input from "../Input.svelte";
+	import Switch from "../Switch.svelte";
 	import {
 		fontName,
 		baseSize,
@@ -17,16 +17,16 @@
 		randomFont,
 		presets,
 		selPresetIndex
-	} from '../../stores/config';
-	import Button from '../Button.svelte';
-	import Select from '../Select.svelte';
-	import Tabs from '../Tabs.svelte';
-	import Tab from '../Tab.svelte';
-	import { accordionStates } from '../../stores/app';
-	import Parameters from './Parameters.svelte';
-	import Export from './Export.svelte';
-	import Contrast from './Contrast.svelte';
-	import Accordion from '../Accordion.svelte';
+	} from "../../stores/config";
+	import Button from "../Button.svelte";
+	import Select from "../Select.svelte";
+	import Tabs from "../Tabs.svelte";
+	import Tab from "../Tab.svelte";
+	import { accordionStates } from "../../stores/app";
+	import Parameters from "./Parameters.svelte";
+	import Export from "./Export.svelte";
+	import Contrast from "./Contrast.svelte";
+	import Accordion from "../Accordion.svelte";
 </script>
 
 <section class="side-bar glass">

@@ -1,4 +1,4 @@
-import type { ApiFont, TypeVariant } from '../models';
+import type { ApiFont, TypeVariant } from "../models";
 
 export const generateCss = (
 	typescale: TypeVariant[],
@@ -7,14 +7,14 @@ export const generateCss = (
 	weights: number[]
 ) => {
 	return `@import url('https://fonts.googleapis.com/css2?family=${font.family.replaceAll(
-		' ',
-		'+'
+		" ",
+		"+"
 	)}:wght@${Array.from(new Set(weights.sort((a, b) => (a >= b ? 1 : -1)))).join(
-		';'
+		";"
 	)}&display=swap');
 
 body {
-	font-size: ${typescale.find(({ name }) => name === 'body-1')?.mobileSize}px;
+	font-size: ${typescale.find(({ name }) => name === "body-1")?.mobileSize}px;
     font-family: "${font.family}", ${font.category};
 	--paragraph-space: 2rem;
 	--title-space: 1rem;
@@ -82,8 +82,8 @@ span b,
 ${typescale
 	.filter(({ isHeading }) => isHeading)
 	.map(({ name, mapsTo }) => (mapsTo ? `${mapsTo}, .${name} ` : `.${name} `))} {
-		font-style: ${typescale[0].italics ? 'italic' : 'normal'};
-		text-transform: ${typescale[0].uppercase ? 'uppercase' : 'none'};
+		font-style: ${typescale[0].italics ? "italic" : "normal"};
+		text-transform: ${typescale[0].uppercase ? "uppercase" : "none"};
 		max-width: 768px;
 	}
 
@@ -102,11 +102,11 @@ ${mapsTo ? `${mapsTo}, .${name}` : `.${name}`} {
 }
 `
 	)
-	.join('')}
+	.join("")}
     
     @media (min-width: ${breakpoint}px) {
 		body {
-			font-size: ${typescale.find(({ name }) => name === 'body-1')?.desktopSize}px;
+			font-size: ${typescale.find(({ name }) => name === "body-1")?.desktopSize}px;
 		}
 
         ${typescale
@@ -119,7 +119,7 @@ ${mapsTo ? `${mapsTo}, .${name}` : `.${name}`} {
         }
         `
 					)
-					.join('')}
+					.join("")}
 
     }`;
 };

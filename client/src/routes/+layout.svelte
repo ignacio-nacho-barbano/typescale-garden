@@ -1,10 +1,10 @@
 <script lang="ts">
-	import '../scss/global.scss';
-	import TopBar from '../components/TopBar.svelte';
-	import Sidebar from '../components/Sidebar/Sidebar.svelte';
-	import CodeSidebar from '../components/Sidebar/Export.svelte';
-	import { baseUnit, visibleGrid } from '../stores/config';
-	import NotificationsProjector from '../components/NotificationsProjector.svelte';
+	import "../scss/global.scss";
+	import TopBar from "../components/TopBar.svelte";
+	import Sidebar from "../components/Sidebar/Sidebar.svelte";
+	import CodeSidebar from "../components/Sidebar/Export.svelte";
+	import { baseUnit, visibleGrid } from "../stores/config";
+	import NotificationsProjector from "../components/NotificationsProjector.svelte";
 </script>
 
 <TopBar />

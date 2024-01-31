@@ -1,7 +1,7 @@
-@use 'sass:map' as *;
-@use './design-system.scss' as *;
-@import './global-classes.scss';
-@import './typography.scss';
+@use "sass:map" as *;
+@use "./design-system.scss" as *;
+@import "./global-classes.scss";
+@import "./typography.scss";
 
 html {
 	scroll-behavior: smooth;

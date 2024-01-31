@@ -1,7 +1,7 @@
-import { sveltekit } from '@sveltejs/kit/vite';
-import { svelteSVG } from 'rollup-plugin-svelte-svg';
-import { defineConfig } from 'vitest/config';
-import { imagetools } from 'vite-imagetools';
+import { sveltekit } from "@sveltejs/kit/vite";
+import { svelteSVG } from "rollup-plugin-svelte-svg";
+import { defineConfig } from "vitest/config";
+import { imagetools } from "vite-imagetools";
 
 export default defineConfig({
 	plugins: [
@@ -15,21 +15,21 @@ export default defineConfig({
 			svgo: {
 				plugins: [
 					{
-						name: 'addAttributesToSVGElement',
+						name: "addAttributesToSVGElement",
 						params: { attributes: ['preserveAspectRatio="xMidYMid meet"'] }
 					},
-					{ name: 'removeViewBox', active: false },
-					{ name: 'removeAttrs', active: false }
+					{ name: "removeViewBox", active: false },
+					{ name: "removeAttrs", active: false }
 				]
 			},
 			// vite-specific
 			// https://vitejs.dev/guide/api-plugin.html#plugin-ordering
 			// enforce: 'pre' | 'post'
-			enforce: 'pre'
+			enforce: "pre"
 		})
 	],
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
+		include: ["src/**/*.{test,spec}.{js,ts}"]
 	},
 	css: {
 		preprocessorOptions: {

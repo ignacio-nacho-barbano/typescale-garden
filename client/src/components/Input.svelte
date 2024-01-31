@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Writable } from 'svelte/store';
-	import type { FormValidator } from '../models';
-	import Button from './Button.svelte';
+	import type { Writable } from "svelte/store";
+	import type { FormValidator } from "../models";
+	import Button from "./Button.svelte";
 
 	export let name: string;
 	export let value: Writable<string> | Writable<number> | string | number;
@@ -10,7 +10,7 @@
 	export let useSearch: boolean = false;
 	export let validators: FormValidator<typeof value>[] = [];
 	let blurEvent: boolean = false;
-	let internalValue: string = (value || '') as string;
+	let internalValue: string = (value || "") as string;
 
 	const outputValue = (newValue: string, blurHappened: boolean) => {
 		if (!useSearch && ((changeOnBlur && blurHappened) || !changeOnBlur)) {

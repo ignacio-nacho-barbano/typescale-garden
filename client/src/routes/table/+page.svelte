@@ -1,20 +1,20 @@
 <script lang="ts">
-	import { lorem } from '../../constants';
-	import { typescale, cssCode, breakpoint } from '../../stores/config';
-	import { onDestroy } from 'svelte';
-	import { routes } from '../routes';
-	import CharsChart from '../../components/CharsChart.svelte';
-	import Tabs from '../../components/Tabs.svelte';
-	import Tab from '../../components/Tab.svelte';
+	import { lorem } from "../../constants";
+	import { typescale, cssCode, breakpoint } from "../../stores/config";
+	import { onDestroy } from "svelte";
+	import { routes } from "../routes";
+	import CharsChart from "../../components/CharsChart.svelte";
+	import Tabs from "../../components/Tabs.svelte";
+	import Tab from "../../components/Tab.svelte";
 
-	let tableStyles = '';
+	let tableStyles = "";
 	const unsubscribe = cssCode.subscribe((code) => {
-		tableStyles = code.replaceAll('body', '.table-page.main-page-section');
-		tableStyles = tableStyles.replace($breakpoint + '', $breakpoint + 360 + '');
+		tableStyles = code.replaceAll("body", ".table-page.main-page-section");
+		tableStyles = tableStyles.replace($breakpoint + "", $breakpoint + 360 + "");
 	});
-	type Option = 'Desktop' | 'Mobile' | 'Both';
-	let currentView: Option = 'Desktop';
-	const tabs: Option[] = ['Desktop', 'Mobile', 'Both'];
+	type Option = "Desktop" | "Mobile" | "Both";
+	let currentView: Option = "Desktop";
+	const tabs: Option[] = ["Desktop", "Mobile", "Both"];
 
 	onDestroy(unsubscribe);
 </script>
@@ -44,7 +44,7 @@
 				${tableStyles}
 				</style>`}
 
-			{#if currentView === 'Desktop' || currentView === 'Mobile'}
+			{#if currentView === "Desktop" || currentView === "Mobile"}
 				<CharsChart viewing={currentView.toLowerCase()} />
 				<div class="device {currentView.toLowerCase()}">
 					<ol>
@@ -127,7 +127,7 @@
 			overflow: auto;
 
 			&::after {
-				content: '';
+				content: "";
 				position: absolute;
 				left: 50%;
 				top: $s5;

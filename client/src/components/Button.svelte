@@ -1,28 +1,28 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import type Icon from 'svelte-material-icons/Pan.svelte';
-	import Tooltip from './Tooltip.svelte';
+	import { onMount } from "svelte";
+	import type Icon from "svelte-material-icons/Pan.svelte";
+	import Tooltip from "./Tooltip.svelte";
 
 	// add mandatory alt in the future for icon buttons
 	export const alt: string | undefined = undefined;
 	export let leadIcon: string | null = null;
 	export let trailIcon: string | null = null;
-	export let cls: string | null = '';
+	export let cls: string | null = "";
 	export let to: string | null = null;
 	export let active: boolean | null = null;
-	export let type: 'primary' | 'outline' | 'ghost' = 'outline';
-	export let size: 'm' | 's' = 'm';
+	export let type: "primary" | "outline" | "ghost" = "outline";
+	export let size: "m" | "s" = "m";
 	let leadIconComp: typeof Icon;
 	let trailIconComp: typeof Icon;
 	let classes = `glass btn shadow-mid ${size} ${cls} ${type}`;
 	let isExternal = false;
 
-	if (to && !to.startsWith('/') && !to.startsWith('#')) {
+	if (to && !to.startsWith("/") && !to.startsWith("#")) {
 		isExternal = true;
 	}
 
 	if ((leadIcon || trailIcon) && !$$slots.default) {
-		classes += ' icon';
+		classes += " icon";
 
 		// if (!alt) {
 		// 	console.warn(
@@ -32,15 +32,15 @@
 	}
 
 	if (leadIcon && $$slots.default) {
-		classes += ' lead-icon';
+		classes += " lead-icon";
 	}
 
 	if (trailIcon && $$slots.default) {
-		classes += ' trail-icon';
+		classes += " trail-icon";
 	}
 
 	if (active) {
-		classes += ' active';
+		classes += " active";
 	}
 
 	if (leadIcon) {
@@ -60,7 +60,7 @@
 </Tooltip> -->
 <button on:click class={classes}>
 	{#if to}
-		<a href={to} target={isExternal ? '_blank' : '_self'}><slot /></a>
+		<a href={to} target={isExternal ? "_blank" : "_self"}><slot /></a>
 	{/if}
 	<svelte:component this={leadIconComp} size="32" />
 	<slot />

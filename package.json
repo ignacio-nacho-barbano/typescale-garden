@@ -1,36 +1,36 @@
 {
-  "name": "typescale-garden",
-  "version": "1.0.0",
-  "description": "a monorepo for all of typescale-garden pieces, a project meant to aid designers working on creating typescales as part of a design system",
-  "main": "index.js",
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "format": "prettier --plugin-search-dir . --write ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ignacio-nacho-barbano/typescale-garden.git"
-  },
-  "workspaces": [
-    "./client",
-    "./plugin"
-  ],
-  "keywords": [
-    "svelte",
-    "svelteKit",
-    "node",
-    "plugin",
-    "figma",
-    "design",
-    "typography",
-    "typographic",
-    "scale"
-  ],
-  "author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
-  "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/ignacio-nacho-barbano/typescale-garden/issues"
-  },
-  "homepage": "https://github.com/ignacio-nacho-barbano/typescale-garden#readme"
+	"name": "typescale-garden",
+	"version": "1.0.0",
+	"description": "a monorepo for all of typescale-garden pieces, a project meant to aid designers working on creating typescales as part of a design system",
+	"main": "index.js",
+	"devDependencies": {},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"format": "prettier --plugin-search-dir . --write ."
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ignacio-nacho-barbano/typescale-garden.git"
+	},
+	"workspaces": [
+		"./client",
+		"./plugin"
+	],
+	"keywords": [
+		"svelte",
+		"svelteKit",
+		"node",
+		"plugin",
+		"figma",
+		"design",
+		"typography",
+		"typographic",
+		"scale"
+	],
+	"author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
+	"license": "GPL-3.0",
+	"bugs": {
+		"url": "https://github.com/ignacio-nacho-barbano/typescale-garden/issues"
+	},
+	"homepage": "https://github.com/ignacio-nacho-barbano/typescale-garden#readme"
 }

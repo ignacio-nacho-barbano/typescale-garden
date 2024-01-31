@@ -11,7 +11,7 @@
 
 <style lang="scss">
 	.code-block {
-		font-family: 'Roboto', monospace;
+		font-family: "Roboto", monospace;
 	}
 
 	.code-wrapper {

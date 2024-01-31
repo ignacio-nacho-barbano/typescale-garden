@@ -1,7 +1,7 @@
 <script lang="ts">
-	export let title: string = 'Typescale Garden';
-	export let description: string = 'A typescale creation tool.';
-	const ogImage = '../../tg-logo.png';
+	export let title: string = "Typescale Garden";
+	export let description: string = "A typescale creation tool.";
+	const ogImage = "../../tg-logo.png";
 </script>
 
 <svelte:head>

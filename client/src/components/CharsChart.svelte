@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { typescale } from '../stores/config';
+	import { typescale } from "../stores/config";
 	export let viewing: string;
 </script>
 
 <div class="chars-chart-wrapper shadow-mid">
 	{#each $typescale as { weight, name, desktopSize, desktopLine, mobileLine, mobileSize }}
 		<span
-			class={'letter-example ' + name}
+			class={"letter-example " + name}
 			style="font-size: {viewing === 'desktop'
 				? desktopSize
 				: mobileSize}px;  line-height: {viewing === 'desktop' ? desktopLine : mobileLine}px;"
@@ -54,7 +54,7 @@
 	}
 
 	.line-height-ref {
-		content: '';
+		content: "";
 		width: 100%;
 		height: 100%;
 		position: absolute;
