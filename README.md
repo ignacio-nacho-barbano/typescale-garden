@@ -15,3 +15,11 @@ The plugin facilitates the direct importation of the typographic scale into Figm
 ## The Server (Upcoming)
 
 The server is intended to function as a library for users to store all their configurations. Additionally, it offers an alternative means of connecting the client and the plugin, enabling the direct importation into Figma of the selected typographic scale from the user's account.
+
+# Support the Project
+
+If you find this project helpful and would like to support its development, you can make a donation through any of the following options.
+
+[GitHub Sponsors](https://github.com/sponsors/ignacio-nacho-barbano/dashboard).
+
+[PayPal](https://paypal.me/IgnacioRBarbano?country.x=UY&locale.x=es_XC).
