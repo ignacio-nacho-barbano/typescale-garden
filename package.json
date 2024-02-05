@@ -14,7 +14,8 @@
 	},
 	"workspaces": [
 		"./client",
-		"./plugin"
+		"./plugin",
+		"./server"
 	],
 	"keywords": [
 		"svelte",
