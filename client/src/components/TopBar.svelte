@@ -4,6 +4,22 @@
 	import Tab from "./Tab.svelte";
 	import Tabs from "./Tabs.svelte";
 	import Logo from "../../static/logo.svg";
+	import Button from "./Button.svelte";
+
+	import { PUB_API } from "$env/static/public";
+	import { onMount } from "svelte";
+
+	let user;
+
+	const getUser = async () => {
+		const request = await fetch(PUB_API + "users");
+		user = await request.json();
+		console.log(user);
+	};
+
+	onMount(() => {
+		getUser();
+	});
 </script>
 
 <div class="top-bar glass">
@@ -22,6 +38,14 @@
 			Typescale Garden <span class="tooltip secondary">(beta)</span>
 		</h1>
 	</div>
+	<div class="btn-gr">
+		{#if user?.isAuthenticated}
+			<Button size="s" type="ghost" to="{PUB_API}users/logout">Log Out</Button>
+		{:else}
+			<Button size="s" type="ghost" to="{PUB_API}users/login">Log In</Button>
+		{/if}
+		<Button size="s" type="primary" to="{PUB_API}users/signIn">Register</Button>
+	</div>
 </div>
 
 <style lang="scss">
@@ -32,6 +56,12 @@
 	:global(#logo) {
 		height: $s5;
 		width: fit-content;
+	}
+
+	.btn-gr {
+		display: flex;
+		gap: $s4;
+		margin-left: auto;
 	}
 	.top-bar {
 		z-index: 4;

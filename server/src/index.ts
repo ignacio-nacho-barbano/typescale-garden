@@ -2,8 +2,9 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
+import cors from "cors";
 import { MainRouter } from "./routes";
-import { APP_PORT } from "./secrets";
+import { APP_PORT, CLIENT_ORIGIN } from "./secrets";
 import { loadErrorHandlers } from "./utils";
 
 const app = express();
@@ -11,6 +12,8 @@ const app = express();
 // test and enable helmet
 // app.use(helmet());
 app.use(logger("dev"));
+
+app.use(cors({ origin: CLIENT_ORIGIN }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

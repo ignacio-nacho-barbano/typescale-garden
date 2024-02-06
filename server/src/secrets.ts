@@ -1,8 +1,9 @@
 import { Secret } from "jsonwebtoken";
 import * as path from "path";
 
+export const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 export const APP_PORT = parseInt(process.env.APP_PORT || "3000");
-export const ENVIRONMENT = process.env.APP_ENV || "dev";
+export const ENVIRONMENT = process.env.PUB_APP_ENV || "dev";
 export const IS_PRODUCTION = ENVIRONMENT === "production";
 
 export const LOG_DIRECTORY = process.env.LOG_DIRECTORY || path.resolve("logs");
