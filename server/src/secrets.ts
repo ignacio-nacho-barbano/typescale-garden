@@ -1,11 +1,16 @@
+import { Secret } from "jsonwebtoken";
 import * as path from "path";
 
+export const APP_PORT = parseInt(process.env.APP_PORT || "3000");
 export const ENVIRONMENT = process.env.APP_ENV || "dev";
 export const IS_PRODUCTION = ENVIRONMENT === "production";
-export const APP_PORT = parseInt(process.env.APP_PORT || "3000");
+
 export const LOG_DIRECTORY = process.env.LOG_DIRECTORY || path.resolve("logs");
-export const JWT_SECRET = process.env.JWT_SECRET || "secret";
-export const SESSION_SECRET = process.env.SESSION_SECRET || "secret";
+export const JWT_SECRET = process.env.JWT_SECRET as Secret;
+export const SESSION_SECRET = process.env.SESSION_SECRET;
+export const BASE_URL = process.env.BASE_URL || "";
+export const CLIENT_ID = process.env.CLIENT_ID || "";
+export const ISSUER = process.env.ISSUER || "";
 export const DB = {
 	USER: process.env.DB_USER || "root",
 	PASSWORD: process.env.DB_USER_PWD || "secret",
