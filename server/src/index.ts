@@ -2,22 +2,24 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import indexRouter from "./routes";
-import usersRouter from "./routes/users";
+import { MainRouter } from "./routes";
+import { APP_PORT } from "./secrets";
+import { loadErrorHandlers } from "./utils";
 
 const app = express();
 // add rate limiter
+// test and enable helmet
+// app.use(helmet());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/users", indexRouter);
-app.use("/", usersRouter);
+app.use("/api/", MainRouter);
 
-const port = process.env.PORT || 3000;
+loadErrorHandlers(app);
 
-app.listen(port, () => {
-	console.log(`[server]: Server is running at port ${port}`);
+app.listen(APP_PORT, () => {
+	console.log(`[server]: Server is running at port ${APP_PORT}`);
 });
