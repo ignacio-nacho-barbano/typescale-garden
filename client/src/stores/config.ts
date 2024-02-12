@@ -235,4 +235,4 @@ export const designTokens = derived(
 	([$typescale, $breakpoint, $currentFont]) => generateTokens($typescale, $breakpoint, $currentFont)
 );
 
-fontName.subscribe(console.log);
+// fontName.subscribe(console.log);

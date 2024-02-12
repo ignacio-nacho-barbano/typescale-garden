@@ -1,24 +1,33 @@
 <script lang="ts">
 	import { page } from "$app/stores";
+	import { onMount } from "svelte";
+	import Logo from "../../static/logo.svg";
 	import { routes } from "../routes/routes";
+	import { getUserData } from "../functions";
+	import { authClient, isAuthenticated } from "../stores/auth";
+	import Button from "./Button.svelte";
 	import Tab from "./Tab.svelte";
 	import Tabs from "./Tabs.svelte";
-	import Logo from "../../static/logo.svg";
-	import Button from "./Button.svelte";
+	import UserControls from "./UserControls.svelte";
 
-	import { PUB_API } from "$env/static/public";
-	import { onMount } from "svelte";
+	function logIn(e: Event, signUp?: boolean) {
+		e.preventDefault();
 
-	let user;
+		let config;
 
-	const getUser = async () => {
-		const request = await fetch(PUB_API + "users");
-		user = await request.json();
-		console.log(user);
-	};
+		if (signUp) {
+			config = {
+				authorizationParams: {
+					screen_hint: "signup"
+				}
+			};
+		}
+
+		$authClient.loginWithRedirect(config);
+	}
 
 	onMount(() => {
-		getUser();
+		getUserData($authClient);
 	});
 </script>
 
@@ -39,12 +48,12 @@
 		</h1>
 	</div>
 	<div class="btn-gr">
-		{#if user?.isAuthenticated}
-			<Button size="s" type="ghost" to="{PUB_API}users/logout">Log Out</Button>
+		{#if $isAuthenticated}
+			<UserControls />
 		{:else}
-			<Button size="s" type="ghost" to="{PUB_API}users/login">Log In</Button>
+			<Button size="s" type="ghost" on:click={logIn}>Log In</Button>
+			<Button size="s" type="primary" on:click={(e) => logIn(e, true)}>Register</Button>
 		{/if}
-		<Button size="s" type="primary" to="{PUB_API}users/signIn">Register</Button>
 	</div>
 </div>
 
@@ -62,6 +71,7 @@
 		display: flex;
 		gap: $s4;
 		margin-left: auto;
+		margin-right: $s5;
 	}
 	.top-bar {
 		z-index: 4;
