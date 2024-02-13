@@ -1,5 +1,5 @@
 import { derived, writable, type Readable, type Writable, get } from "svelte/store";
-import type { ApiFont, TypePreset, TypeVariant } from "../models";
+import type { ApiFont, StoredTypescale, TypeVariant } from "../models";
 import { mockFontsApi } from "../constants/mockFontsApi";
 import {
 	calculateDistributeWeights,
@@ -8,7 +8,7 @@ import {
 	generateTokens
 } from "../functions";
 
-export const presets: TypePreset[] = [
+export const presets: StoredTypescale[] = [
 	{
 		id: 0,
 		name: "Typescale Garden",
@@ -22,7 +22,10 @@ export const presets: TypePreset[] = [
 		useUppercaseForTitles: false,
 		useItalicsForTitles: false,
 		headingsInitialWeight: 700,
-		headingsFinalWeight: 500
+		headingsFinalWeight: 500,
+		author: "Typescale Garden",
+		createdAt: "0",
+		lastModifiedAt: "0"
 	},
 	{
 		id: 1,
@@ -37,7 +40,10 @@ export const presets: TypePreset[] = [
 		useUppercaseForTitles: false,
 		useItalicsForTitles: false,
 		headingsInitialWeight: 200,
-		headingsFinalWeight: 400
+		headingsFinalWeight: 400,
+		author: "IBM Design Team",
+		createdAt: "0",
+		lastModifiedAt: "0"
 	},
 	{
 		id: 2,
@@ -52,7 +58,10 @@ export const presets: TypePreset[] = [
 		useUppercaseForTitles: false,
 		useItalicsForTitles: false,
 		headingsInitialWeight: 200,
-		headingsFinalWeight: 600
+		headingsFinalWeight: 600,
+		author: "Google Design Team",
+		createdAt: "0",
+		lastModifiedAt: "0"
 	}
 ];
 export const selPresetIndex: Writable<number> = writable(0);

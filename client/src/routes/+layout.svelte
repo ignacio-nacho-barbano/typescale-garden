@@ -4,6 +4,17 @@
 	import Sidebar from "../components/Sidebar/Sidebar.svelte";
 	import { baseUnit, visibleGrid } from "../stores/config";
 	import NotificationsProjector from "../components/NotificationsProjector.svelte";
+	import { storedTypescales } from "../stores/typescales";
+	import { onMount } from "svelte";
+	import type { LayoutData } from "./$types";
+
+	export let data: LayoutData;
+
+	onMount(() => {
+		if (data.typescales) {
+			storedTypescales.set(data.typescales);
+		}
+	});
 </script>
 
 <TopBar />

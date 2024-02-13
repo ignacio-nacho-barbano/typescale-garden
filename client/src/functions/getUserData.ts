@@ -1,5 +1,5 @@
 import type { Auth0Client } from "@auth0/auth0-spa-js";
-import { user } from "../stores/auth";
+import { authToken, user } from "../stores/auth";
 
 export async function getUserData(client: Auth0Client) {
 	if (client) {
@@ -12,8 +12,10 @@ export async function getUserData(client: Auth0Client) {
 		}
 
 		try {
-			const hasToken = await client.getTokenSilently();
-			if (hasToken) {
+			const token = await client.getTokenSilently();
+			authToken.set(token);
+
+			if (token) {
 				const loggedUser = await client.getUser();
 
 				if (loggedUser) {

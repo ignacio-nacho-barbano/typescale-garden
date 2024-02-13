@@ -43,9 +43,12 @@ export interface TypeConfigOptions {
 	headingsFinalWeight: number;
 }
 
-export interface TypePreset extends TypeConfigOptions {
+export interface StoredTypescale extends TypeConfigOptions {
 	id: number;
 	name: string;
+	author: string;
+	createdAt: string;
+	lastModifiedAt: string;
 }
 
 export type ApiFont = (typeof mockFontsApi.items)[0];
