@@ -2,7 +2,9 @@
 	import Icon from "svelte-material-icons/MenuDown.svelte";
 	import { authClient, user } from "../stores/auth";
 	import Button from "./Button.svelte";
+	import Menu from "./Menu.svelte";
 
+	let userName = $user.nickname || $user.name || $user.email;
 	let menuOpen = false;
 
 	function logOut(e: Event) {
@@ -12,18 +14,14 @@
 </script>
 
 <button class="user-controls body-2" on:click={() => (menuOpen = !menuOpen)}>
-	<img src={$user.picture} alt={$user.nickname || $user.name || $user.email} />
-	<span>{$user.nickname}</span>
-	{#if menuOpen}
-		<menu class="user-controls-menu glass shadow-high">
-			<ul>
-				<li>Free Account</li>
-				<li>
-					<Button size="s" type="outline" on:click={logOut}>Log Out</Button>
-				</li>
-			</ul>
-		</menu>
-	{/if}
+	<img src={$user.picture} alt={userName} />
+	<p id="user-name" class="body-2">{userName}</p>
+	<Menu bind:open={menuOpen} position="right">
+		<li>Free Account</li>
+		<li>
+			<Button size="s" type="outline" on:click={logOut}>Log Out</Button>
+		</li>
+	</Menu>
 	<Icon />
 </button>
 
@@ -35,6 +33,7 @@
 		gap: $s3;
 		background: none;
 		border: none;
+		position: relative;
 
 		img {
 			height: 100%;
@@ -45,16 +44,11 @@
 		}
 	}
 
-	.user-controls-menu {
-		border-radius: $s6 0 $s6 $s6;
-		position: fixed;
-		padding: $s4;
-		top: calc($s6 - $s1);
-		right: $s4;
-		background-color: $c-base;
+	#user-name {
+		display: none;
 
-		ul {
-			list-style: none;
+		@media ($bp-l) {
+			display: unset;
 		}
 	}
 </style>

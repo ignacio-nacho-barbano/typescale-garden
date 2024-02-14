@@ -7,8 +7,9 @@ import {
 } from "$env/static/public";
 import type { Auth0ClientOptions } from "@auth0/auth0-spa-js";
 import { createAuth0Client } from "@auth0/auth0-spa-js";
-import type { StoredTypescale } from "../models/type-variants.js";
+import type { Typescale } from "@prisma/client";
 import { authClient } from "../stores/auth";
+import { getUserData } from "../functions";
 
 const authConfig: Auth0ClientOptions = {
 	domain: PUB_AUTH_DOMAIN,
@@ -21,7 +22,7 @@ const authConfig: Auth0ClientOptions = {
 
 export interface LayoutData {
 	successfulLoad: boolean;
-	typescales?: StoredTypescale[];
+	typescales?: Typescale[];
 	error?: unknown;
 }
 
@@ -32,7 +33,11 @@ export async function load({ fetch }): Promise<LayoutData> {
 
 	if (browser) {
 		try {
-			authClient.set(await createAuth0Client(authConfig));
+			const client = await createAuth0Client(authConfig);
+			authClient.set(client);
+
+			await getUserData(client);
+
 			return {
 				...data,
 				successfulLoad: true

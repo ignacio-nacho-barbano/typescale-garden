@@ -6,6 +6,5 @@ const router = Router();
 
 router.use("/users", UsersRoutes);
 router.use("/typescales", TypescalesRouter);
-// router.use('/tags', TagRoutes);
 
 export const MainRouter: Router = router;

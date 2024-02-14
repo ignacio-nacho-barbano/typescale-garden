@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {
-		selPresetIndex,
 		fontName,
 		baseSize,
 		baseUnit,
@@ -13,8 +12,7 @@
 		letterSpacingRatio,
 		useUppercaseForTitles,
 		useItalicsForTitles,
-		randomFont,
-		presets
+		randomFont
 	} from "../../stores/config";
 	import Input from "../Input.svelte";
 	import Button from "../Button.svelte";
@@ -23,12 +21,6 @@
 </script>
 
 <div class="sidebar-parameters">
-	<Select
-		label="Preset"
-		id="preset"
-		bind:value={$selPresetIndex}
-		options={presets.map(({ name, id }) => ({ label: name, value: id }))}
-	/>
 	<Input name="family" label="Font Family (Google Fonts)" useSearch bind:value={$fontName} />
 	<Input name="base-font" label="Base Font Size (px)" bind:value={$baseSize} />
 	<Input name="visual-size" label="Base Visual Unit" bind:value={$baseUnit} />

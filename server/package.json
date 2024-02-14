@@ -8,6 +8,7 @@
     "dev": "nodemon --watch './src' -e .ts --exec ts-node -r ./env-loader.js ./src/index.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.9.1",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
@@ -16,8 +17,10 @@
     "express-oauth2-jwt-bearer": "^1.6.0",
     "express-openid-connect": "^2.17.1",
     "jsonwebtoken": "^9.0.2",
+    "jwks-rsa": "^3.1.0",
     "mongodb": "^6.3.0",
-    "morgan": "~1.9.1"
+    "morgan": "~1.9.1",
+    "prisma": "^5.9.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.6",

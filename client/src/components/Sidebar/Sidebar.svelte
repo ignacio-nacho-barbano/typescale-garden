@@ -1,35 +1,18 @@
 <script lang="ts">
-	import Input from "../Input.svelte";
-	import Switch from "../Switch.svelte";
-	import {
-		fontName,
-		baseSize,
-		baseUnit,
-		desktopRatio,
-		mobileRatio,
-		breakpoint,
-		headingsFinalWeight,
-		headingsInitialWeight,
-		letterSpacingRatio,
-		useUppercaseForTitles,
-		useItalicsForTitles,
-		availableWeights,
-		randomFont,
-		presets,
-		selPresetIndex
-	} from "../../stores/config";
-	import Button from "../Button.svelte";
-	import Select from "../Select.svelte";
-	import Tabs from "../Tabs.svelte";
-	import Tab from "../Tab.svelte";
 	import { accordionStates } from "../../stores/app";
-	import Parameters from "./Parameters.svelte";
-	import Export from "./Export.svelte";
-	import Contrast from "./Contrast.svelte";
 	import Accordion from "../Accordion.svelte";
+	import LoadControl from "../FileControls/LoadControl.svelte";
+	import SaveControl from "../FileControls/SaveControl.svelte";
+	import Contrast from "./Contrast.svelte";
+	import Export from "./Export.svelte";
+	import Parameters from "./Parameters.svelte";
 </script>
 
-<section class="side-bar glass">
+<section id="sidebar" class="side-bar glass">
+	<div class="file-buttons">
+		<LoadControl />
+		<SaveControl />
+	</div>
 	<Accordion bind:open={$accordionStates.parameters}>
 		<span slot="title">Parameters</span>
 		<Parameters slot="content" />
@@ -51,14 +34,24 @@
 	section.side-bar {
 		min-width: 256px;
 		max-width: 440px;
-		height: calc(100vh - $s6);
-		position: sticky;
-		top: $s6;
 		display: flex;
 		flex-direction: column;
 		gap: $s4;
-		padding: $s4 0 $s5;
+		padding: 0 0 $s5;
 		overflow: auto;
 		border-right: solid $lw $c-primary;
+	}
+
+	.file-buttons {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background: $c-base;
+		display: flex;
+		align-items: center;
+		height: $s6;
+		gap: $s3;
+		padding: 0 $s4;
+		border-bottom: $lw solid $c-primary;
 	}
 </style>

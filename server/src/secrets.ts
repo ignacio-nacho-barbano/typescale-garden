@@ -21,5 +21,6 @@ export const DB = {
 	PASSWORD: process.env.DB_USER_PWD || "secret",
 	HOST: process.env.DB_HOST || "localhost",
 	NAME: process.env.DB_NAME || "conduit",
-	PORT: parseInt(process.env.DB_PORT || "27017")
+	PORT: parseInt(process.env.DB_PORT || "27017"),
+	STRING: `mongodb+srv://${process.env.DB_HOST}/?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority`
 };
