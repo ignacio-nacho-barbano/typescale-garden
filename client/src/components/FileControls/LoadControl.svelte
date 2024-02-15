@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { loadedTypescale } from "../../stores/typescales";
+	import { loadedTypescale, loadedTypescaleId } from "../../stores/typescales";
 	import { storedTypescales } from "../../stores/typescales";
 	import Button from "../Button.svelte";
 	import Menu from "../Menu.svelte";
@@ -13,7 +13,7 @@
 	<Select
 		label="Preset"
 		id="preset"
-		bind:value={$loadedTypescale.id}
+		bind:value={$loadedTypescaleId}
 		options={$storedTypescales.map(({ name, id }) => ({ label: name, value: id }))}
 	/>
 </Menu>

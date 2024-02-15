@@ -1,13 +1,12 @@
-import { derived, writable, type Readable, type Writable, get } from "svelte/store";
-import type { ApiFont, TypeVariant } from "../models";
+import { derived, get, writable, type Readable } from "svelte/store";
 import { mockFontsApi } from "../constants/mockFontsApi";
-import type { Typescale } from "@prisma/client";
 import {
 	calculateDistributeWeights,
 	expectedRange,
 	generateCss,
 	generateTokens
 } from "../functions";
+import type { ApiFont, TypeVariant } from "../models";
 
 // constants
 const variants = [

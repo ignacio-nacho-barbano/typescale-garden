@@ -1,11 +1,15 @@
-import { writable } from "svelte/store";
+import { browser } from "$app/environment";
 import type { Typescale } from "@prisma/client";
+import { derived, writable } from "svelte/store";
 import { isAuthenticated } from "./auth";
 import { fetch } from "./fetch";
-import { browser } from "$app/environment";
 
-export const loadedTypescale = writable<Typescale>();
+export const loadedTypescaleId = writable<string>("65cccfa9da28ca09248358df");
 export const storedTypescales = writable<Typescale[]>([]);
+export const loadedTypescale = derived(
+	[loadedTypescaleId, storedTypescales],
+	([loadedId, typescales]) => typescales.find(({ id }) => id === loadedId)
+);
 
 isAuthenticated.subscribe(async (authenticated) => {
 	fetch.subscribe(async (fetch) => {
@@ -21,12 +25,4 @@ isAuthenticated.subscribe(async (authenticated) => {
 			}
 		}
 	});
-});
-
-storedTypescales.subscribe((typescales) => {
-	// This should always be true, but just in case
-	// if default typographies change, this should change as well
-	if (typescales.length >= 3) {
-		loadedTypescale.set(typescales.at(-3)!);
-	}
 });
