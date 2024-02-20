@@ -8,8 +8,9 @@ import {
 import type { Auth0ClientOptions } from "@auth0/auth0-spa-js";
 import { createAuth0Client } from "@auth0/auth0-spa-js";
 import type { Typescale } from "@prisma/client";
-import { authClient } from "../stores/auth";
 import { getUserData } from "../functions";
+import { logError } from "../services/errorLogger";
+import { authClient } from "../stores/auth";
 
 const authConfig: Auth0ClientOptions = {
 	domain: PUB_AUTH_DOMAIN,
@@ -28,8 +29,14 @@ export interface LayoutData {
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ fetch }): Promise<LayoutData> {
-	const res = await fetch(PUB_API_URL + "/api/typescales/default");
-	const data = await res.json();
+	let data = {};
+
+	try {
+		const res = await fetch(PUB_API_URL + "/api/typescales/default");
+		data = await res.json();
+	} catch (err) {
+		logError("Unable to load default typescales", err);
+	}
 
 	if (browser) {
 		try {
@@ -42,11 +49,11 @@ export async function load({ fetch }): Promise<LayoutData> {
 				...data,
 				successfulLoad: true
 			};
-		} catch (error) {
-			console.error("Unable to create auth client", error);
+		} catch (err) {
+			console.error("Unable to create auth client", err);
 			return {
 				successfulLoad: false,
-				error
+				error: err
 			};
 		}
 	} else {

@@ -3,6 +3,7 @@ import type { Typescale } from "@prisma/client";
 import { derived, writable } from "svelte/store";
 import { isAuthenticated } from "./auth";
 import { fetch } from "./fetch";
+import { logError } from "../services/errorLogger";
 
 export const loadedTypescaleId = writable<string>("65cccfa9da28ca09248358df");
 export const storedTypescales = writable<Typescale[]>([]);
@@ -21,7 +22,7 @@ isAuthenticated.subscribe(async (authenticated) => {
 					storedTypescales.set(res.data.typescales);
 				}
 			} catch (error) {
-				console.error("Error loading typescales", error);
+				logError("Error loading typescales", error);
 			}
 		}
 	});

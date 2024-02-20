@@ -53,14 +53,6 @@
 		flex-direction: row;
 		width: 100dvw;
 		height: 100dvh;
-
-		:global(#sidebar) {
-			display: none;
-
-			@media ($bp-l) {
-				display: unset;
-			}
-		}
 	}
 	main#main-content {
 		flex: 1 1;

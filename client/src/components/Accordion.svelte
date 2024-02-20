@@ -18,7 +18,9 @@
 		width: 100%;
 
 		.title-bar {
-			padding: $s3;
+			height: $s6;
+			padding: 0 $s4;
+			align-items: center;
 			display: flex;
 			width: 100%;
 			border-bottom: $lw solid $c-accent;
