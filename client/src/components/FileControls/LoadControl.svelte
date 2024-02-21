@@ -8,12 +8,21 @@
 	let open = false;
 </script>
 
-<Button size="s" type="outline" on:click={() => (open = !open)}>Load</Button>
-<Menu bind:open>
-	<Select
-		label="Preset"
-		id="preset"
-		bind:value={$loadedTypescaleId}
-		options={$storedTypescales.map(({ name, id }) => ({ label: name, value: id }))}
-	/>
-</Menu>
+<div class="wrapper">
+	<Button size="s" type="outline" on:click={() => (open = !open)}>Load</Button>
+	<Menu bind:open>
+		<Select
+			label="Preset"
+			id="preset"
+			bind:value={$loadedTypescaleId}
+			options={$storedTypescales.map(({ name, id }) => ({ label: name, value: id }))}
+		/>
+	</Menu>
+</div>
+
+<style lang="scss">
+	.wrapper {
+		z-index: 1;
+		position: relative;
+	}
+</style>
