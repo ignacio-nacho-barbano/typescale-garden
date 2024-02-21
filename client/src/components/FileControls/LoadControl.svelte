@@ -17,8 +17,3 @@
 		options={$storedTypescales.map(({ name, id }) => ({ label: name, value: id }))}
 	/>
 </Menu>
-
-<style lang="scss">
-	.controls {
-	}
-</style>
