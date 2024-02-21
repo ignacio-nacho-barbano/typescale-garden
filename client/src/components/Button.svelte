@@ -74,7 +74,7 @@
 		gap: $s2;
 		color: currentColor;
 		display: flex;
-		border-radius: 26px;
+		border-radius: $s5;
 		text-transform: uppercase;
 		padding: 0 $s5;
 		transition: 0.2s ease-in-out;
@@ -94,8 +94,8 @@
 		}
 
 		&.s {
-			min-height: $s5;
-			max-height: $s5;
+			min-height: 40px;
+			max-height: 40px;
 		}
 
 		&.outline {
@@ -104,11 +104,9 @@
 		}
 
 		&.ghost {
-			border-color: transparent;
 		}
 
 		&.primary {
-			border: $lw solid $c-accent;
 			background: linear-gradient(60deg, $c-primary, transparent);
 		}
 
@@ -136,19 +134,14 @@
 			height: 52px;
 		}
 
-		&.outlined {
-			border: $lw solid transparent;
-		}
-
 		&.active {
-			background-color: $c-accent;
 			color: $c-base;
 		}
 
 		&:hover:not(:active) {
-			background-color: $c-accent;
+			border: none;
 			color: $c-base;
-			border-color: transparent;
+			background: linear-gradient(60deg, $c-primary, $c-accent);
 			transform: (translate(-2px, -2px));
 			@include shadow-high;
 		}

@@ -60,8 +60,8 @@
 </Modal>
 
 <div class="export-block">
-	<Button on:click={() => (modalOpen = true)}>See Result</Button>
-	<Button on:click={() => copyToClipboard($cssCode, "CSS Code")} cls="copy-btn">Copy Styles</Button>
+	<Button on:click={() => (modalOpen = true)}>See Code</Button>
+	<Button on:click={() => copyToClipboard($cssCode, "CSS Code")} cls="copy-btn">Copy CSS</Button>
 	<Button on:click={() => copyToClipboard($designTokens, "Design Tokens")} cls="copy-btn"
 		>Copy Tokens</Button
 	>

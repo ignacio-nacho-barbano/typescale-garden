@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { lorem } from "../constants";
-	import { typescale, cssCode, currentFont, breakpoint } from "../stores/config";
 	import { onDestroy } from "svelte";
-	import { routes } from "./routes";
 	import typescale3d from "../../images/typescale-3d.jpg?w=500&format=webp";
+	import { breakpoint, cssCode } from "../stores/config";
+	import { routes } from "./routes";
 
 	let tableStyles = "";
 	const unsubscribe = cssCode.subscribe((code) => {
@@ -49,12 +48,13 @@
 	<h2>What is different about Typescale Garden?</h2>
 	<p>
 		Typescale Garden is another tool for generating a typescale based on several relations. It's
-		more configurable than most other tools and it provides the possibilty of generating two sets of
-		related typographic scales, one for phones and other small devices and one for bigger screens.
+		more configurable than most other tools and it provides the possibility of generating two sets
+		of related typographic scales, one for phones and other small devices and one for bigger
+		screens.
 	</p>
 	<h3>Two Typescales? Why?</h3>
 	<p>
-		Tpypographic scales have been here long before screens. In printed media you knew the format you
+		Typographic scales have been here long before screens. In printed media you knew the format you
 		where working with, and therefore you could design the ideal scale for such media, sizes and
 		viewing distance.
 	</p>
@@ -68,10 +68,10 @@
 	<h4>The Desktop vs Mobile Ratios Problem</h4>
 	<h5>TL;DR</h5>
 	<p>
-		The same size difference between your smaller fonts and your biggers fonts won't work on both
+		The same size difference between your smaller fonts and your bigger glyphs won't work on both
 		small and big screens. If you proportionally scale it, you will either have a font that's
-		absurdly oversized on the bigger headings, or completely out of the accessibity standards on the
-		paragraphs.
+		absurdly oversized on the bigger headings, or completely out of the accessibility standards on
+		the paragraphs.
 	</p>
 
 	<h5>Let's analyze this scenario:</h5>
@@ -80,10 +80,10 @@
 		have a strikingly growing typescale right?
 	</p>
 	<p>
-		We begin a new file in our new favourite design tool (figma in my case), we work trough picking
-		a font, a spacing system and many other pieces, day comes when we start working on the
-		typographic scale, we explore different ratios, weights, make visual adjustments and we even
-		test it on a couple test pages.
+		We begin a new file in our new favorite design tool (figma in my case), we work trough picking a
+		font, a spacing system and many other pieces, day comes when we start working on the typographic
+		scale, we explore different ratios, weights, make visual adjustments and we even test it on a
+		couple test pages.
 	</p>
 	<p>
 		Likely you are doing all of this on a laptop or even a big monitor, which could be keeping you
@@ -91,7 +91,7 @@
 	</p>
 	<p>
 		You could even go as far as not testing your font on any design for a small screen, because
-		you're just "testing the font, and the tpographic scale".
+		you're just "testing the font, and the typographic scale".
 	</p>
 	<p>
 		Process iterates and you've a result you're happy, you make your first page using your new

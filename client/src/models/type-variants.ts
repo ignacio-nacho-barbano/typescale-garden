@@ -43,9 +43,4 @@ export interface TypeConfigOptions {
 	headingsFinalWeight: number;
 }
 
-export interface TypePreset extends TypeConfigOptions {
-	id: number;
-	name: string;
-}
-
 export type ApiFont = (typeof mockFontsApi.items)[0];

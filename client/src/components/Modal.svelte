@@ -24,7 +24,6 @@
 			body = document.body;
 
 			dialog.addEventListener("close", () => {
-				console.log("close event", { open });
 				open = false;
 			});
 		}

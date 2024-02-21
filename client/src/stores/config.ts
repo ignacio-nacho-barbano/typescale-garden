@@ -1,5 +1,4 @@
-import { derived, writable, type Readable, type Writable, get } from "svelte/store";
-import type { ApiFont, TypePreset, TypeVariant } from "../models";
+import { derived, get, writable, type Readable } from "svelte/store";
 import { mockFontsApi } from "../constants/mockFontsApi";
 import {
 	calculateDistributeWeights,
@@ -7,57 +6,7 @@ import {
 	generateCss,
 	generateTokens
 } from "../functions";
-
-export const presets: TypePreset[] = [
-	{
-		id: 0,
-		name: "Typescale Garden",
-		breakpoint: 768,
-		fontName: "Red Hat Text",
-		baseSize: 22,
-		baseUnit: 4,
-		letterSpacingRatio: 1.5,
-		desktopRatio: 1.2,
-		mobileRatio: 1.15,
-		useUppercaseForTitles: false,
-		useItalicsForTitles: false,
-		headingsInitialWeight: 700,
-		headingsFinalWeight: 500
-	},
-	{
-		id: 1,
-		name: "IBM Carbon Design",
-		breakpoint: 768,
-		fontName: "IBM Plex Sans",
-		baseSize: 16,
-		baseUnit: 4,
-		desktopRatio: 1.29,
-		mobileRatio: 1.15,
-		letterSpacingRatio: 1.2,
-		useUppercaseForTitles: false,
-		useItalicsForTitles: false,
-		headingsInitialWeight: 200,
-		headingsFinalWeight: 400
-	},
-	{
-		id: 2,
-		name: "Material Design 2",
-		breakpoint: 768,
-		fontName: "Roboto",
-		baseSize: 16,
-		baseUnit: 4,
-		desktopRatio: 1.29,
-		mobileRatio: 1.15,
-		letterSpacingRatio: 1.7,
-		useUppercaseForTitles: false,
-		useItalicsForTitles: false,
-		headingsInitialWeight: 200,
-		headingsFinalWeight: 600
-	}
-];
-export const selPresetIndex: Writable<number> = writable(0);
-
-const currentPreset = () => presets[get(selPresetIndex)];
+import type { ApiFont, TypeVariant } from "../models";
 
 // constants
 const variants = [
@@ -74,19 +23,18 @@ const variants = [
 
 // writables
 
-export const breakpoint = writable(currentPreset().breakpoint);
-export const fontName = writable(currentPreset().fontName);
-export const baseSize = writable(currentPreset().baseSize);
-export const baseUnit = writable(currentPreset().baseUnit);
+export const breakpoint = writable(768);
+export const fontName = writable("Red Hat Text");
+export const baseSize = writable(22);
+export const baseUnit = writable(4);
 export const visibleGrid = writable(false);
-export const desktopRatio = writable(currentPreset().desktopRatio);
-export const mobileRatio = writable(currentPreset().mobileRatio);
-export const letterSpacingRatio = writable(currentPreset().letterSpacingRatio);
-export const useUppercaseForTitles = writable(currentPreset().useUppercaseForTitles);
-export const useItalicsForTitles = writable(currentPreset().useItalicsForTitles);
+export const desktopRatio = writable(1.22);
+export const mobileRatio = writable(1.15);
+export const letterSpacingRatio = writable(1.5);
+export const useUppercaseForTitles = writable(false);
+export const useItalicsForTitles = writable(false);
 
 // deriveds
-
 export const currentFont = derived(fontName, ($fontName: string): ApiFont => {
 	return (
 		mockFontsApi.items.find(({ family }) => $fontName.toLowerCase() === family.toLowerCase()) ||
@@ -105,8 +53,8 @@ export const availableWeights = derived(currentFont, ($currentFont) => {
 	return variants;
 });
 
-export const headingsInitialWeight = writable(currentPreset().headingsInitialWeight);
-export const headingsFinalWeight = writable(currentPreset().headingsFinalWeight);
+export const headingsInitialWeight = writable(700);
+export const headingsFinalWeight = writable(500);
 
 availableWeights.subscribe(($aw) => {
 	if (!$aw.includes(get(headingsInitialWeight)))
@@ -202,21 +150,21 @@ export const typescale = derived(
 		})
 );
 
-selPresetIndex.subscribe((i) => {
-	const p = presets[i];
+// selPresetIndex.subscribe((i) => {
+// 	const p = presets[i];
 
-	fontName.set(p.fontName);
-	breakpoint.set(p.breakpoint);
-	baseSize.set(p.baseSize);
-	baseUnit.set(p.baseUnit);
-	letterSpacingRatio.set(p.letterSpacingRatio);
-	desktopRatio.set(p.desktopRatio);
-	mobileRatio.set(p.mobileRatio);
-	useUppercaseForTitles.set(p.useUppercaseForTitles);
-	useItalicsForTitles.set(p.useItalicsForTitles);
-	headingsInitialWeight.set(p.headingsInitialWeight);
-	headingsFinalWeight.set(p.headingsFinalWeight);
-});
+// 	fontName.set(p.fontName);
+// 	breakpoint.set(p.breakpoint);
+// 	baseSize.set(p.baseSize);
+// 	baseUnit.set(p.baseUnit);
+// 	letterSpacingRatio.set(p.letterSpacingRatio);
+// 	desktopRatio.set(p.desktopRatio);
+// 	mobileRatio.set(p.mobileRatio);
+// 	useUppercaseForTitles.set(p.useUppercaseForTitles);
+// 	useItalicsForTitles.set(p.useItalicsForTitles);
+// 	headingsInitialWeight.set(p.headingsInitialWeight);
+// 	headingsFinalWeight.set(p.headingsFinalWeight);
+// });
 
 export const cssCode = derived(
 	[typescale, breakpoint, currentFont, weightSteps],
@@ -235,4 +183,4 @@ export const designTokens = derived(
 	([$typescale, $breakpoint, $currentFont]) => generateTokens($typescale, $breakpoint, $currentFont)
 );
 
-fontName.subscribe(console.log);
+// fontName.subscribe(console.log);

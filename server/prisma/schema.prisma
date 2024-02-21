@@ -1,0 +1,32 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DB_STRING")
+}
+
+type TypescaleBase {
+    breakpoint            Int
+    fontName              String
+    baseUnit              Float
+    baseSize              Float
+    desktopRatio          Float
+    mobileRatio           Float
+    letterSpacingRatio    Float
+    useUppercaseForTitles Boolean
+    useItalicsForTitles   Boolean
+    headingsInitialWeight Int
+    headingsFinalWeight   Int
+}
+
+model Typescale {
+    id             String        @id @default(auto()) @map("_id") @db.ObjectId
+    authorId       String
+    name           String
+    createdAt      DateTime      @default(now())
+    lastModifiedAt DateTime      @updatedAt
+    base           TypescaleBase
+    overrides      Json?
+}

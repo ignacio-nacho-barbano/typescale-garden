@@ -5,3 +5,4 @@ export * from "./calculateDistributeWeights";
 export * from "./expectedRange";
 export * from "./generateTokens";
 export * from "./downloadFile";
+export * from "./getUserData";

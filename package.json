@@ -3,7 +3,6 @@
 	"version": "1.0.0",
 	"description": "a monorepo for all of typescale-garden pieces, a project meant to aid designers working on creating typescales as part of a design system",
 	"main": "index.js",
-	"devDependencies": {},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"format": "prettier --plugin-search-dir . --write ."
@@ -14,7 +13,8 @@
 	},
 	"workspaces": [
 		"./client",
-		"./plugin"
+		"./plugin",
+		"./server"
 	],
 	"keywords": [
 		"svelte",
@@ -32,5 +32,7 @@
 	"bugs": {
 		"url": "https://github.com/ignacio-nacho-barbano/typescale-garden/issues"
 	},
-	"homepage": "https://github.com/ignacio-nacho-barbano/typescale-garden#readme"
+	"homepage": "https://github.com/ignacio-nacho-barbano/typescale-garden#readme",
+	"devDependencies": {
+	}
 }

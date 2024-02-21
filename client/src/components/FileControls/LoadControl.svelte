@@ -1,0 +1,19 @@
+<script lang="ts">
+	import { loadedTypescale, loadedTypescaleId } from "../../stores/typescales";
+	import { storedTypescales } from "../../stores/typescales";
+	import Button from "../Button.svelte";
+	import Menu from "../Menu.svelte";
+	import Select from "../Select.svelte";
+
+	let open = false;
+</script>
+
+<Button size="s" type="outline" on:click={() => (open = !open)}>Load</Button>
+<Menu bind:open>
+	<Select
+		label="Preset"
+		id="preset"
+		bind:value={$loadedTypescaleId}
+		options={$storedTypescales.map(({ name, id }) => ({ label: name, value: id }))}
+	/>
+</Menu>

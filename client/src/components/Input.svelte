@@ -8,7 +8,7 @@
 	export let label: string | null = null;
 	export let changeOnBlur: boolean = false;
 	export let useSearch: boolean = false;
-	export let validators: FormValidator<typeof value>[] = [];
+	// export let validators: FormValidator<typeof value>[] = [];
 	let blurEvent: boolean = false;
 	let internalValue: string = (value || "") as string;
 
