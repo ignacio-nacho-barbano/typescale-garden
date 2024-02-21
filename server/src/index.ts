@@ -6,6 +6,7 @@ import path from "path";
 import { MainRouter } from "./routes";
 import { APP_PORT, CLIENT_ORIGIN } from "./secrets";
 import { loadErrorHandlers } from "./utils";
+import { rateLimiter } from "./middlewares/rateLimit";
 
 const app = express();
 // add rate limiter
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(rateLimiter);
 
 app.use("/api/", MainRouter);
 
