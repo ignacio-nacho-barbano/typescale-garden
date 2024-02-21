@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon --watch './src' -e .ts --exec ts-node -r ./env-loader.env.js ./src/index.ts",
+    "dev": "nodemon --watch './src' -e .ts --exec ts-node -r ./env-loader.dev.js ./src/index.ts",
     "db:migrate:dev": "dotenv -e ../.env npx prisma prisma db push seed",
     "db:migrate:prod": "dotenv -e ../.env.prod npx prisma db push seed",
     "prisma:file": "ts-node --project ../tsconfig.json -r ./env-loader.prod.js ./prisma/seeds/typescales.ts"
