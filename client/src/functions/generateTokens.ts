@@ -38,20 +38,46 @@ export const generateTokens = (
 				// fontWeight: weight,
 				letterSpacing: { value: letterSpacing * 10, unit: "PERCENT" }
 			};
+			const desktopName = "desktop/" + name;
+			const mobileName = "mobile/" + name;
 			// @ts-ignore
-			tokens["desktop/" + name] = {
+			tokens[desktopName] = {
 				...base,
-				name: "desktop/" + name,
+				name: desktopName,
 				fontSize: desktopSize,
 				lineHeight: { value: desktopLine, unit: "PIXELS" }
 			};
 			// @ts-ignore
-			tokens["mobile/" + name] = {
+			tokens[mobileName] = {
 				...base,
-				name: "mobile/" + name,
+				name: mobileName,
 				fontSize: mobileSize,
 				lineHeight: { value: mobileLine, unit: "PIXELS" }
 			};
+
+			if (name.includes("body") && weightsMap[weight + 200]) {
+				const boldSuffix = "-bold";
+				const fontName = {
+					family: font.family,
+					style: weightsMap[weight + 200] + (italics ? " Italic" : "")
+				};
+				// @ts-ignore
+				tokens[desktopName + boldSuffix] = {
+					...base,
+					fontName,
+					name: desktopName + boldSuffix,
+					fontSize: desktopSize,
+					lineHeight: { value: desktopLine, unit: "PIXELS" }
+				};
+				// @ts-ignore
+				tokens[mobileName + boldSuffix] = {
+					...base,
+					fontName,
+					name: mobileName + boldSuffix,
+					fontSize: mobileSize,
+					lineHeight: { value: mobileLine, unit: "PIXELS" }
+				};
+			}
 		}
 	);
 
