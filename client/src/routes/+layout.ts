@@ -1,7 +1,6 @@
 import { browser } from "$app/environment";
 import {
 	PUB_API_URL,
-	PUB_APP_ENV,
 	PUB_AUTH_CLIENT_ID,
 	PUB_AUTH_DOMAIN,
 	PUB_CLIENT_ORIGIN
@@ -17,14 +16,10 @@ const authConfig: Auth0ClientOptions = {
 	domain: PUB_AUTH_DOMAIN,
 	clientId: PUB_AUTH_CLIENT_ID,
 	authorizationParams: {
-		redirect_uri: PUB_CLIENT_ORIGIN
+		redirect_uri: PUB_CLIENT_ORIGIN,
+		audience: PUB_API_URL
 	}
 };
-
-// remove the following if once backend is deployed
-if (PUB_APP_ENV === "dev") {
-	authConfig.authorizationParams.audience = PUB_API_URL;
-}
 
 export interface LayoutData {
 	successfulLoad: boolean;
