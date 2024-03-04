@@ -7,15 +7,16 @@ import {
 	generateTokens
 } from "../functions";
 import type { ApiFont, TypeVariant } from "../models";
+const headingPrefix = "title-";
 
 // constants
 const variants = [
-	{ isHeading: true, location: 7, name: "heading1", mapsTo: "h1" },
-	{ isHeading: true, location: 6, name: "heading2", mapsTo: "h2" },
-	{ isHeading: true, location: 5, name: "heading3", mapsTo: "h3" },
-	{ isHeading: true, location: 4, name: "heading4", mapsTo: "h4" },
-	{ isHeading: true, location: 3, name: "heading5", mapsTo: "h5" },
-	{ isHeading: true, location: 2, name: "heading6", mapsTo: "h6" },
+	{ isHeading: true, location: 7, name: headingPrefix + "1", mapsTo: "h1" },
+	{ isHeading: true, location: 6, name: headingPrefix + "2", mapsTo: "h2" },
+	{ isHeading: true, location: 5, name: headingPrefix + "3", mapsTo: "h3" },
+	{ isHeading: true, location: 4, name: headingPrefix + "4", mapsTo: "h4" },
+	{ isHeading: true, location: 3, name: headingPrefix + "5", mapsTo: "h5" },
+	{ isHeading: true, location: 2, name: headingPrefix + "6", mapsTo: "h6" },
 	{ isHeading: false, location: 0, name: "body-1", mapsTo: "p, button" },
 	{ isHeading: false, location: -1, name: "body-2", mapsTo: "label, figcaption, input" },
 	{ isHeading: false, location: -2, name: "tooltip" }

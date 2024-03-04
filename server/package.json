@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "dev": "nodemon --watch './src' -e .ts --exec ts-node -r ./env-loader.dev.js ./src/index.ts",
     "db:migrate:dev": "dotenv -e ../.env npx prisma prisma db push seed",
     "db:migrate:prod": "dotenv -e ../.env.prod npx prisma db push seed",
@@ -29,7 +29,8 @@
     "mongodb": "^6.3.0",
     "morgan": "~1.9.1",
     "prisma": "^5.9.1",
-    "rollbar": "^2.26.3"
+    "rollbar": "^2.26.3",
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.6",
@@ -40,7 +41,6 @@
     "@types/node": "^20.11.16",
     "dotenv-cli": "^7.3.0",
     "nodemon": "^3.0.3",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "ts-node": "^10.9.2"
   }
 }

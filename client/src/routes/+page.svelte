@@ -20,7 +20,7 @@
 	{@html `<style>
 			${tableStyles}
 		</style>`}
-	<h1 class="heading1 space-text-below">A Typescale Creation Tool</h1>
+	<h1 class="title-1 space-text-below">A Typescale Creation Tool</h1>
 
 	<div class="text-and-image space-text-below">
 		<div>
