@@ -78,6 +78,7 @@
 		border-radius: $s5;
 		text-transform: uppercase;
 		padding: 0 $s5;
+		white-space: nowrap;
 		transition: 0.2s ease-in-out;
 		align-items: center;
 		justify-content: center;
