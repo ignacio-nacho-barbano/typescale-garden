@@ -15,7 +15,7 @@ const app = express();
 // app.use(helmet());
 app.use(logger("dev"));
 
-app.use(cors({ origin: CLIENT_ORIGIN }));
+app.use(cors({ origin: [CLIENT_ORIGIN!, "https://typescale-garden.netlify.app"] }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

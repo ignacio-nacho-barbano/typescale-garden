@@ -39,6 +39,8 @@ export async function load({ fetch }): Promise<LayoutData> {
 	}
 
 	if (browser) {
+		console.log("Svelte loaded");
+
 		try {
 			const client = await createAuth0Client(authConfig);
 			authClient.set(client);
