@@ -12,7 +12,6 @@ import type { Typescale } from "@prisma/client";
 import { getUserData } from "../functions";
 import { logError } from "../services/errorLogger";
 import { authClient } from "../stores/auth";
-import {} from "$env/dynamic/public";
 
 const authConfig: Auth0ClientOptions = {
 	domain: PUB_AUTH_DOMAIN,
