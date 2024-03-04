@@ -85,10 +85,6 @@
 		font-weight: 700;
 		border: none;
 
-		@media only screen and ($bp-m) {
-			font-size: 16px;
-		}
-
 		&.m {
 			min-height: $s6;
 			max-height: $s6;
