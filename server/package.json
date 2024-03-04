@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "npm i && npx tsc",
+    "build": "npm i && npx prisma generate && npx tsc",
     "start": "node dist/src/index.js",
     "dev": "nodemon --watch './src' -e .ts --exec ts-node -r ./env-loader.dev.js ./src/index.ts",
     "db:migrate:dev": "dotenv -e ../.env npx prisma prisma db push seed",
