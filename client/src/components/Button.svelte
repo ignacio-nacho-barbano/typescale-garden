@@ -16,12 +16,13 @@
 	let trailIconComp: typeof Icon;
 	let classes = `glass btn shadow-mid ${size} ${cls} ${type}`;
 	let isExternal = false;
+	let hasText = $$slots.default;
 
 	if (to && !to.startsWith("/") && !to.startsWith("#")) {
 		isExternal = true;
 	}
 
-	if ((leadIcon || trailIcon) && !$$slots.default) {
+	if ((leadIcon || trailIcon) && !hasText) {
 		classes += " icon";
 
 		// if (!alt) {
@@ -31,11 +32,11 @@
 		// }
 	}
 
-	if (leadIcon && $$slots.default) {
+	if (leadIcon && hasText) {
 		classes += " lead-icon";
 	}
 
-	if (trailIcon && $$slots.default) {
+	if (trailIcon && hasText) {
 		classes += " trail-icon";
 	}
 

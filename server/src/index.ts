@@ -7,6 +7,7 @@ import { MainRouter } from "./routes";
 import { APP_PORT, CLIENT_ORIGIN } from "./secrets";
 import { loadErrorHandlers } from "./utils";
 import { rateLimiter } from "./middlewares/rateLimit";
+import helmet from "helmet";
 
 const app = express();
 // add rate limiter
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(rateLimiter);
+app.use(helmet());
 
 app.use("/api/", MainRouter);
 

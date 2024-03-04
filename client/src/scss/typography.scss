@@ -66,17 +66,17 @@ span b,
 }
 
 h1,
-.heading1,
+.title-1,
 h2,
-.heading2,
+.title-2,
 h3,
-.heading3,
+.title-3,
 h4,
-.heading4,
+.title-4,
 h5,
-.heading5,
+.title-5,
 h6,
-.heading6 {
+.title-6 {
 	font-style: normal;
 	text-transform: none;
 	max-width: 768px;
@@ -87,7 +87,7 @@ p {
 }
 
 h1,
-.heading1 {
+.title-1 {
 	font-size: 50px;
 	line-height: 56px;
 	font-weight: 500;
@@ -95,7 +95,7 @@ h1,
 }
 
 h2,
-.heading2 {
+.title-2 {
 	font-size: 44px;
 	line-height: 52px;
 	font-weight: 500;
@@ -103,7 +103,7 @@ h2,
 }
 
 h3,
-.heading3 {
+.title-3 {
 	font-size: 38px;
 	line-height: 52px;
 	font-weight: 600;
@@ -111,7 +111,7 @@ h3,
 }
 
 h4,
-.heading4 {
+.title-4 {
 	font-size: 34px;
 	line-height: 48px;
 	font-weight: 600;
@@ -119,7 +119,7 @@ h4,
 }
 
 h5,
-.heading5 {
+.title-5 {
 	font-size: 30px;
 	line-height: 48px;
 	font-weight: 700;
@@ -127,7 +127,7 @@ h5,
 }
 
 h6,
-.heading6 {
+.title-6 {
 	font-size: 26px;
 	line-height: 48px;
 	font-weight: 700;
@@ -166,32 +166,32 @@ input,
 	}
 
 	h1,
-	.heading1 {
+	.title-1 {
 		font-size: 78px;
 		line-height: 84px;
 	}
 	h2,
-	.heading2 {
+	.title-2 {
 		font-size: 66px;
 		line-height: 80px;
 	}
 	h3,
-	.heading3 {
+	.title-3 {
 		font-size: 54px;
 		line-height: 72px;
 	}
 	h4,
-	.heading4 {
+	.title-4 {
 		font-size: 46px;
 		line-height: 68px;
 	}
 	h5,
-	.heading5 {
+	.title-5 {
 		font-size: 38px;
 		line-height: 60px;
 	}
 	h6,
-	.heading6 {
+	.title-6 {
 		font-size: 32px;
 		line-height: 56px;
 	}
