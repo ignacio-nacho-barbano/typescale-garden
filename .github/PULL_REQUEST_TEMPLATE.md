@@ -7,31 +7,29 @@
 >
 > 2. Please check our [contribution guidelines](https://github.com/ignacio-nacho-barbano/typescale-garden?tab=coc-ov-file#readme) for guidance.
 
-# Pull Request: [Title of the Pull Request]
-
-## Description
+# Description
 
 [Provide a brief description of the changes introduced by this pull request.]
 
-## Related Issue
+# Related Issue
 
 Closes #[Issue Number]
 
-## Changes Made
+# Changes Made
 
 - [List the main changes or features implemented in bullet points.]
 
-## Screenshots
+# Screenshots
 
 [Include any relevant screenshots or visuals to assist in the review process.]
 
-## Checklist
+# Checklist
 
 - [ ] Tested the changes locally
 - [ ] Resolved any merge conflicts
 - [ ] Followed coding style guidelines
 - [ ] Updated documentation if necessary
 
-## Additional Notes
+# Additional Notes
 
 [Include any additional information or context that may be helpful for reviewers.]
