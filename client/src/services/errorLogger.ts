@@ -5,6 +5,9 @@ export const rollbar = new Rollbar({
 	accessToken: PUB_ROLLBAR_TOKEN,
 	captureUncaught: true,
 	captureUnhandledRejections: true,
+	environment: PUB_APP_ENV,
+	itemsPerMinute: 10,
+	maxItems: 5,
 	payload: {
 		code_version: "1.0.0"
 	}

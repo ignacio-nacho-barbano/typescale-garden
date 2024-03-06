@@ -1,7 +1,10 @@
 <script lang="ts">
+	import Phone from "svelte-material-icons/CellphoneText.svelte";
 	import Logo from "../../static/logo.svg";
+	import { mobileView, sidebarOpen, userSidebarOpen } from "../stores/app";
 	import { authClient, isAuthenticated } from "../stores/auth";
 	import Button from "./Button.svelte";
+	import Switch from "./Switch.svelte";
 	import UserControls from "./UserControls.svelte";
 
 	function logIn(e: Event, signUp?: boolean) {
@@ -19,29 +22,56 @@
 
 		$authClient.loginWithRedirect(config);
 	}
-
-	// onMount(() => {
-
-	// });
 </script>
 
-<div class="top-bar glass">
+<div class="top-bar glass" class:sidebarOpen={$sidebarOpen}>
+	<Button
+		cls="sidebar-toggle-button"
+		size="s"
+		leadIcon="MenuOpen"
+		on:click={() => {
+			sidebarOpen.update((actual) => !actual);
+		}}
+	/>
+
 	<div class="logo-wrapper">
 		<Logo id="logo" aria-hidden />
 		<h1 class="logo body-2">Typescale Garden</h1>
 	</div>
 
-	<div class="btn-gr">
-		{#if $isAuthenticated}
-			<UserControls />
-		{:else}
+	<div class="phone-view">
+		<Phone size="20" />
+		<Switch size="s" name="mobile-view" label="Mobile View" bind:value={$mobileView} />
+	</div>
+
+	{#if $isAuthenticated}
+		<UserControls />
+	{:else}
+		<Button
+			cls="config-toggle-button"
+			size="s"
+			leadIcon="Menu"
+			on:click={() => {
+				userSidebarOpen.update((actual) => !actual);
+			}}
+		/>
+		<div class="btn-gr {$userSidebarOpen ? 'shadow-high open' : ''}">
 			<Button size="s" type="outline" on:click={logIn}>Log In</Button>
 			<Button size="s" type="primary" on:click={(e) => logIn(e, true)}>Register</Button>
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>
 
 <style lang="scss">
+	:global(.sidebar-toggle-button) {
+		transition: rotate ease-in-out 300ms;
+		rotate: 180deg;
+	}
+	.sidebarOpen {
+		:global(.sidebar-toggle-button) {
+			rotate: 0deg;
+		}
+	}
 	.logo-wrapper {
 		display: flex;
 		gap: $s3;
@@ -49,11 +79,29 @@
 	}
 	:global(#logo) {
 		height: $s5;
+		flex: 0 0 auto;
 		width: fit-content;
 	}
-	.btn-gr {
+
+	.phone-view {
 		display: flex;
-		gap: $s4;
+		align-items: center;
+		margin: 0 auto;
+		gap: $s1;
+
+		:global(svg) {
+			flex: 0 0 auto;
+		}
+
+		:global(label) {
+			visibility: hidden;
+			width: 0;
+
+			@media ($bp-xl) {
+				visibility: unset;
+				width: unset;
+			}
+		}
 	}
 
 	.logo-wrapper {
@@ -64,7 +112,36 @@
 		}
 	}
 
+	:global(button.btn.config-toggle-button.icon) {
+		@media ($bp-m) {
+			display: none;
+		}
+	}
+
 	.btn-gr {
+		display: flex;
+		gap: $s4;
+		position: fixed;
+		right: 0;
+		top: $s6;
+		flex-direction: column;
+		background: $c-base;
+		padding: $s4;
+		border-radius: $s4 0 $s4 $s4;
+		transform: translateX(100%);
+		transition: transform 200ms ease-in-out;
+
+		&.open {
+			transform: translateX(0);
+		}
+
+		@media ($bp-m) {
+			position: unset;
+			background: none;
+			padding: 0;
+			flex-direction: row;
+			transform: none;
+		}
 	}
 	.top-bar {
 		z-index: 4;
@@ -74,8 +151,9 @@
 		width: auto;
 		position: sticky;
 		border-bottom: solid $lw $c-primary;
-		left: $s5;
+		left: 0;
 		right: $s5;
+		gap: $s4;
 		top: 0;
 		justify-content: space-between;
 		align-items: center;

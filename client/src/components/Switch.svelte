@@ -2,11 +2,12 @@
 	export let name: string;
 	export let value: boolean = false;
 	export let label: string = name;
+	export let size: "s" | "m" = "m";
 </script>
 
-<div class="input-wrapper switch {value ? 'active' : ''}">
-	<label class="body-2" for={name}>{label || name}</label>
-	<input id={name} type="checkbox" bind:value />
+<div class="input-wrapper {size} switch {value ? 'active' : ''}">
+	<label class={size === "m" ? "body-2" : "tooltip"} for={name}>{label || name}</label>
+	<input aria-label={label} id={name} type="checkbox" bind:value />
 	<button class="slider" on:click={() => (value = !value)} />
 </div>
 
@@ -15,10 +16,19 @@
 		display: flex;
 		align-items: center;
 		gap: $s3;
+		flex: 0 0 auto;
+
+		label {
+			margin: 0;
+		}
+		&.s {
+			gap: $s1;
+		}
 
 		&.active .slider:before {
 			left: 24px;
 			background-color: $c-accent;
+			filter: none;
 		}
 
 		input {
@@ -51,6 +61,7 @@
 			top: 50%;
 			transform: translateY(-50%);
 			background-color: $c-primary;
+			filter: grayscale(0.6);
 			transition: 300ms;
 		}
 

@@ -26,6 +26,7 @@
 	<label class="body-2" for={name}>{label || name}</label>
 	<div class="controls-wrapper">
 		<input
+			aria-label={label}
 			class="body-2"
 			id={name}
 			bind:value={internalValue}

@@ -69,7 +69,6 @@
 	<Input name="letterSpacing" label="letterSpacing Multiplier" bind:value={$letterSpacingRatio} />
 	<Switch name="Uppercase for Titles" bind:value={$useUppercaseForTitles} />
 	<Switch name="Italics for Titles" bind:value={$useItalicsForTitles} />
-	<Button on:click={randomFont}>Random Font 🎲</Button>
 </div>
 
 <style lang="scss">

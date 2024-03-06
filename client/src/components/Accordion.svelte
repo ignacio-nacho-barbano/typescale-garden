@@ -16,6 +16,7 @@
 <style lang="scss">
 	.accordion {
 		width: 100%;
+		border-bottom: $lw solid $c-primary;
 
 		.title-bar {
 			height: $s6;
@@ -23,7 +24,7 @@
 			align-items: center;
 			display: flex;
 			width: 100%;
-			border-bottom: $lw solid $c-accent;
+			transition: margin-top ease-in-out 200ms;
 
 			:global(svg) {
 				margin-left: auto;
@@ -37,24 +38,28 @@
 		}
 
 		.content {
-			margin: $s3 0;
 			padding: 0 $s3;
-			height: 0;
-			overflow: hidden;
-			transition: height ease-in-out 20000ms;
+			max-height: 0;
+			transform-origin: top;
+			transform: rotateX(-90deg);
+			opacity: 0;
+			transition: ease-in-out 300ms;
 		}
 
 		&.open {
+			border-bottom: $lw solid $c-accent;
 			.title-bar {
-				border-bottom: $lw solid $c-primary;
-
+				margin-top: $s2;
 				:global(svg) {
 					transform: rotateZ(-180deg);
 				}
 			}
 			.content {
-				height: unset;
-				overflow: unset;
+				opacity: 1;
+				transform: rotateY(0);
+				max-height: unset;
+				margin: $s3 0;
+				padding-bottom: $s4;
 			}
 		}
 	}

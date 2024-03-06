@@ -6,6 +6,11 @@ export const secondaryNav: Writable<"parameters" | "contrast" | "export"> = writ
 export const testingColors = writable(false);
 export const exportNav: Writable<"css" | "tokens"> = writable("css");
 export const sidebarOpen = writable(true);
+export const userSidebarOpen = writable(false);
+export const mobileView = writable(false);
+export const windowWidth = writable(0);
+
+userSidebarOpen.subscribe((sidebar) => console.log({ sidebar }));
 
 export const accordionStates = writable({
 	file: true,

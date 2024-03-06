@@ -14,7 +14,7 @@
 	export let size: "m" | "s" = "m";
 	let leadIconComp: typeof Icon;
 	let trailIconComp: typeof Icon;
-	let classes = `glass btn shadow-mid ${size} ${cls} ${type}`;
+	let classes = `glass btn shadow-mid bold ${size} ${cls} ${type}`;
 	let isExternal = false;
 	let hasText = $$slots.default;
 
@@ -43,6 +43,8 @@
 	if (active) {
 		classes += " active";
 	}
+
+	classes += size === "m" ? " body-1" : " body-2";
 
 	if (leadIcon) {
 		onMount(async () => {
@@ -83,7 +85,6 @@
 		align-items: center;
 		justify-content: center;
 		color: $c-accent;
-		font-weight: 700;
 		border: none;
 
 		&.m {
@@ -92,6 +93,7 @@
 		}
 
 		&.s {
+			padding: 0 $s4;
 			min-height: 40px;
 			max-height: 40px;
 		}
@@ -116,7 +118,7 @@
 				width: $s6;
 			}
 			&.s {
-				width: $s5;
+				width: 40px;
 			}
 		}
 

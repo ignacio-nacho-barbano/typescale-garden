@@ -8,7 +8,10 @@ module.exports = {
 	settings: {
 		"svelte3/typescript": () => require("typescript")
 	},
-	rules: { "@typescript-eslint/no-non-null-assertion": "off" },
+	rules: {
+		"@typescript-eslint/ban-ts-comment": "off",
+		"@typescript-eslint/no-non-null-assertion": "off"
+	},
 	parserOptions: {
 		sourceType: "module",
 		ecmaVersion: 2020

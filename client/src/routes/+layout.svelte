@@ -1,18 +1,27 @@
 <script lang="ts">
-	import "../scss/global.scss";
-	import TopBar from "../components/TopBar.svelte";
-	import Sidebar from "../components/Sidebar/Sidebar.svelte";
-	import { baseUnit, visibleGrid } from "../stores/config";
-	import NotificationsProjector from "../components/NotificationsProjector.svelte";
-	import { storedTypescales } from "../stores/typescales";
 	import { onMount } from "svelte";
+	import NotificationsProjector from "../components/NotificationsProjector.svelte";
+	import Sidebar from "../components/Sidebar/Sidebar.svelte";
+	import TopBar from "../components/TopBar.svelte";
+	import { Breakpoints } from "../constants";
+	import "../scss/global.scss";
+	import { mobileView, sidebarOpen, userSidebarOpen, windowWidth } from "../stores/app";
+	import { baseUnit, visibleGrid } from "../stores/config";
+	import { storedTypescales } from "../stores/typescales";
 	import type { LayoutData } from "./$types";
-	import { page } from "$app/stores";
-	import Tab from "../components/Tab.svelte";
-	import Tabs from "../components/Tabs.svelte";
-	import { routes } from "./routes";
 
 	export let data: LayoutData;
+
+	let innerWidth: number;
+
+	const updateWidthDependencies = (width: number) => {
+		mobileView.set(width < 1000);
+		windowWidth.set(width);
+		userSidebarOpen.set(false);
+		sidebarOpen.set(width > Breakpoints.XL);
+	};
+
+	$: updateWidthDependencies(innerWidth);
 
 	onMount(() => {
 		if (data.typescales) {
@@ -22,20 +31,26 @@
 </script>
 
 <NotificationsProjector />
-<div id="global-wrapper">
+<svelte:window bind:innerWidth />
+<div
+	id="global-wrapper"
+	class:sidebarOpen={$sidebarOpen}
+	class:sidebarHasNormalPosition={innerWidth > Breakpoints.XL}
+>
 	<Sidebar />
+
 	<main id="main-content">
 		<TopBar />
 		<div class="container">
-			<Tabs>
+			<!-- 	<Tabs>
 				{#each routes as { name, url, id }, i}
 					<Tab active={$page.route.id === url}>
 						<a href={url}>
-							<!-- <svelte:component this={icons[i]} size="20" ariaHidden /> -->{name}
+							{name}
 						</a>
 					</Tab>
 				{/each}
-			</Tabs>
+			</Tabs> -->
 		</div>
 		<div
 			class="grid-overlay"
@@ -54,6 +69,13 @@
 		width: 100dvw;
 		height: 100dvh;
 	}
+
+	.toggle-button-wrapper {
+		padding: 0 $s2;
+		border-bottom: $c-accent solid $lw;
+		height: fit-content;
+	}
+
 	main#main-content {
 		flex: 1 1;
 		display: flex;
@@ -75,10 +97,4 @@
 		width: 100%;
 		height: 100%;
 	}
-
-	// @media screen and (min-width: 920px) {
-	// 	:global(body nav) {
-	// 		display: none;
-	// 	}
-	// }
 </style>

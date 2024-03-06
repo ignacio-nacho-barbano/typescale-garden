@@ -1,11 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Red+Hat+Text:wght@300;400;500&display=swap");
 
 body {
 	font-size: 20px;
 	font-family: "Red Hat Text", sans-serif;
 	--paragraph-space: 2rem;
 	--title-space: 1rem;
-	font-weight: 500;
+	font-weight: 400;
 }
 
 .space-text-above,
@@ -90,48 +90,48 @@ h1,
 .title-1 {
 	font-size: 50px;
 	line-height: 56px;
-	font-weight: 500;
-	letter-spacing: -0.003em;
+	font-weight: 300;
+	letter-spacing: -0.005em;
 }
 
 h2,
 .title-2 {
 	font-size: 44px;
 	line-height: 52px;
-	font-weight: 500;
-	letter-spacing: -0.002em;
+	font-weight: 300;
+	letter-spacing: -0.004em;
 }
 
 h3,
 .title-3 {
 	font-size: 38px;
 	line-height: 52px;
-	font-weight: 600;
-	letter-spacing: -0.001em;
+	font-weight: 400;
+	letter-spacing: -0.002em;
 }
 
 h4,
 .title-4 {
 	font-size: 34px;
 	line-height: 48px;
-	font-weight: 600;
-	letter-spacing: 0em;
+	font-weight: 400;
+	letter-spacing: -0.001em;
 }
 
 h5,
 .title-5 {
 	font-size: 30px;
 	line-height: 48px;
-	font-weight: 700;
-	letter-spacing: 0.001em;
+	font-weight: 500;
+	letter-spacing: 0em;
 }
 
 h6,
 .title-6 {
 	font-size: 26px;
 	line-height: 48px;
-	font-weight: 700;
-	letter-spacing: 0.001em;
+	font-weight: 500;
+	letter-spacing: 0em;
 }
 
 p,
@@ -149,15 +149,15 @@ input,
 .body-2 {
 	font-size: 16px;
 	line-height: 24px;
-	font-weight: 500;
+	font-weight: 400;
 	letter-spacing: 0.043em;
 }
 
 .tooltip {
 	font-size: 14px;
 	line-height: 20px;
-	font-weight: 600;
-	letter-spacing: 0.063em;
+	font-weight: 400;
+	letter-spacing: 0.08em;
 }
 
 @media (min-width: 768px) {
@@ -167,28 +167,28 @@ input,
 
 	h1,
 	.title-1 {
-		font-size: 78px;
-		line-height: 84px;
+		font-size: 88px;
+		line-height: 96px;
 	}
 	h2,
 	.title-2 {
-		font-size: 66px;
-		line-height: 80px;
+		font-size: 72px;
+		line-height: 88px;
 	}
 	h3,
 	.title-3 {
-		font-size: 54px;
-		line-height: 72px;
+		font-size: 60px;
+		line-height: 80px;
 	}
 	h4,
 	.title-4 {
-		font-size: 46px;
-		line-height: 68px;
+		font-size: 48px;
+		line-height: 72px;
 	}
 	h5,
 	.title-5 {
-		font-size: 38px;
-		line-height: 60px;
+		font-size: 40px;
+		line-height: 64px;
 	}
 	h6,
 	.title-6 {
@@ -209,7 +209,7 @@ input,
 		line-height: 28px;
 	}
 	.tooltip {
-		font-size: 16px;
-		line-height: 24px;
+		font-size: 14px;
+		line-height: 20px;
 	}
 }

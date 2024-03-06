@@ -4,19 +4,17 @@
 </script>
 
 {#if open}
-	<menu
+	<div
 		style="border-top-{position}-radius: 0; {position}: var(--size-4);"
 		class="user-controls-menu glass shadow-high"
 	>
-		<ul>
-			<slot />
-		</ul>
-	</menu>
+		<slot />
+	</div>
 {/if}
 
 <style lang="scss">
 	.user-controls-menu {
-		border-radius: $s6;
+		border-radius: $s4;
 		position: absolute;
 		padding: $s4;
 		top: 100%;

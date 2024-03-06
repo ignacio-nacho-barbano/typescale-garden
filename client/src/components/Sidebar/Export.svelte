@@ -60,12 +60,15 @@
 </Modal>
 
 <div class="export-block">
-	<Button on:click={() => (modalOpen = true)}>See Code</Button>
-	<Button on:click={() => copyToClipboard($cssCode, "CSS Code")} cls="copy-btn">Copy CSS</Button>
-	<Button on:click={() => copyToClipboard($designTokens, "Design Tokens")} cls="copy-btn"
+	<Button size="s" on:click={() => (modalOpen = true)}>See Code</Button>
+	<Button size="s" on:click={() => copyToClipboard($cssCode, "CSS Code")} cls="copy-btn"
+		>Copy CSS</Button
+	>
+	<Button size="s" on:click={() => copyToClipboard($designTokens, "Design Tokens")} cls="copy-btn"
 		>Copy Tokens</Button
 	>
 	<Button
+		size="s"
 		to="https://www.figma.com/community/plugin/1318298863966194157/typescale-garden-import-tool"
 		cls="copy-btn">Use Figma Plugin</Button
 	>
