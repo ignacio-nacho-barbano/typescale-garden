@@ -9,11 +9,7 @@
 	import Parameters from "./Parameters.svelte";
 </script>
 
-<section
-	id="sidebar"
-	class:open={$sidebarOpen}
-	class="side-bar {$windowWidth < 1000 ? 'shadow-high' : ''}"
->
+<section id="sidebar" class:open={$sidebarOpen} class="side-bar shadow-high">
 	<div class="scrollable-area">
 		<div class="settings-title">
 			<h2 class="title-6">Settings</h2>
@@ -67,7 +63,8 @@
 		min-width: $width;
 		max-width: $width;
 		overflow: hidden;
-		border-right: solid $lw $c-primary;
+		border: solid $lw $c-primary;
+		border-left: none;
 		margin-left: calc(-1 * $width);
 		background: $c-base;
 		transition: margin-left 500ms ease-in-out;
@@ -89,8 +86,11 @@
 		}
 
 		@media ($bp-xl) {
+			border-top: none;
+			border-bottom: none;
 			border-radius: 0;
 			position: unset;
+			box-shadow: none;
 		}
 	}
 
