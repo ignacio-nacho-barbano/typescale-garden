@@ -1,5 +1,5 @@
 <footer>
-	<div class="container">
+	<div class="container shadow-high">
 		<section class="encouragement">
 			<h1 class="title-5">Hi, Nacho Here 😄! I Think There's Something You Should Know:</h1>
 			<h2 class="title-6">Typescale Garden is an Open Source Project!</h2>
@@ -35,6 +35,7 @@
 			<p class="body-1"><b>Links of Interest</b></p>
 			<nav>
 				<ul class="body-2">
+					<li><a href="/">Home</a></li>
 					<li><a href="/privacy">Privacy Policy</a></li>
 					<li>
 						<a target="_blank" href="https://github.com/ignacio-nacho-barbano/typescale-garden"
@@ -46,6 +47,9 @@
 							>GitHub Sponsors</a
 						>
 					</li>
+					<li>
+						<a target="_blank" href="mailto:nacho.barbano.dev@gmail.com">Support Mail</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -55,12 +59,11 @@
 <style lang="scss">
 	footer {
 		width: 100%;
-		background: $c-primary;
-		border-top: solid $c-accent $lw;
+
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		padding: $s6 0;
+		padding: $s4 0;
 
 		@media ($bp-m) {
 			padding: $s7 $s4;
@@ -69,7 +72,11 @@
 		& > div {
 			display: flex;
 			flex-wrap: wrap;
+			padding: $sd5;
 			gap: $sd6;
+			border-radius: $s5;
+			background: $c-primary;
+			border: solid $c-accent $lw;
 		}
 	}
 </style>

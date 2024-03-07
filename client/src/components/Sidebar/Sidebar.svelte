@@ -14,35 +14,37 @@
 	class:open={$sidebarOpen}
 	class="side-bar {$windowWidth < 1000 ? 'shadow-high' : ''}"
 >
-	<div class="settings-title">
-		<h2 class="title-6">Settings</h2>
-	</div>
+	<div class="scrollable-area">
+		<div class="settings-title">
+			<h2 class="title-6">Settings</h2>
+		</div>
 
-	{#if PUB_FEATURE_FLAGS?.includes("load-save")}
-		<Accordion bind:open={$accordionStates.file}>
-			<span slot="title">File</span>
-			<div slot="content" class="file-buttons">
-				<LoadControl />
-				<SaveControl />
-			</div>
+		{#if PUB_FEATURE_FLAGS?.includes("load-save")}
+			<Accordion bind:open={$accordionStates.file}>
+				<span slot="title">File</span>
+				<div slot="content" class="file-buttons">
+					<LoadControl />
+					<SaveControl />
+				</div>
+			</Accordion>
+		{/if}
+		<!-- <Button leadIcon="Parameters" /> -->
+		<Accordion bind:open={$accordionStates.parameters}>
+			<span slot="title">Typescale</span>
+			<Parameters slot="content" />
 		</Accordion>
-	{/if}
-	<!-- <Button leadIcon="Parameters" /> -->
-	<Accordion bind:open={$accordionStates.parameters}>
-		<span slot="title">Typescale</span>
-		<Parameters slot="content" />
-	</Accordion>
-	<!-- experimental feature, needs development -->
-	{#if PUB_FEATURE_FLAGS?.includes("contrast")}
-		<Accordion bind:open={$accordionStates.contrast}>
-			<span slot="title">Contrast</span>
-			<Contrast slot="content" />
+		<!-- experimental feature, needs development -->
+		{#if PUB_FEATURE_FLAGS?.includes("contrast")}
+			<Accordion bind:open={$accordionStates.contrast}>
+				<span slot="title">Contrast</span>
+				<Contrast slot="content" />
+			</Accordion>
+		{/if}
+		<Accordion bind:open={$accordionStates.export}>
+			<span slot="title">Export</span>
+			<Export slot="content" />
 		</Accordion>
-	{/if}
-	<Accordion bind:open={$accordionStates.export}>
-		<span slot="title">Export</span>
-		<Export slot="content" />
-	</Accordion>
+	</div>
 </section>
 
 <style lang="scss">
@@ -58,20 +60,25 @@
 
 		position: fixed;
 		z-index: 5;
-		top: $s6;
-		bottom: 0;
+		top: calc($s6 + $s3);
+		bottom: $s4;
 		left: 0;
 		border-radius: 0 $s5 $s5 0;
 		min-width: $width;
 		max-width: $width;
-		display: flex;
-		flex-direction: column;
-		padding: 0 0 $s5;
-		overflow: auto;
+		overflow: hidden;
 		border-right: solid $lw $c-primary;
 		margin-left: calc(-1 * $width);
 		background: $c-base;
 		transition: margin-left 500ms ease-in-out;
+
+		.scrollable-area {
+			display: flex;
+			flex-direction: column;
+			overflow: auto;
+			height: 100%;
+			width: 100%;
+		}
 
 		&.open {
 			margin-left: 0;

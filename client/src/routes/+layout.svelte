@@ -10,8 +10,11 @@
 	import { storedTypescales } from "../stores/typescales";
 	import type { LayoutData } from "./$types";
 	import Footer from "../components/Footer.svelte";
+	import { navigating } from "$app/stores";
 
 	export let data: LayoutData;
+
+	let scrollContainer: HTMLElement | null = null;
 
 	let innerWidth: number;
 
@@ -24,10 +27,12 @@
 
 	$: updateWidthDependencies(innerWidth);
 
+	$: if ($navigating) {
+		scrollContainer?.scroll({ top: 0, behavior: "smooth" });
+	}
+
 	onMount(() => {
-		// if (data.typescales) {
-		// 	storedTypescales.set(data.typescales);
-		// }
+		scrollContainer = document.getElementById("scrollable-area");
 	});
 </script>
 
@@ -40,9 +45,9 @@
 >
 	<Sidebar />
 
-	<div class="scrollable-area">
+	<div id="scrollable-area">
+		<TopBar />
 		<main id="main-content">
-			<TopBar />
 			<div
 				class="grid-overlay"
 				style="display: {$visibleGrid
@@ -76,7 +81,7 @@
 		position: relative;
 	}
 
-	.scrollable-area {
+	#scrollable-area {
 		flex: 1 1;
 		overflow: auto;
 		max-width: 100dvw;
