@@ -29,7 +29,7 @@
 		</li>
 	</ul>
 
-	<h3>3. How We Use Your Data</h3>
+	<h3 class="space-text-above">3. How We Use Your Data</h3>
 	<h4>We use the collected data for the following purposes:</h4>
 	<ul>
 		<li><strong>User Authentication:</strong> Utilizing Auth0 for secure user authentication.</li>
@@ -40,7 +40,7 @@
 		</li>
 	</ul>
 
-	<h3>4. Data Security</h3>
+	<h3 class="space-text-above">4. Data Security</h3>
 	<h4>We prioritize the security of your data:</h4>
 	<ul>
 		<li>
@@ -52,7 +52,7 @@
 		</li>
 	</ul>
 
-	<h3>5. Data Retention</h3>
+	<h3 class="space-text-above">5. Data Retention</h3>
 	<p>
 		We retain user data for the duration necessary for the outlined purposes. Users can request data
 		deletion by contacting <strong
@@ -75,3 +75,9 @@
 		>.
 	</p>
 </article>
+
+<style lang="scss">
+	article * {
+		max-width: 768px;
+	}
+</style>

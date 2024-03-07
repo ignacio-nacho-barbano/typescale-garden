@@ -73,6 +73,11 @@
 	margin-right: $s5;
 	max-width: 1168px;
 
+	& > * {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
 	@media screen and ($bp-m) {
 		margin-left: $s6;
 		margin-right: $s6;
@@ -83,7 +88,7 @@
 		margin-right: $s7;
 	}
 
-	@media screen and ($bp-xxxl) {
+	@media screen and ($bp-xxl) {
 		margin-left: $s8;
 		margin-right: $s8;
 	}

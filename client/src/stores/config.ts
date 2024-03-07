@@ -61,7 +61,7 @@ export const availableWeights = derived(currentFont, ($currentFont) => {
 });
 
 export const headingsInitialWeight = writable(700);
-export const headingsFinalWeight = writable(500);
+export const headingsFinalWeight = writable(300);
 
 availableWeights.subscribe(($aw) => {
 	if (!$aw.includes(get(headingsInitialWeight)))

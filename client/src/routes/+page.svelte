@@ -5,46 +5,31 @@
 	import { cssCode } from "../stores/config";
 	import { routes } from "./routes";
 	import { Breakpoints } from "../constants";
+	const wrapperClass = "styles-injection-wrapper";
 
-	const tableStyles = derived([cssCode, mobileView], ([code, mobile]) => {
+	const userGeneratedStyles = derived([cssCode, mobileView], ([code, mobile]) => {
 		let styles = code;
 		let minWidthOverride = "@media (min-width: ";
 		minWidthOverride += mobile ? "100000" : "1";
-		let bodyOverride = ".how-it-works-page.main-page-section {";
-		bodyOverride += mobile
-			? `
-		max-width: 400px;
-		min-width: unset;
-		margin: 32px 0;
-		padding: 52px 32px;
-		`
-			: "\n";
+		// opens a new scope
+		const bodyOverride = `
+.${wrapperClass} {
+	.how-it-works-page.main-page-section {`;
+		/* intentionally missing a closing bracket for wrapper class
+		and the selector replacing the body, see comment below */
 
-		styles = styles.replaceAll("body {", bodyOverride);
 		styles = styles.replaceAll(/@media \(min-width: \d+/g, minWidthOverride);
+		styles = styles.replace("body {", bodyOverride);
+
+		// closes a new scope at the end of the file
+		styles += "}\n}";
 
 		return styles;
 	});
 </script>
 
-<div class="styles-injection-wrapper">
-	{@html `
-	<style>
-		${$tableStyles}
-	.styles-injection-wrapper {
-		.how-it-works-page.mobileView {
-			.text-and-image {
-			flex-direction: column !important;
-		}
-
-			@media (min-width: ${Breakpoints.M}px) {
-			border: var(--c-accent) solid 1px;
-			border-radius: 32px;
-		}
-	}
-		
-	}
-		</style>`}
+<div class={wrapperClass}>
+	{@html `<style>${$userGeneratedStyles}</style>`}
 	<section
 		id={routes[0].id}
 		class:mobileView={$mobileView}
@@ -153,12 +138,25 @@
 	.styles-injection-wrapper {
 		display: contents;
 	}
+
 	#how-it-works {
 		overflow: hidden;
 		max-width: 100%;
-		& > * {
-			margin-left: min($s5, auto);
-			margin-right: min($s5, auto);
+
+		&.mobileView {
+			min-width: unset;
+			margin: $s5 0;
+			padding: $s6 $s5;
+
+			.text-and-image {
+				flex-direction: column;
+			}
+
+			@media ($bp-s) {
+				max-width: 400px;
+				border: var(--c-accent) solid $lw;
+				border-radius: $s5;
+			}
 		}
 	}
 
