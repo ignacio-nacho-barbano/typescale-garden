@@ -151,7 +151,7 @@
 		}
 
 		@media ($bp-m) {
-			position: relative;
+			position: static;
 			background: none;
 			padding: 0;
 			flex-direction: row;
