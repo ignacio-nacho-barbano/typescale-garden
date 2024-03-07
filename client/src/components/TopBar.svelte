@@ -34,10 +34,10 @@
 		}}
 	/>
 
-	<div class="logo-wrapper">
+	<a href="/" class="logo-wrapper">
 		<Logo id="logo" aria-hidden />
 		<h1 class="logo body-2">Typescale Garden</h1>
-	</div>
+	</a>
 
 	<div class="phone-view">
 		<Phone size="20" />
@@ -72,15 +72,29 @@
 			rotate: 0deg;
 		}
 	}
-	.logo-wrapper {
+	a.logo-wrapper {
 		display: flex;
 		gap: $s3;
 		align-items: center;
+		text-decoration: none;
+
+		h1.logo {
+			font-weight: 500;
+		}
+
+		&:hover {
+			text-decoration: underline;
+
+			:global(svg#logo) {
+				transform: scale(1.1);
+			}
+		}
 	}
 	:global(#logo) {
 		height: $s5;
 		flex: 0 0 auto;
 		width: fit-content;
+		transition: transform 200ms ease-in-out;
 	}
 
 	.phone-view {
@@ -128,7 +142,8 @@
 		background: $c-base;
 		padding: $s4;
 		border-radius: $s4 0 $s4 $s4;
-		transform: translateX(100%);
+		transform-origin: top right;
+		transform: rotateY(90deg);
 		transition: transform 200ms ease-in-out;
 
 		&.open {
@@ -136,7 +151,7 @@
 		}
 
 		@media ($bp-m) {
-			position: unset;
+			position: relative;
 			background: none;
 			padding: 0;
 			flex-direction: row;

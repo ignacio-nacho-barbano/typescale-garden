@@ -4,6 +4,7 @@
 	import { mobileView } from "../stores/app";
 	import { cssCode } from "../stores/config";
 	import { routes } from "./routes";
+	import { Breakpoints } from "../constants";
 
 	const tableStyles = derived([cssCode, mobileView], ([code, mobile]) => {
 		let styles = code;
@@ -14,14 +15,8 @@
 			? `
 		max-width: 400px;
 		min-width: unset;
-		border: var(--c-accent) solid 1px;
-		padding: 52px 32px;
-		border-radius: 32px;
 		margin: 32px 0;
-
-		.text-and-image {
-			flex-direction: column !important;
-		}
+		padding: 52px 32px;
 		`
 			: "\n";
 
@@ -35,10 +30,24 @@
 <div class="styles-injection-wrapper">
 	{@html `<style>
 	.styles-injection-wrapper {
+		.how-it-works-page.mobileView {
+			.text-and-image {
+			flex-direction: column !important;
+		}
+
+			@media (min-width: ${Breakpoints.M}px) {
+			border: var(--c-accent) solid 1px;
+			border-radius: 32px;
+		}
+	}
 		${$tableStyles}
 	}
 		</style>`}
-	<section id={routes[0].id} class="container how-it-works-page main-page-section">
+	<section
+		id={routes[0].id}
+		class:mobileView={$mobileView}
+		class="container how-it-works-page main-page-section"
+	>
 		<h1 class="title-1 space-text-below">A Typescale Creation Tool</h1>
 
 		<div class="text-and-image space-text-below">
@@ -143,9 +152,11 @@
 		display: contents;
 	}
 	#how-it-works {
+		overflow: hidden;
+		max-width: 100%;
 		& > * {
-			margin-left: auto;
-			margin-right: auto;
+			margin-left: min($s5, auto);
+			margin-right: min($s5, auto);
 		}
 	}
 

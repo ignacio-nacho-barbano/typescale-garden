@@ -9,6 +9,7 @@
 	import { baseUnit, visibleGrid } from "../stores/config";
 	import { storedTypescales } from "../stores/typescales";
 	import type { LayoutData } from "./$types";
+	import Footer from "../components/Footer.svelte";
 
 	export let data: LayoutData;
 
@@ -24,9 +25,9 @@
 	$: updateWidthDependencies(innerWidth);
 
 	onMount(() => {
-		if (data.typescales) {
-			storedTypescales.set(data.typescales);
-		}
+		// if (data.typescales) {
+		// 	storedTypescales.set(data.typescales);
+		// }
 	});
 </script>
 
@@ -39,27 +40,19 @@
 >
 	<Sidebar />
 
-	<main id="main-content">
-		<TopBar />
-		<div class="container">
-			<!-- 	<Tabs>
-				{#each routes as { name, url, id }, i}
-					<Tab active={$page.route.id === url}>
-						<a href={url}>
-							{name}
-						</a>
-					</Tab>
-				{/each}
-			</Tabs> -->
-		</div>
-		<div
-			class="grid-overlay"
-			style="display: {$visibleGrid
-				? 'block'
-				: 'none'};		background-size: {$baseUnit}px {$baseUnit}px;"
-		/>
-		<slot />
-	</main>
+	<div class="scrollable-area">
+		<main id="main-content">
+			<TopBar />
+			<div
+				class="grid-overlay"
+				style="display: {$visibleGrid
+					? 'block'
+					: 'none'};		background-size: {$baseUnit}px {$baseUnit}px;"
+			/>
+			<slot />
+		</main>
+		<Footer />
+	</div>
 </div>
 
 <style lang="scss">
@@ -77,12 +70,17 @@
 	}
 
 	main#main-content {
-		flex: 1 1;
 		display: flex;
 		flex-direction: column;
 		align-items: stretch;
 		position: relative;
+	}
+
+	.scrollable-area {
+		flex: 1 1;
 		overflow: auto;
+		max-width: 100dvw;
+		max-height: 100dvh;
 	}
 
 	.grid-overlay {

@@ -20,6 +20,7 @@ export async function getUserData(client: Auth0Client) {
 
 				if (loggedUser) {
 					user.set(loggedUser);
+					return loggedUser;
 				}
 			}
 		} catch (e) {

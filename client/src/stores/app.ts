@@ -10,8 +10,6 @@ export const userSidebarOpen = writable(false);
 export const mobileView = writable(false);
 export const windowWidth = writable(0);
 
-userSidebarOpen.subscribe((sidebar) => console.log({ sidebar }));
-
 export const accordionStates = writable({
 	file: true,
 	parameters: true,

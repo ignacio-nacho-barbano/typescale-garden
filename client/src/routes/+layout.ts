@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
 import {
 	PUB_API_URL,
+	PUB_APP_ENV,
 	PUB_AUTH_CLIENT_ID,
 	PUB_AUTH_DOMAIN,
 	PUB_CLIENT_ORIGIN
@@ -11,6 +12,7 @@ import type { Typescale } from "@prisma/client";
 import { getUserData } from "../functions";
 import { logError } from "../services/errorLogger";
 import { authClient } from "../stores/auth";
+import { storedTypescales } from "../stores/typescales";
 
 const authConfig: Auth0ClientOptions = {
 	domain: PUB_AUTH_DOMAIN,
@@ -29,18 +31,7 @@ export interface LayoutData {
 
 /** @type {import('./$types').LayoutLoad} */
 export async function load({ fetch }): Promise<LayoutData> {
-	let data = {};
-
-	try {
-		const res = await fetch(PUB_API_URL + "/api/typescales/default");
-		data = await res.json();
-	} catch (err) {
-		logError("Unable to load default typescales:\n", err);
-	}
-
 	if (browser) {
-		console.log("Svelte loaded");
-
 		try {
 			const client = await createAuth0Client(authConfig);
 			authClient.set(client);
@@ -48,7 +39,6 @@ export async function load({ fetch }): Promise<LayoutData> {
 			await getUserData(client);
 
 			return {
-				...data,
 				successfulLoad: true
 			};
 		} catch (err) {
@@ -59,6 +49,16 @@ export async function load({ fetch }): Promise<LayoutData> {
 			};
 		}
 	} else {
-		return { ...data, successfulLoad: true };
+		// if (PUB_APP_ENV === "dev") {
+		// 	let data = {};
+		// 	try {
+		// 		const res = await fetch(PUB_API_URL + "/api/typescales/default");
+		// 		data = await res.json();
+		// 		storedTypescales.set(data.typescales);
+		// 	} catch (err) {
+		// 		logError("Unable to load default typescales during SSR:\n", err);
+		// 	}
+		// 	return { ...data, successfulLoad: true };
+		// }
 	}
 }
