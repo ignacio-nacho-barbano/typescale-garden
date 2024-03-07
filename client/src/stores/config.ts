@@ -7,6 +7,7 @@ import {
 	generateTokens
 } from "../functions";
 import type { ApiFont, TypeVariant } from "../models";
+import { showNotification } from "./notifications";
 const headingPrefix = "title-";
 
 // constants
@@ -37,10 +38,15 @@ export const useItalicsForTitles = writable(false);
 
 // deriveds
 export const currentFont = derived(fontName, ($fontName: string): ApiFont => {
-	return (
-		mockFontsApi.items.find(({ family }) => $fontName.toLowerCase() === family.toLowerCase()) ||
-		mockFontsApi.items[0]
+	const font = mockFontsApi.items.find(
+		({ family }) => $fontName.toLowerCase() === family.toLowerCase()
 	);
+	if (font) {
+		return font;
+	} else {
+		showNotification(`🚨 Unable to find font: ${$fontName}, make sure there aren't any typos.`);
+		return mockFontsApi.items[0];
+	}
 });
 export const availableWeights = derived(currentFont, ($currentFont) => {
 	const fontVariants = [...$currentFont.variants];

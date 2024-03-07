@@ -28,7 +28,9 @@
 </script>
 
 <div class="styles-injection-wrapper">
-	{@html `<style>
+	{@html `
+	<style>
+		${$tableStyles}
 	.styles-injection-wrapper {
 		.how-it-works-page.mobileView {
 			.text-and-image {
@@ -40,7 +42,7 @@
 			border-radius: 32px;
 		}
 	}
-		${$tableStyles}
+		
 	}
 		</style>`}
 	<section
