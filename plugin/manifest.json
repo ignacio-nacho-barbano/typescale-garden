@@ -5,9 +5,14 @@
 	"main": "code.js",
 	"capabilities": [],
 	"enableProposedApi": false,
-	"editorType": ["figma"],
+	"editorType": [
+		"figma"
+	],
 	"ui": "ui.html",
+	"documentAccess": "dynamic-page",
 	"networkAccess": {
-		"allowedDomains": ["none"]
+		"allowedDomains": [
+			"none"
+		]
 	}
 }

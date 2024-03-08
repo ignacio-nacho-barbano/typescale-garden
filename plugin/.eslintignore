@@ -1,0 +1,11 @@
+node_modules
+code.js
+/package
+.env
+.env.*
+.eslintrc.*
+
+# Ignore files for PNPM, NPM and YARN
+pnpm-lock.yaml
+package-lock.json
+yarn.lock

@@ -3,9 +3,17 @@
 	<label for="jsonStyles">Paste your JSON styles below:</label>
 	<textarea type="text" rows="5" id="jsonStyles"></textarea>
 
+
+	<p>
+		<a href="https://typescalegarden.uy">Typescale Garden</a> is an Open Source project, please consider supporting!
+		You can do it through:
+		<a href="https://github.com/sponsors/ignacio-nacho-barbano">GitHub Sponsors</a> or
+		<a href="https://paypal.me/IgnacioRBarbano?country.x=UY&locale.x=es_XC">PayPal</a>
+	</p>
+
 	<div id="about-tsg">
 		<button id="about-tsg-btn">
-			<span class="btn-text-closed">What is This? 🔽</span>
+			<span class="btn-text-closed">What is This plugin? 🔽</span>
 			<span class="btn-text-open">Thanks! ⬆️</span>
 		</button>
 		<div class="content">
@@ -17,11 +25,6 @@
 			</p>
 		</div>
 	</div>
-	<p>
-		Typescale Garden is an Open Source project, please consider supporting! You can do it through:
-		<a href="https://github.com/sponsors/ignacio-nacho-barbano">GitHub Sponsors</a> or
-		<a href="https://paypal.me/IgnacioRBarbano?country.x=UY&locale.x=es_XC">PayPal</a>
-	</p>
 
 	<div class="btns-group">
 		<button id="cancel">Cancel</button>
@@ -53,9 +56,18 @@
 
 <style>
 	* {
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
+	}
+
+	h2 {
+		font-weight: 500;
+	}
+
+	h3 {
+		font-weight: 600;
 	}
 
 	h2,
@@ -80,7 +92,7 @@
 
 	a,
 	a:visited {
-		color: var(--figma-color-bg-selected-strong);
+		color: var(--figma-color-text-brand);
 	}
 
 	button {
@@ -100,6 +112,8 @@
 	}
 
 	textarea#jsonStyles {
+		font-family: monospace;
+		padding: 20px;
 		height: 136px;
 		resize: none;
 	}
