@@ -7,6 +7,8 @@
 >
 > 2. Please check our [contribution guidelines](https://github.com/ignacio-nacho-barbano/typescale-garden?tab=coc-ov-file#readme) for guidance.
 
+<!-- Delete Everything Above -->
+
 # Description
 
 [Provide a brief description of the changes introduced by this pull request.]
