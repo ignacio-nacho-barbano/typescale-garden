@@ -1,13 +1,11 @@
 {
-	"extends": "../tsconfig.json",
-	"include": ["./code.ts"],
+	// "extends": "../tsconfig.json",
+	"include": ["./code.ts", "./.eslintrc.cjs"],
 	"compilerOptions": {
 		"target": "ESNext",
 		"lib": ["ES2023"],
 		"strict": true,
-		"esModuleInterop": true
-	},
-	"typeAcquisition": {
-		"include": ["@types/node"]
+		"esModuleInterop": true,
+		"typeRoots": ["../node_modules/@figma"]
 	}
 }

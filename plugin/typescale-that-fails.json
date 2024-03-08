@@ -1,0 +1,398 @@
+{
+    "desktop/title-1": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Light"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": -0.05,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/title-1",
+        "fontSize": 88,
+        "lineHeight": {
+            "value": 96,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/title-1": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Light"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": -0.05,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/title-1",
+        "fontSize": 50,
+        "lineHeight": {
+            "value": 56,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/title-2": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Light"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": -0.04,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/title-2",
+        "fontSize": 72,
+        "lineHeight": {
+            "value": 88,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/title-2": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Light"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": -0.04,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/title-2",
+        "fontSize": 44,
+        "lineHeight": {
+            "value": 52,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/title-3": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Regular"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": -0.02,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/title-3",
+        "fontSize": 60,
+        "lineHeight": {
+            "value": 80,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/title-3": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Regular"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": -0.02,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/title-3",
+        "fontSize": 38,
+        "lineHeight": {
+            "value": 52,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/title-4": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Medium"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": -0.01,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/title-4",
+        "fontSize": 48,
+        "lineHeight": {
+            "value": 72,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/title-4": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Medium"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": -0.01,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/title-4",
+        "fontSize": 34,
+        "lineHeight": {
+            "value": 48,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/title-5": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "SemiBold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/title-5",
+        "fontSize": 40,
+        "lineHeight": {
+            "value": 64,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/title-5": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "SemiBold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/title-5",
+        "fontSize": 30,
+        "lineHeight": {
+            "value": 48,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/title-6": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Bold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.01,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/title-6",
+        "fontSize": 32,
+        "lineHeight": {
+            "value": 56,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/title-6": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Bold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.01,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/title-6",
+        "fontSize": 26,
+        "lineHeight": {
+            "value": 48,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/body-1": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Regular"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.01,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/body-1",
+        "fontSize": 22,
+        "lineHeight": {
+            "value": 32,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/body-1": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Regular"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.01,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/body-1",
+        "fontSize": 20,
+        "lineHeight": {
+            "value": 32,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/body-1-bold": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "SemiBold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.01,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/body-1-bold",
+        "fontSize": 22,
+        "lineHeight": {
+            "value": 32,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/body-1-bold": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "SemiBold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.01,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/body-1-bold",
+        "fontSize": 20,
+        "lineHeight": {
+            "value": 32,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/body-2": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Medium"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.42999999999999994,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/body-2",
+        "fontSize": 18,
+        "lineHeight": {
+            "value": 28,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/body-2": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Medium"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.42999999999999994,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/body-2",
+        "fontSize": 16,
+        "lineHeight": {
+            "value": 24,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/body-2-bold": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Bold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.42999999999999994,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/body-2-bold",
+        "fontSize": 18,
+        "lineHeight": {
+            "value": 28,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/body-2-bold": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "Bold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.42999999999999994,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/body-2-bold",
+        "fontSize": 16,
+        "lineHeight": {
+            "value": 24,
+            "unit": "PIXELS"
+        }
+    },
+    "desktop/tooltip": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "SemiBold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.81,
+            "unit": "PERCENT"
+        },
+        "name": "desktop/tooltip",
+        "fontSize": 14,
+        "lineHeight": {
+            "value": 20,
+            "unit": "PIXELS"
+        }
+    },
+    "mobile/tooltip": {
+        "type": "TEXT",
+        "fontName": {
+            "family": "Space Grotesk",
+            "style": "SemiBold"
+        },
+        "textCase": "ORIGINAL",
+        "letterSpacing": {
+            "value": 0.81,
+            "unit": "PERCENT"
+        },
+        "name": "mobile/tooltip",
+        "fontSize": 14,
+        "lineHeight": {
+            "value": 20,
+            "unit": "PIXELS"
+        }
+    }
+}

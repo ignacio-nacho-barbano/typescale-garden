@@ -1,6 +1,6 @@
 {
 	"name": "typescale-garden-plugin",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "An import tool for typescale-garden",
 	"main": "code.js",
 	"scripts": {
@@ -10,7 +10,11 @@
 	"author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
 	"license": "GPL-3.0",
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.82.0",
-		"typescript": "*"
+		"@figma/eslint-plugin-figma-plugins": "^0.14.0",
+		"@figma/plugin-typings": "^1.88.0",
+		"@typescript-eslint/eslint-plugin": "^7.1.1",
+		"@typescript-eslint/parser": "^7.1.1",
+		"eslint": "^8.57.0",
+		"typescript": "^5.4.2"
 	}
 }

@@ -2,12 +2,12 @@ figma.showUI(__html__, { themeColors: true, width: 450, height: 500 });
 
 figma.ui.onmessage = async (msg) => {
 	figma.notify("Starting Plugin");
-	let currentStyles = figma.getLocalTextStyles();
+	const currentStyles = await figma.getLocalTextStylesAsync();
 
 	if (msg.type === "import-styles") {
-		const jsonStyles = msg.jsonStyles as Record<string, any>;
+		const jsonStyles = msg.jsonStyles as Record<string, TextStyle>;
 
-		let fontsToLoad = new Set<string>();
+		const fontsToLoad = new Set<string>();
 
 		Object.keys(jsonStyles).forEach((textName) => {
 			const { fontName } = jsonStyles[textName];
@@ -16,11 +16,19 @@ figma.ui.onmessage = async (msg) => {
 		});
 
 		try {
-			await Promise.allSettled(
+			console.log(
+				Array.from(fontsToLoad.values()).map((font) => {
+					console.log(font);
+
+					return JSON.parse(font);
+				})
+			);
+
+			await Promise.all(
 				Array.from(fontsToLoad.values()).map((font) => figma.loadFontAsync(JSON.parse(font)))
 			);
 		} catch (error) {
-			const message = `Unable to load one of the font weights: ${fontsToLoad.values()}`;
+			const message = `Unable to load one of the font weights: ${error}`;
 			figma.notify(message, { error: true });
 			console.error(message, fontsToLoad, error);
 		}
@@ -36,10 +44,11 @@ figma.ui.onmessage = async (msg) => {
 				}
 
 				Object.keys(styleProps).forEach((property) => {
+					type PropertyKeys = keyof Omit<TextStyle, "id" | "key" | "consumers" | "remote">;
 					const avoidedProps = ["type", "fontWeight"];
+
 					if (!avoidedProps.includes(property)) {
-						// @ts-ignore
-						style[property] = styleProps[property];
+						style[property as PropertyKeys] = styleProps[property as PropertyKeys] as never;
 					}
 				});
 			});
