@@ -1,10 +1,14 @@
 <script lang="ts">
+	import { outsideListener } from "../actions";
+
 	export let open = false;
 	export let position: "left" | "right" = "left";
 </script>
 
 {#if open}
 	<div
+		use:outsideListener
+		on:clickOutside={() => (open = false)}
 		style="border-top-{position}-radius: 0; {position}: var(--size-4);"
 		class="user-controls-menu glass shadow-high"
 	>
@@ -15,7 +19,7 @@
 <style lang="scss">
 	.user-controls-menu {
 		border-radius: $s4;
-		position: absolute;
+		position: fixed;
 		padding: $s4;
 		top: 100%;
 		background-color: $c-base;

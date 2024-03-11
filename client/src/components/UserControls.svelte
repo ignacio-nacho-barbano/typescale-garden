@@ -4,7 +4,7 @@
 	import Button from "./Button.svelte";
 	import Menu from "./Menu.svelte";
 
-	let userName = $user.nickname || $user.name || $user.email;
+	let userName = $user.name || $user.nickname || $user.name || $user.email;
 	let menuOpen = false;
 
 	function logOut(e: Event) {

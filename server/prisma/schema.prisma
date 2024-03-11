@@ -23,10 +23,10 @@ type TypescaleBase {
 
 model Typescale {
     id             String        @id @default(auto()) @map("_id") @db.ObjectId
-    authorId       String
-    name           String
     createdAt      DateTime      @default(now())
     lastModifiedAt DateTime      @updatedAt
+    authorId       String
+    name           String
     base           TypescaleBase
     overrides      Json?
 }

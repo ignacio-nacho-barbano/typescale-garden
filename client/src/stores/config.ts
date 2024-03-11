@@ -8,6 +8,7 @@ import {
 } from "../functions";
 import type { ApiFont, TypeVariant } from "../models";
 import { showNotification } from "./notifications";
+import { loadedTypescale } from "./typescales";
 const headingPrefix = "title-";
 
 // constants
@@ -26,6 +27,7 @@ const variants = [
 // writables
 
 export const breakpoint = writable(768);
+export const typescaleName = writable("");
 export const fontName = writable("Red Hat Text");
 export const baseSize = writable(22);
 export const baseUnit = writable(4);
@@ -190,4 +192,19 @@ export const designTokens = derived(
 	([$typescale, $breakpoint, $currentFont]) => generateTokens($typescale, $breakpoint, $currentFont)
 );
 
-// fontName.subscribe(console.log);
+loadedTypescale.subscribe((typescale) => {
+	if (typescale) {
+		const tsb = typescale.base;
+		breakpoint.set(tsb.breakpoint);
+		fontName.set(tsb.fontName);
+		baseUnit.set(tsb.baseUnit);
+		baseSize.set(tsb.baseSize);
+		desktopRatio.set(tsb.desktopRatio);
+		mobileRatio.set(tsb.mobileRatio);
+		useUppercaseForTitles.set(tsb.useUppercaseForTitles);
+		useItalicsForTitles.set(tsb.useItalicsForTitles);
+		headingsInitialWeight.set(tsb.headingsInitialWeight);
+		headingsFinalWeight.set(tsb.headingsFinalWeight);
+		letterSpacingRatio.set(tsb.letterSpacingRatio);
+	}
+});
