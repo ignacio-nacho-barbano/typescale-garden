@@ -1,13 +1,13 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 import logger from "morgan";
 import path from "path";
+import { rateLimiter } from "./middlewares/rateLimit";
 import { MainRouter } from "./routes";
 import { APP_PORT, CLIENT_ORIGIN } from "./secrets";
 import { loadErrorHandlers } from "./utils";
-import { rateLimiter } from "./middlewares/rateLimit";
-import helmet from "helmet";
 
 const app = express();
 // add rate limiter
