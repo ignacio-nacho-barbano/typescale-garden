@@ -8,7 +8,12 @@
 
 <div class="notification glass shadow-high fade-in">
 	<p class="body-2">{data.text}</p>
-	<Button leadIcon="Close" size="s" on:click={() => removeNotification(data.id)} />
+	<Button
+		leadIcon="Close"
+		alt="Close notification"
+		size="s"
+		on:click={() => removeNotification(data.id)}
+	/>
 	<p class="tooltip secondary">{data.timestamp.toLocaleTimeString()}</p>
 </div>
 

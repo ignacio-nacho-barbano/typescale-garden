@@ -28,6 +28,7 @@
 	<Button
 		cls="sidebar-toggle-button"
 		size="s"
+		alt="{$sidebarOpen ? 'close' : 'open'} settings sidebar"
 		leadIcon="MenuOpen"
 		on:click={() => {
 			sidebarOpen.update((actual) => !actual);

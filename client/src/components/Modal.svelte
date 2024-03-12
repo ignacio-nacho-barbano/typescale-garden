@@ -33,7 +33,7 @@
 <dialog bind:this={dialog} class:open class=" modal glass shadow-high">
 	<div class="title-bar">
 		<h1 class="title-3">{title}</h1>
-		<Button leadIcon="Close" on:click={() => (open = false)} />
+		<Button leadIcon="Close" alt="Close {title} modal" on:click={() => (open = false)} />
 	</div>
 	<div class="content">
 		<slot />

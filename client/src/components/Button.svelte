@@ -4,7 +4,7 @@
 	import Tooltip from "./Tooltip.svelte";
 
 	// add mandatory alt in the future for icon buttons
-	export const alt: string | undefined = undefined;
+	export let alt: string | undefined = undefined;
 	export let leadIcon: string | null = null;
 	export let trailIcon: string | null = null;
 	export let cls: string | null = "";
@@ -12,6 +12,8 @@
 	export let active: boolean | null = null;
 	export let type: "primary" | "outline" | "ghost" = "outline";
 	export let size: "m" | "s" = "m";
+	let element: Node;
+	let name = alt;
 	let leadIconComp: typeof Icon;
 	let trailIconComp: typeof Icon;
 	let classes = `glass btn shadow-mid bold ${size} ${cls} ${type}`;
@@ -24,12 +26,6 @@
 
 	if ((leadIcon || trailIcon) && !hasText) {
 		classes += " icon";
-
-		// if (!alt) {
-		// 	console.warn(
-		// 		"it's recommended for buttons that have only icons to have an alt, please provide one"
-		// 	);
-		// }
 	}
 
 	if (leadIcon && hasText) {
@@ -57,11 +53,26 @@
 			trailIconComp = (await import(`./icons/${trailIcon}.svelte`)).default;
 		});
 	}
+
+	onMount(() => {
+		if (element) {
+			if (hasText) {
+				name = element.textContent || undefined;
+			} else {
+				if (!alt) {
+					console.warn(
+						"it's recommended for buttons that have only icons to have an alt, please provide one",
+						{ leadIcon, trailIcon, element }
+					);
+				}
+			}
+		}
+	});
 </script>
 
 <!-- <Tooltip {alt}>
 </Tooltip> -->
-<button on:click class={classes}>
+<button bind:this={element} {name} on:click class={classes}>
 	{#if to}
 		<a href={to} target={isExternal ? "_blank" : "_self"}><slot /></a>
 	{/if}
