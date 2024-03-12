@@ -21,6 +21,7 @@ html {
 	--c-base: #f4f7cb;
 	--c-accent: #09613f;
 	--c-primary: #a2d765;
+	--c-primary-bg: #c8ed9c;
 	// main light
 	--c-text-ml: #06331a;
 	// secondary light
@@ -57,6 +58,7 @@ html {
 $c-base: var(--c-base);
 $c-accent: var(--c-accent);
 $c-primary: var(--c-primary);
+$c-primary-bg: var(--c-primary-bg);
 $c-text-ml: var(--c-text-ml);
 $c-text-sl: var(--c-text-sl);
 

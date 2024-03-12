@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { navigating } from "$app/stores";
 	import { onMount } from "svelte";
+	import Footer from "../components/Footer.svelte";
 	import NotificationsProjector from "../components/NotificationsProjector.svelte";
 	import Sidebar from "../components/Sidebar/Sidebar.svelte";
 	import TopBar from "../components/TopBar.svelte";
@@ -7,12 +9,10 @@
 	import "../scss/global.scss";
 	import { mobileView, sidebarOpen, userSidebarOpen, windowWidth } from "../stores/app";
 	import { baseUnit, visibleGrid } from "../stores/config";
-	import { storedTypescales } from "../stores/typescales";
 	import type { LayoutData } from "./$types";
-	import Footer from "../components/Footer.svelte";
-	import { navigating } from "$app/stores";
 
 	export let data: LayoutData;
+	let showIcons = true;
 
 	let scrollContainer: HTMLElement | null = null;
 
@@ -40,6 +40,7 @@
 <svelte:window bind:innerWidth />
 <div
 	id="global-wrapper"
+	class:showIcons
 	class:sidebarOpen={$sidebarOpen}
 	class:sidebarHasNormalPosition={innerWidth > Breakpoints.XL}
 >

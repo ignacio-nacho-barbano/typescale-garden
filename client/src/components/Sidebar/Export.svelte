@@ -83,6 +83,11 @@
 
 		p {
 			margin-bottom: $s4;
+			display: none;
+
+			@media ($bp-m) {
+				display: block;
+			}
 		}
 
 		:global(.buttons) {

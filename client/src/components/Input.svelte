@@ -36,7 +36,7 @@
 		/>
 		{#if useSearch}
 			<Button
-				alt="submit value for {name}"
+				alt="submit {label || name}"
 				on:click={() => {
 					value = internalValue;
 				}}

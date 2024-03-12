@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Icon from "svelte-material-icons/MenuDown.svelte";
+	import Icon from "./Icon.svelte";
 
 	export let open = true;
 </script>
 
 <section class="accordion" class:open>
 	<button on:click={() => (open = !open)} class="glass title-bar"
-		><slot name="title" /><Icon class="icon" size="32" /></button
+		><slot name="title" /><Icon cls="drop-icon">arrow_drop_down</Icon></button
 	>
 	<div class="content">
 		<slot name="content" />
@@ -26,7 +26,7 @@
 			width: 100%;
 			transition: margin-top ease-in-out 200ms;
 
-			:global(svg) {
+			:global(.drop-icon) {
 				margin-left: auto;
 				transition: transform 400ms ease-in-out;
 			}
@@ -50,7 +50,7 @@
 			border-bottom: $lw solid $c-accent;
 			.title-bar {
 				margin-top: $s2;
-				:global(svg) {
+				:global(.drop-icon) {
 					transform: rotateZ(-180deg);
 				}
 			}

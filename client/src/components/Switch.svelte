@@ -8,7 +8,7 @@
 <div class="input-wrapper {size} switch {value ? 'active' : ''}">
 	<label class={size === "m" ? "body-2" : "tooltip"} for={name}>{label || name}</label>
 	<input aria-label={label} id={name} type="checkbox" bind:value />
-	<button class="slider" on:click={() => (value = !value)} />
+	<button aria-label={label || name} class="slider" on:click={() => (value = !value)} />
 </div>
 
 <style lang="scss">

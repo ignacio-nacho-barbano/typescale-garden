@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import type Icon from "svelte-material-icons/Pan.svelte";
 	import Tooltip from "./Tooltip.svelte";
+	import Icon from "./Icon.svelte";
+	import { ENV } from "../services/env";
 
 	// add mandatory alt in the future for icon buttons
 	export let alt: string | undefined = undefined;
@@ -14,8 +15,6 @@
 	export let size: "m" | "s" = "m";
 	let element: Node;
 	let name = alt;
-	let leadIconComp: typeof Icon;
-	let trailIconComp: typeof Icon;
 	let classes = `glass btn shadow-mid bold ${size} ${cls} ${type}`;
 	let isExternal = false;
 	let hasText = $$slots.default;
@@ -42,24 +41,12 @@
 
 	classes += size === "m" ? " body-1" : " body-2";
 
-	if (leadIcon) {
-		onMount(async () => {
-			leadIconComp = (await import(`./icons/${leadIcon}.svelte`)).default;
-		});
-	}
-
-	if (trailIcon) {
-		onMount(async () => {
-			trailIconComp = (await import(`./icons/${trailIcon}.svelte`)).default;
-		});
-	}
-
 	onMount(() => {
 		if (element) {
 			if (hasText) {
 				name = element.textContent || undefined;
 			} else {
-				if (!alt) {
+				if (!alt && ENV.IS_DEV) {
 					console.warn(
 						"it's recommended for buttons that have only icons to have an alt, please provide one",
 						{ leadIcon, trailIcon, element }
@@ -76,9 +63,15 @@
 	{#if to}
 		<a href={to} target={isExternal ? "_blank" : "_self"}><slot /></a>
 	{/if}
-	<svelte:component this={leadIconComp} size="32" />
+	{#if leadIcon}
+		<Icon cls="lead-icon-comp">{leadIcon}</Icon>
+	{/if}
+	<!-- <svelte:component this={leadIconComp} size="32" /> -->
 	<slot />
-	<svelte:component this={trailIconComp} size="32" />
+	{#if trailIcon}
+		<Icon cls="trail-icon-comp">{trailIcon}</Icon>
+	{/if}
+	<!-- <svelte:component this={trailIconComp} size="32" /> -->
 </button>
 
 <style lang="scss">
@@ -133,11 +126,11 @@
 			}
 		}
 
-		&.lead-icon {
+		&:global(.lead-icon-comp) {
 			padding-left: $s4;
 		}
 
-		&.trail-icon {
+		&:global(.trail-icon-comp) {
 			padding-right: $s4;
 		}
 

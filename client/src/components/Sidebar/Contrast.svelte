@@ -1,6 +1,6 @@
 <script lang="ts">
 	// based on https://dev.to/alvaromontoro/building-your-own-color-contrast-checker-4j7o
-	import Icon from "svelte-material-icons/Pan.svelte";
+
 	import Input from "../Input.svelte";
 	import ColorPicker from "svelte-awesome-color-picker";
 	import type { A11yColor } from "svelte-awesome-color-picker/type/types";

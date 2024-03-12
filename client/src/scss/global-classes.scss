@@ -7,6 +7,19 @@
 	align-items: center;
 }
 
+.material-icon {
+	display: none;
+}
+#global-wrapper.showIcons {
+	.material-icon {
+		display: unset;
+		font-family: "Material Symbols Outlined" !important;
+		font-display: swap;
+		white-space: pre !important;
+		font-variation-settings: "FILL" 1, "wght" 300, "GRAD" 0, "opsz" 32;
+	}
+}
+
 .main-page-section {
 	padding-top: $s6;
 	padding-bottom: $s8;
