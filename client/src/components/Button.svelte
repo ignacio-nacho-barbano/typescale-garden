@@ -72,7 +72,7 @@
 
 <!-- <Tooltip {alt}>
 </Tooltip> -->
-<button bind:this={element} {name} on:click class={classes}>
+<button bind:this={element} aria-label={name} on:click class={classes}>
 	{#if to}
 		<a href={to} target={isExternal ? "_blank" : "_self"}><slot /></a>
 	{/if}
