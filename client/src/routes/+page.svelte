@@ -5,6 +5,7 @@
 	import { cssCode } from "../stores/config";
 	import { routes } from "./routes";
 	import { Breakpoints } from "../constants";
+	import SvelteHead from "../components/SvelteHead.svelte";
 	const wrapperClass = "styles-injection-wrapper";
 
 	const userGeneratedStyles = derived([cssCode, mobileView], ([code, mobile]) => {
@@ -27,6 +28,8 @@
 		return styles;
 	});
 </script>
+
+<SvelteHead />
 
 <div class={wrapperClass}>
 	{@html `<style>${$userGeneratedStyles}</style>`}

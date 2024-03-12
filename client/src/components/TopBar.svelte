@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Phone from "svelte-material-icons/CellphoneText.svelte";
 	import Logo from "../../static/logo.svg";
 	import { mobileView, sidebarOpen, userSidebarOpen } from "../stores/app";
 	import { authClient, isAuthenticated } from "../stores/auth";
 	import Button from "./Button.svelte";
+	import Icon from "./Icon.svelte";
 	import Switch from "./Switch.svelte";
 	import UserControls from "./UserControls.svelte";
 
@@ -28,19 +28,20 @@
 	<Button
 		cls="sidebar-toggle-button"
 		size="s"
-		leadIcon="MenuOpen"
+		alt="{$sidebarOpen ? 'close' : 'open'} settings sidebar"
+		leadIcon="menu_open"
 		on:click={() => {
 			sidebarOpen.update((actual) => !actual);
 		}}
 	/>
 
-	<a href="/" class="logo-wrapper">
+	<a href="/" aria-label="go to homepage" class="logo-wrapper">
 		<Logo id="logo" aria-hidden />
 		<h1 class="logo body-2">Typescale Garden</h1>
 	</a>
 
 	<div class="phone-view">
-		<Phone size="20" />
+		<Icon>aod</Icon>
 		<Switch size="s" name="mobile-view" label="Mobile View" bind:value={$mobileView} />
 	</div>
 
@@ -48,6 +49,7 @@
 		<UserControls />
 	{:else}
 		<Button
+			alt="{$userSidebarOpen ? 'close' : 'open'} log in and sign in menu"
 			cls="config-toggle-button"
 			size="s"
 			leadIcon="Menu"
@@ -63,12 +65,12 @@
 </div>
 
 <style lang="scss">
-	:global(.sidebar-toggle-button) {
+	:global(.sidebar-toggle-button .material-icon) {
 		transition: rotate ease-in-out 300ms;
 		rotate: 180deg;
 	}
 	.sidebarOpen {
-		:global(.sidebar-toggle-button) {
+		:global(.sidebar-toggle-button .material-icon) {
 			rotate: 0deg;
 		}
 	}

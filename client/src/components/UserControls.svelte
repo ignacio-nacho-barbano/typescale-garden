@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Icon from "svelte-material-icons/MenuDown.svelte";
 	import { authClient, user } from "../stores/auth";
 	import Button from "./Button.svelte";
+	import Icon from "./Icon.svelte";
 	import Menu from "./Menu.svelte";
 
 	let userName = $user.name || $user.nickname || $user.name || $user.email;
@@ -26,7 +26,7 @@
 			</ul>
 		</nav>
 	</Menu>
-	<Icon />
+	<Icon>expand_more</Icon>
 </button>
 
 <style lang="scss">

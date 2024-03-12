@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import type Icon from "svelte-material-icons/Pan.svelte";
 	import Tooltip from "./Tooltip.svelte";
+	import Icon from "./Icon.svelte";
+	import { ENV } from "../services/env";
 
 	// add mandatory alt in the future for icon buttons
-	export const alt: string | undefined = undefined;
+	export let alt: string | undefined = undefined;
 	export let leadIcon: string | null = null;
 	export let trailIcon: string | null = null;
 	export let disabled: boolean | null = false;
@@ -13,8 +14,8 @@
 	export let active: boolean | null = null;
 	export let type: "primary" | "outline" | "ghost" = "outline";
 	export let size: "m" | "s" = "m";
-	let leadIconComp: typeof Icon;
-	let trailIconComp: typeof Icon;
+	let element: Node;
+	let name = alt;
 	let classes = `glass btn shadow-mid bold ${size} ${cls} ${type}`;
 	let isExternal = false;
 	let hasText = $$slots.default;
@@ -25,12 +26,6 @@
 
 	if ((leadIcon || trailIcon) && !hasText) {
 		classes += " icon";
-
-		// if (!alt) {
-		// 	console.warn(
-		// 		"it's recommended for buttons that have only icons to have an alt, please provide one"
-		// 	);
-		// }
 	}
 
 	if (leadIcon && hasText) {
@@ -47,28 +42,37 @@
 
 	classes += size === "m" ? " body-1" : " body-2";
 
-	if (leadIcon) {
-		onMount(async () => {
-			leadIconComp = (await import(`./icons/${leadIcon}.svelte`)).default;
-		});
-	}
-
-	if (trailIcon) {
-		onMount(async () => {
-			trailIconComp = (await import(`./icons/${trailIcon}.svelte`)).default;
-		});
-	}
+	onMount(() => {
+		if (element) {
+			if (hasText) {
+				name = element.textContent || undefined;
+			} else {
+				if (!alt && ENV.IS_DEV) {
+					console.warn(
+						"it's recommended for buttons that have only icons to have an alt, please provide one",
+						{ leadIcon, trailIcon, element }
+					);
+				}
+			}
+		}
+	});
 </script>
 
 <!-- <Tooltip {alt}>
 </Tooltip> -->
-<button on:click class={classes} {disabled}>
+<button bind:this={element} aria-label={name} on:click class={classes}>
 	{#if to}
 		<a href={to} target={isExternal ? "_blank" : "_self"}><slot /></a>
 	{/if}
-	<svelte:component this={leadIconComp} size="32" />
+	{#if leadIcon}
+		<Icon cls="lead-icon-comp">{leadIcon}</Icon>
+	{/if}
+	<!-- <svelte:component this={leadIconComp} size="32" /> -->
 	<slot />
-	<svelte:component this={trailIconComp} size="32" />
+	{#if trailIcon}
+		<Icon cls="trail-icon-comp">{trailIcon}</Icon>
+	{/if}
+	<!-- <svelte:component this={trailIconComp} size="32" /> -->
 </button>
 
 <style lang="scss">
@@ -142,11 +146,11 @@
 			}
 		}
 
-		&.lead-icon {
+		&:global(.lead-icon-comp) {
 			padding-left: $s4;
 		}
 
-		&.trail-icon {
+		&:global(.trail-icon-comp) {
 			padding-right: $s4;
 		}
 

@@ -32,8 +32,8 @@
 
 <dialog bind:this={dialog} class:open class=" modal glass shadow-high">
 	<div class="title-bar">
-		<h1 class="title-3">{title}</h1>
-		<Button leadIcon="Close" on:click={() => (open = false)} />
+		<h1 class="title-4">{title}</h1>
+		<Button leadIcon="Close" alt="Close {title} modal" on:click={() => (open = false)} />
 	</div>
 	<div class="content">
 		<slot />
@@ -43,13 +43,13 @@
 <style lang="scss">
 	.modal {
 		margin: auto;
-		height: calc(100vh - 10vh);
+		height: calc(100vh - 5vh);
 		flex-direction: column;
 		padding: $s5;
 		border-radius: $s5;
 		background-color: $c-base;
 		overflow: hidden;
-		width: calc(100vw - 10vh);
+		width: calc(100vw - 5vh);
 		max-width: 1000px;
 
 		&.open {

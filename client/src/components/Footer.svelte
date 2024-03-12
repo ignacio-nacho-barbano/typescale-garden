@@ -75,7 +75,7 @@
 			padding: $sd5;
 			gap: $sd6;
 			border-radius: $s5;
-			background: $c-primary;
+			background: $c-primary-bg;
 			border: solid $c-accent $lw;
 		}
 	}
