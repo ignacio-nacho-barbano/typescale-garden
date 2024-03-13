@@ -57,6 +57,9 @@
 			}
 
 			storedTypescales.set(res.data.typescales);
+			if (saveAsNew || !existingTypescale) {
+				loadedTypescaleId.set(res.data.typescales[0].id);
+			}
 			showNotification(`Typescale ${existingTypescale ? "updated" : "saved"} successfully`);
 		} catch (error) {
 			let message = "ERROR: Could not save the typescale please try again or contact support.";

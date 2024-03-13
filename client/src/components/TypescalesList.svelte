@@ -1,9 +1,4 @@
 <script lang="ts">
-	import { browser } from "$app/environment";
-	import type { Typescale } from "@prisma/client";
-	import { isAuthenticated } from "../stores/auth";
-	import { fetch } from "../stores/fetch";
-	import { showNotification } from "../stores/notifications";
 	import { storedTypescales } from "../stores/typescales";
 	import Button from "./Button.svelte";
 </script>

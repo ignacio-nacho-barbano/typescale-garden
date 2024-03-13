@@ -4,15 +4,22 @@
 	import Button from "./Button.svelte";
 
 	export let name: string;
-	export let value: Writable<string> | Writable<number> | string | number;
-	export let label: string | null = null;
+	export let value: string | number;
+	export let label: string = name;
 	export let changeOnBlur: boolean = false;
 	export let useSearch: boolean = false;
 	// export let validators: FormValidator<typeof value>[] = [];
 	let blurEvent: boolean = false;
-	let internalValue: string = (value || "") as string;
+	let internalValue: string | number = value || "";
 
-	const outputValue = (newValue: string, blurHappened: boolean) => {
+	// having this assures internal value will be updated when value changes from the outside
+	const updateInternalValue = (newValue: string | number) => {
+		internalValue = newValue;
+	};
+
+	$: updateInternalValue(value);
+
+	const outputValue = (newValue: string | number, blurHappened: boolean) => {
 		if (!useSearch && ((changeOnBlur && blurHappened) || !changeOnBlur)) {
 			value = newValue;
 		}
@@ -23,7 +30,7 @@
 </script>
 
 <div class="input-wrapper">
-	<label class="body-2" for={name}>{label || name}</label>
+	<label class="body-2" for={name}>{label}</label>
 	<div class="controls-wrapper">
 		<input
 			aria-label={label}

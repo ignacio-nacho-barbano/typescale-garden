@@ -17,6 +17,7 @@
 					<button
 						on:click={() => {
 							loadedTypescaleId.set(ts.id);
+							open = false;
 						}}
 						><b class="body-2">{ts.name}</b><br /><span class="tooltip">
 							by {ts.authorId === "typescale-garden" ? "Typescale Garden" : "You"}
