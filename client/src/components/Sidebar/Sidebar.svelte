@@ -16,16 +16,13 @@
 			<h2 class="title-6">Settings</h2>
 		</div>
 
-		{#if $isAuthenticated && $user.email === "nacho.barbano.dev@gmail.com"}
-			<!-- will be removed after testing in prod with my user -->
-			<Accordion bind:open={$accordionStates.file}>
-				<span slot="title">File</span>
-				<div slot="content" class="file-buttons">
-					<LoadControl />
-					<SaveControl />
-				</div>
-			</Accordion>
-		{/if}
+		<Accordion bind:open={$accordionStates.file}>
+			<span slot="title">File</span>
+			<div slot="content" class="file-buttons">
+				<LoadControl />
+				<SaveControl />
+			</div>
+		</Accordion>
 		<!-- <Button leadIcon="Parameters" /> -->
 		<Accordion bind:open={$accordionStates.parameters}>
 			<span slot="title">Typescale</span>
