@@ -29,7 +29,7 @@
 		cls="sidebar-toggle-button"
 		size="s"
 		alt="{$sidebarOpen ? 'close' : 'open'} settings sidebar"
-		leadIcon="menu_open"
+		leadIcon={$sidebarOpen ? "menu_open" : "custom_typography"}
 		on:click={() => {
 			sidebarOpen.update((actual) => !actual);
 		}}
@@ -52,7 +52,7 @@
 			alt="{$userSidebarOpen ? 'close' : 'open'} log in and sign in menu"
 			cls="config-toggle-button"
 			size="s"
-			leadIcon="Menu"
+			leadIcon="person_add"
 			on:click={() => {
 				userSidebarOpen.update((actual) => !actual);
 			}}
@@ -65,15 +65,6 @@
 </div>
 
 <style lang="scss">
-	:global(.sidebar-toggle-button .material-icon) {
-		transition: rotate ease-in-out 300ms;
-		rotate: 180deg;
-	}
-	.sidebarOpen {
-		:global(.sidebar-toggle-button .material-icon) {
-			rotate: 0deg;
-		}
-	}
 	a.logo-wrapper {
 		display: flex;
 		gap: $s3;
@@ -94,6 +85,7 @@
 	}
 	:global(#logo) {
 		height: $s5;
+		max-width: $s5;
 		flex: 0 0 auto;
 		width: fit-content;
 		transition: transform 200ms ease-in-out;
@@ -103,7 +95,8 @@
 		display: flex;
 		align-items: center;
 		margin: 0 auto;
-		gap: $s1;
+		gap: $sd1;
+		flex: 0 0 auto;
 
 		:global(svg) {
 			flex: 0 0 auto;

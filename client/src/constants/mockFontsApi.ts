@@ -31565,3 +31565,5 @@ export const mockFontsApi = {
 		}
 	]
 };
+
+export const mockFontsApiNames = mockFontsApi.items.map(({ family }) => family);

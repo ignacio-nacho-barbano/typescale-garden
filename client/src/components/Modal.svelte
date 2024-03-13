@@ -45,7 +45,7 @@
 		margin: auto;
 		height: calc(100vh - 5vh);
 		flex-direction: column;
-		padding: $s5;
+		padding: $sd5;
 		border-radius: $s5;
 		background-color: $c-base;
 		overflow: hidden;
@@ -67,7 +67,7 @@
 		flex: 1 1;
 		justify-content: space-between;
 		margin-bottom: $s4;
-		gap: $s6;
+		gap: $sd6;
 	}
 	.content {
 		display: flex;

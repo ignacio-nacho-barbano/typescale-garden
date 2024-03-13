@@ -1,14 +1,11 @@
-import { browser } from "$app/environment";
-
 import type { Auth0ClientOptions } from "@auth0/auth0-spa-js";
 import { createAuth0Client } from "@auth0/auth0-spa-js";
 import type { Typescale } from "@prisma/client";
 import { getUserData } from "../functions";
-import { logError } from "../services/errorLogger";
-import { authClient } from "../stores/auth";
-import { storedTypescales } from "../stores/typescales";
-import { initAnonymousAnalysis } from "../services/hotjar";
 import { ENV } from "../services/env";
+import { logError } from "../services/errorLogger";
+import { initAnonymousAnalysis } from "../services/hotjar";
+import { authClient } from "../stores/auth";
 
 const authConfig: Auth0ClientOptions = {
 	domain: ENV.AUTH_DOMAIN,

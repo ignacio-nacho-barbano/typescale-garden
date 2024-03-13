@@ -8,6 +8,7 @@
 	export let alt: string | undefined = undefined;
 	export let leadIcon: string | null = null;
 	export let trailIcon: string | null = null;
+	export let disabled: boolean | null = false;
 	export let cls: string | null = "";
 	export let to: string | null = null;
 	export let active: boolean | null = null;
@@ -59,7 +60,7 @@
 
 <!-- <Tooltip {alt}>
 </Tooltip> -->
-<button bind:this={element} aria-label={name} on:click class={classes}>
+<button bind:this={element} {disabled} aria-label={name} on:click class={classes}>
 	{#if to}
 		<a href={to} target={isExternal ? "_blank" : "_self"}><slot /></a>
 	{/if}
@@ -90,6 +91,25 @@
 		justify-content: center;
 		color: $c-accent;
 		border: none;
+
+		&[disabled] {
+			&,
+			&:hover,
+			&:active,
+			&.active {
+				&,
+				&.outline[disabled],
+				&.ghost[disabled],
+				&.primary[disabled] {
+					filter: grayscale(0.8);
+					box-shadow: none;
+					background: $c-base;
+					transform: none;
+					border: $lw solid rgb(162, 162, 162);
+					color: rgb(93, 93, 93);
+				}
+			}
+		}
 
 		&.m {
 			min-height: $s6;

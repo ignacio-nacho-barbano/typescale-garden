@@ -27,12 +27,29 @@
 
 		return styles;
 	});
+
+	let wrapper: Node;
+	const injectStyles = (wrapper: Node, styles: string) => {
+		if (wrapper) {
+			const stylesId = "injected-styles";
+
+			let styleTag = document.getElementById(stylesId);
+			if (!styleTag) {
+				styleTag = document.createElement("style");
+				styleTag.id = stylesId;
+			}
+
+			styleTag.innerText = styles;
+			wrapper.appendChild(styleTag);
+		}
+	};
+
+	$: injectStyles(wrapper, $userGeneratedStyles);
 </script>
 
 <SvelteHead />
 
-<div class={wrapperClass}>
-	{@html `<style>${$userGeneratedStyles}</style>`}
+<div bind:this={wrapper} class={wrapperClass}>
 	<section
 		id={routes[0].id}
 		class:mobileView={$mobileView}

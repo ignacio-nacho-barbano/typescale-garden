@@ -1,27 +1,32 @@
 <script lang="ts">
+	import { mockFontsApiNames } from "../../constants/mockFontsApi";
 	import {
-		fontName,
+		availableWeights,
 		baseSize,
 		baseUnit,
-		desktopRatio,
-		mobileRatio,
-		headingsInitialWeight,
-		availableWeights,
-		headingsFinalWeight,
 		breakpoint,
+		desktopRatio,
+		fontName,
+		headingsFinalWeight,
+		headingsInitialWeight,
 		letterSpacingRatio,
-		useUppercaseForTitles,
+		mobileRatio,
 		useItalicsForTitles,
-		randomFont
+		useUppercaseForTitles
 	} from "../../stores/config";
+	import AutoComplete from "../AutoComplete.svelte";
 	import Input from "../Input.svelte";
-	import Button from "../Button.svelte";
 	import Select from "../Select.svelte";
 	import Switch from "../Switch.svelte";
 </script>
 
 <div class="sidebar-parameters">
-	<Input name="family" label="Font Family (Google Fonts)" useSearch bind:value={$fontName} />
+	<AutoComplete
+		name="family"
+		label="Font Family (Google Fonts)"
+		bind:value={$fontName}
+		options={mockFontsApiNames}
+	/>
 	<Input name="base-font" label="Base Font Size (px)" bind:value={$baseSize} />
 	<Input name="visual-size" label="Base Visual Unit" bind:value={$baseUnit} />
 	<Input name="desktop-ratio" label="Desktop Sizes Ratio" bind:value={$desktopRatio} />

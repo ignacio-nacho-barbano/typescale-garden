@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { PUB_FEATURE_FLAGS } from "$env/static/public";
-	import { accordionStates, sidebarOpen, windowWidth } from "../../stores/app";
+	import { accordionStates, sidebarOpen } from "../../stores/app";
+	import { isAuthenticated, user } from "../../stores/auth";
 	import Accordion from "../Accordion.svelte";
 	import LoadControl from "../FileControls/LoadControl.svelte";
 	import SaveControl from "../FileControls/SaveControl.svelte";
@@ -15,7 +16,8 @@
 			<h2 class="title-6">Settings</h2>
 		</div>
 
-		{#if PUB_FEATURE_FLAGS?.includes("load-save")}
+		{#if $isAuthenticated && $user.email === "nacho.barbano.dev@gmail.com"}
+			<!-- will be removed after testing in prod with my user -->
 			<Accordion bind:open={$accordionStates.file}>
 				<span slot="title">File</span>
 				<div slot="content" class="file-buttons">
@@ -75,6 +77,10 @@
 			overflow: auto;
 			height: 100%;
 			width: 100%;
+
+			:global(> section:first-of-type) {
+				z-index: 10;
+			}
 		}
 
 		&.open {
@@ -95,11 +101,17 @@
 	}
 
 	.file-buttons {
+		position: relative;
 		display: flex;
 		align-items: center;
 		min-height: $s6;
 		max-height: $s6;
 		gap: $s3;
 		padding: 0 $s4;
+
+		:global(.floating-menu-wrapper) {
+			margin-top: -$s4;
+			position: fixed;
+		}
 	}
 </style>

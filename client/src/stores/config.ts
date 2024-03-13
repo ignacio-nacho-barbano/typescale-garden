@@ -6,8 +6,10 @@ import {
 	generateCss,
 	generateTokens
 } from "../functions";
+import type { Typescale } from "@prisma/client";
 import type { ApiFont, TypeVariant } from "../models";
 import { showNotification } from "./notifications";
+import { loadedTypescale } from "./typescales";
 const headingPrefix = "title-";
 
 // constants
@@ -26,6 +28,7 @@ const variants = [
 // writables
 
 export const breakpoint = writable(768);
+export const typescaleName = writable("");
 export const fontName = writable("Red Hat Text");
 export const baseSize = writable(22);
 export const baseUnit = writable(4);
@@ -190,4 +193,67 @@ export const designTokens = derived(
 	([$typescale, $breakpoint, $currentFont]) => generateTokens($typescale, $breakpoint, $currentFont)
 );
 
-// fontName.subscribe(console.log);
+loadedTypescale.subscribe((typescale) => {
+	if (typescale) {
+		const tsb = typescale.base;
+
+		typescaleName.set(typescale.name);
+		breakpoint.set(tsb.breakpoint);
+		fontName.set(tsb.fontName);
+		baseUnit.set(tsb.baseUnit);
+		baseSize.set(tsb.baseSize);
+		desktopRatio.set(tsb.desktopRatio);
+		mobileRatio.set(tsb.mobileRatio);
+		useUppercaseForTitles.set(tsb.useUppercaseForTitles);
+		useItalicsForTitles.set(tsb.useItalicsForTitles);
+		headingsInitialWeight.set(tsb.headingsInitialWeight);
+		headingsFinalWeight.set(tsb.headingsFinalWeight);
+		letterSpacingRatio.set(tsb.letterSpacingRatio);
+	}
+});
+
+export const typescaleObject: Readable<Pick<Typescale, "base" | "name">> = derived(
+	[
+		typescaleName,
+		fontName,
+		breakpoint,
+		baseSize,
+		baseUnit,
+		desktopRatio,
+		mobileRatio,
+		letterSpacingRatio,
+		useUppercaseForTitles,
+		useItalicsForTitles,
+		headingsInitialWeight,
+		headingsFinalWeight
+	],
+	([
+		$typescaleName,
+		$fontName,
+		$breakpoint,
+		$baseSize,
+		$baseUnit,
+		$desktopRatio,
+		$mobileRatio,
+		$letterSpacingRatio,
+		$useUppercaseForTitles,
+		$useItalicsForTitles,
+		$headingsInitialWeight,
+		$headingsFinalWeight
+	]) => ({
+		name: $typescaleName,
+		base: {
+			fontName: $fontName,
+			breakpoint: $breakpoint,
+			baseSize: $baseSize,
+			baseUnit: $baseUnit,
+			desktopRatio: $desktopRatio,
+			mobileRatio: $mobileRatio,
+			letterSpacingRatio: $letterSpacingRatio,
+			useUppercaseForTitles: $useUppercaseForTitles,
+			useItalicsForTitles: $useItalicsForTitles,
+			headingsInitialWeight: $headingsInitialWeight,
+			headingsFinalWeight: $headingsFinalWeight
+		}
+	})
+);

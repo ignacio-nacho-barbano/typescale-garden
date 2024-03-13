@@ -36,7 +36,6 @@
 	});
 </script>
 
-<NotificationsProjector />
 <svelte:window bind:innerWidth />
 <div
 	id="global-wrapper"
@@ -44,6 +43,7 @@
 	class:sidebarOpen={$sidebarOpen}
 	class:sidebarHasNormalPosition={innerWidth > Breakpoints.XL}
 >
+	<NotificationsProjector />
 	<Sidebar />
 
 	<div id="scrollable-area">

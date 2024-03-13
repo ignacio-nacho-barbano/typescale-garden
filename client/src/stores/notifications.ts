@@ -12,7 +12,7 @@ export const showNotification = (text: string) => {
 
 	notifications.update((prev) => [...prev, { id, text, timestamp: new Date() }]);
 
-	setTimeout(() => deleteById(id), 30000);
+	setTimeout(() => deleteById(id), 10000);
 };
 
 export const removeNotification = (id: string) => {
