@@ -22,6 +22,7 @@
 		position: fixed;
 		padding: $s4;
 		top: 100%;
+		z-index: 50;
 		background-color: $c-base;
 
 		ul {

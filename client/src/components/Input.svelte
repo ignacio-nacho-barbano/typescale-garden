@@ -37,6 +37,7 @@
 			class="body-2"
 			id={name}
 			bind:value={internalValue}
+			on:click
 			on:blur={() => {
 				blurEvent = true;
 			}}
