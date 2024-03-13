@@ -85,6 +85,7 @@
 	}
 	:global(#logo) {
 		height: $s5;
+		max-width: $s5;
 		flex: 0 0 auto;
 		width: fit-content;
 		transition: transform 200ms ease-in-out;
@@ -94,7 +95,8 @@
 		display: flex;
 		align-items: center;
 		margin: 0 auto;
-		gap: $s1;
+		gap: $sd1;
+		flex: 0 0 auto;
 
 		:global(svg) {
 			flex: 0 0 auto;
