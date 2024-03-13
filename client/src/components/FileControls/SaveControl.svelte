@@ -21,6 +21,7 @@
 	import Input from "../Input.svelte";
 	import type { AxiosResponse } from "axios";
 	import type { Typescale } from ".prisma/client";
+	import { logError } from "../../services/errorLogger";
 
 	let open = false;
 
@@ -61,6 +62,7 @@
 				loadedTypescaleId.set(res.data.typescales[0].id);
 			}
 			showNotification(`Typescale ${existingTypescale ? "updated" : "saved"} successfully`);
+			open = false;
 		} catch (error) {
 			let message = "ERROR: Could not save the typescale please try again or contact support.";
 
@@ -69,7 +71,7 @@
 					"You have reached the maximum amount of stored typescales.<br/> You can delete some through the load menu.";
 			}
 			showNotification(message);
-			console.error(message, error);
+			logError(message, error);
 		}
 	};
 </script>

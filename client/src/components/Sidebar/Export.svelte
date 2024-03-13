@@ -48,9 +48,12 @@
 			{/if}
 		</Code>
 		<div class="buttons">
-			<Button cls="copy-btn" on:click={onDownload}>Download {activeTab} file</Button>
-			<Button cls="copy-btn" on:click={onCopy}>Copy Styles</Button>
+			<Button size="s" leadIcon="download" cls="copy-btn" on:click={onDownload}
+				>Download .{activeTab}</Button
+			>
+			<Button size="s" leadIcon="content_copy" cls="copy-btn" on:click={onCopy}>Copy Styles</Button>
 			<Button
+				size="s"
 				cls="copy-btn"
 				to="https://www.figma.com/community/plugin/1318298863966194157/typescale-garden-import-tool"
 				>Use Figma Plugin</Button
@@ -60,7 +63,7 @@
 </Modal>
 
 <div class="export-block">
-	<Button size="s" on:click={() => (modalOpen = true)}>See Code</Button>
+	<Button leadIcon="data_object" size="s" on:click={() => (modalOpen = true)}>See Code</Button>
 	<Button size="s" on:click={() => copyToClipboard($cssCode, "CSS Code")} cls="copy-btn"
 		>Copy CSS</Button
 	>
@@ -93,9 +96,12 @@
 		:global(.buttons) {
 			display: flex;
 			gap: $s4;
+			padding: $s3;
 			width: fit-content;
+			justify-content: center;
 			margin-top: $s5;
 			margin-left: auto;
+			flex-wrap: wrap;
 		}
 
 		:global(.code-block) {

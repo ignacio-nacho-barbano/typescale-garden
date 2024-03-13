@@ -38,6 +38,13 @@
 					<li><a href="/">Home</a></li>
 					<li><a href="/privacy">Privacy Policy</a></li>
 					<li>
+						<a
+							target="_blank"
+							href="https://www.figma.com/community/plugin/1318298863966194157/typescale-garden-import-tool"
+							>Official Import Tool Plugin for Figma</a
+						>
+					</li>
+					<li>
 						<a target="_blank" href="https://github.com/ignacio-nacho-barbano/typescale-garden"
 							>GitHub Repo</a
 						>

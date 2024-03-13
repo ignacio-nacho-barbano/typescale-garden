@@ -15,8 +15,10 @@
 
 		menu {
 			display: flex;
+			flex-wrap: wrap;
 			justify-content: space-around;
 			list-style: none;
+			max-height: $s6;
 			height: 100%;
 			justify-content: flex-start;
 		}

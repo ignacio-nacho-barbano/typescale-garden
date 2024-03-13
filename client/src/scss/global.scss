@@ -19,6 +19,11 @@ html {
 a,
 a:visited {
 	color: $c-accent;
+	transition: font-weight 200ms ease-in-out;
+
+	&:hover {
+		font-weight: 450 !important;
+	}
 }
 
 fieldset {
