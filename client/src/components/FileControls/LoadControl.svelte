@@ -19,7 +19,7 @@
 							loadedTypescaleId.set(ts.id);
 							open = false;
 						}}
-						><b class="body-2">{ts.name}</b><br /><span class="tooltip">
+						><b class="body-2">{ts.name}</b><span class="tooltip">
 							by {ts.authorId === "typescale-garden" ? "Typescale Garden" : "You"}
 						</span></button
 					>
@@ -44,7 +44,8 @@
 
 		.typescales-list {
 			list-style: none;
-			width: 280px;
+			min-width: 240px;
+			max-width: 280px;
 			display: flex;
 			flex-direction: column;
 			overflow: auto;
@@ -54,18 +55,28 @@
 
 			li {
 				display: flex;
-				padding: $s2 0;
+				min-height: 60px;
+				max-height: 60px;
+				overflow: hidden;
+				padding-right: $s1;
+				justify-content: space-between;
 				align-items: center;
+				border-bottom: $c-primary solid $lw;
 				:global(.btn) {
-					display: none;
+					opacity: 0;
+					margin-right: -50px;
+					transition: all ease-in-out 200ms;
 				}
 
 				&:hover {
 					button span {
-						display: block;
+						line-height: 1rem;
+						opacity: 1;
 					}
 					:global(.btn) {
+						opacity: 1;
 						display: flex;
+						margin-right: 0;
 					}
 				}
 			}
@@ -75,10 +86,14 @@
 				text-align: left;
 				padding: $s2;
 				overflow: hidden;
-				width: 100%;
+				text-overflow: ellipsis;
+				white-space: nowrap;
 				background: none;
 				border: none;
-				border-bottom: $c-primary solid $lw;
+				background-repeat: no-repeat;
+				background-position-x: -300px;
+				background-image: linear-gradient(30deg, $c-primary, transparent 50%);
+				transition: background-position-x 200ms ease-in-out;
 
 				text-wrap: nowrap;
 				text-overflow: ellipsis;
@@ -86,13 +101,17 @@
 
 				span {
 					color: $c-text-sl;
-					display: none;
+					line-height: 0;
+					opacity: 0;
+					display: block;
+					transition: 300ms ease-in-out;
 				}
 
 				&:hover {
-					background: linear-gradient(30deg, $c-primary, transparent 50%);
+					background-position-x: 0;
 					span {
-						display: block;
+						line-height: 1rem;
+						opacity: 1;
 					}
 				}
 			}

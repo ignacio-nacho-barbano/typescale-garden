@@ -9,17 +9,17 @@
 	<div
 		use:outsideListener
 		on:clickOutside={() => (open = false)}
-		style="border-top-{position}-radius: 0; {position}: var(--size-4);"
-		class="user-controls-menu glass shadow-high"
+		style="border-top-{position}-radius: 0; top: calc(100% + 12px);  {position}: var(--size-4);"
+		class="floating-menu-wrapper glass shadow-high"
 	>
 		<slot />
 	</div>
 {/if}
 
 <style lang="scss">
-	.user-controls-menu {
+	.floating-menu-wrapper {
 		border-radius: $s4;
-		position: fixed;
+		position: absolute;
 		padding: $s4;
 		top: 100%;
 		z-index: 50;

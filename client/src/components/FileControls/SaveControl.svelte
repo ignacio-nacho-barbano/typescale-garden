@@ -1,59 +1,33 @@
 <script lang="ts">
-	import Button from "../Button.svelte";
-	import { fetch } from "../../stores/fetch";
-	import { loadedTypescale, loadedTypescaleId, storedTypescales } from "../../stores/typescales";
-	import { showNotification } from "../../stores/notifications";
-	import {
-		baseSize,
-		baseUnit,
-		breakpoint,
-		desktopRatio,
-		fontName,
-		headingsFinalWeight,
-		letterSpacingRatio,
-		mobileRatio,
-		typescaleName,
-		headingsInitialWeight,
-		useItalicsForTitles,
-		useUppercaseForTitles
-	} from "../../stores/config";
-	import Menu from "../Menu.svelte";
-	import Input from "../Input.svelte";
-	import type { AxiosResponse } from "axios";
 	import type { Typescale } from ".prisma/client";
+	import type { AxiosResponse } from "axios";
 	import { logError } from "../../services/errorLogger";
+	import { typescaleName, typescaleObject } from "../../stores/config";
+	import { fetch } from "../../stores/fetch";
+	import { showNotification } from "../../stores/notifications";
+	import { loadedTypescaleId, storedTypescales } from "../../stores/typescales";
+	import Button from "../Button.svelte";
+	import Input from "../Input.svelte";
+	import Menu from "../Menu.svelte";
 
 	let open = false;
+	const maxChars = 30;
 
 	const save = async (saveAsNew = false) => {
+		if ($typescaleName.length > maxChars) return;
+
 		const existingTypescale = $storedTypescales.find(({ name }) => name === $typescaleName);
-		const data: Partial<Typescale> = {
-			name: $typescaleName,
-			base: {
-				fontName: $fontName,
-				breakpoint: $breakpoint,
-				baseSize: $baseSize,
-				baseUnit: $baseUnit,
-				desktopRatio: $desktopRatio,
-				mobileRatio: $mobileRatio,
-				letterSpacingRatio: $letterSpacingRatio,
-				useUppercaseForTitles: $useUppercaseForTitles,
-				useItalicsForTitles: $useItalicsForTitles,
-				headingsInitialWeight: $headingsInitialWeight,
-				headingsFinalWeight: $headingsFinalWeight
-			}
-		};
 
 		let res: AxiosResponse<{ typescales: Typescale[] }>;
 
 		try {
 			if (saveAsNew || !existingTypescale) {
 				res = await $fetch.post("/typescales/saved", {
-					data
+					data: $typescaleObject
 				});
 			} else {
 				res = await $fetch.put("/typescales/saved/" + existingTypescale.id, {
-					data
+					data: $typescaleObject
 				});
 			}
 
@@ -82,8 +56,11 @@
 	<Menu bind:open>
 		<div class="menu-content">
 			<Input name="typescale-name" label="Typescale Name" bind:value={$typescaleName} />
+			{#if $typescaleName.length > maxChars}
+				<p class="error-message tooltip">Sorry!<br />Max allowed length is {maxChars} chars</p>
+			{/if}
 			<Button
-				disabled={!$typescaleName}
+				disabled={!$typescaleName || $typescaleName.length > maxChars}
 				size="s"
 				type="primary"
 				on:click={() => {
@@ -98,6 +75,11 @@
 	.wrapper {
 		z-index: 1;
 		position: relative;
+	}
+
+	.error-message {
+		margin-top: $s3;
+		color: darkred;
 	}
 
 	.menu-content {

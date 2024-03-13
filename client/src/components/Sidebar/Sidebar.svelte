@@ -17,7 +17,7 @@
 		</div>
 
 		{#if $isAuthenticated && $user.email === "nacho.barbano.dev@gmail.com"}
-			<!-- WHO CAN SEE THIS? -->
+			<!-- will be removed after testing in prod with my user -->
 			<Accordion bind:open={$accordionStates.file}>
 				<span slot="title">File</span>
 				<div slot="content" class="file-buttons">
@@ -101,11 +101,17 @@
 	}
 
 	.file-buttons {
+		position: relative;
 		display: flex;
 		align-items: center;
 		min-height: $s6;
 		max-height: $s6;
 		gap: $s3;
 		padding: 0 $s4;
+
+		:global(.floating-menu-wrapper) {
+			margin-top: -$s4;
+			position: fixed;
+		}
 	}
 </style>

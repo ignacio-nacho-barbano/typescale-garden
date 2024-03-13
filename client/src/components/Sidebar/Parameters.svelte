@@ -21,7 +21,6 @@
 </script>
 
 <div class="sidebar-parameters">
-	<!-- <Input name="family" label="Font Family (Google Fonts)" useSearch bind:value={$fontName} /> -->
 	<AutoComplete
 		name="family"
 		label="Font Family (Google Fonts)"

@@ -6,6 +6,7 @@ import {
 	generateCss,
 	generateTokens
 } from "../functions";
+import type { Typescale } from "@prisma/client";
 import type { ApiFont, TypeVariant } from "../models";
 import { showNotification } from "./notifications";
 import { loadedTypescale } from "./typescales";
@@ -195,6 +196,8 @@ export const designTokens = derived(
 loadedTypescale.subscribe((typescale) => {
 	if (typescale) {
 		const tsb = typescale.base;
+
+		typescaleName.set(typescale.name);
 		breakpoint.set(tsb.breakpoint);
 		fontName.set(tsb.fontName);
 		baseUnit.set(tsb.baseUnit);
@@ -208,3 +211,49 @@ loadedTypescale.subscribe((typescale) => {
 		letterSpacingRatio.set(tsb.letterSpacingRatio);
 	}
 });
+
+export const typescaleObject: Readable<Pick<Typescale, "base" | "name">> = derived(
+	[
+		typescaleName,
+		fontName,
+		breakpoint,
+		baseSize,
+		baseUnit,
+		desktopRatio,
+		mobileRatio,
+		letterSpacingRatio,
+		useUppercaseForTitles,
+		useItalicsForTitles,
+		headingsInitialWeight,
+		headingsFinalWeight
+	],
+	([
+		$typescaleName,
+		$fontName,
+		$breakpoint,
+		$baseSize,
+		$baseUnit,
+		$desktopRatio,
+		$mobileRatio,
+		$letterSpacingRatio,
+		$useUppercaseForTitles,
+		$useItalicsForTitles,
+		$headingsInitialWeight,
+		$headingsFinalWeight
+	]) => ({
+		name: $typescaleName,
+		base: {
+			fontName: $fontName,
+			breakpoint: $breakpoint,
+			baseSize: $baseSize,
+			baseUnit: $baseUnit,
+			desktopRatio: $desktopRatio,
+			mobileRatio: $mobileRatio,
+			letterSpacingRatio: $letterSpacingRatio,
+			useUppercaseForTitles: $useUppercaseForTitles,
+			useItalicsForTitles: $useItalicsForTitles,
+			headingsInitialWeight: $headingsInitialWeight,
+			headingsFinalWeight: $headingsFinalWeight
+		}
+	})
+);
