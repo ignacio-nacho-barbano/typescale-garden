@@ -60,7 +60,7 @@
 	.autocomplete-wrapper {
 		position: relative;
 
-		:global(.user-controls-menu) {
+		:global(.floating-menu-wrapper) {
 			left: 0;
 			top: $s7;
 			max-height: 50dvh;

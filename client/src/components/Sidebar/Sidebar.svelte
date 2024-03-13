@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { PUB_FEATURE_FLAGS } from "$env/static/public";
 	import { accordionStates, sidebarOpen } from "../../stores/app";
-	import { isAuthenticated, user } from "../../stores/auth";
 	import Accordion from "../Accordion.svelte";
 	import LoadControl from "../FileControls/LoadControl.svelte";
 	import SaveControl from "../FileControls/SaveControl.svelte";
