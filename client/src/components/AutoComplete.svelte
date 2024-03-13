@@ -20,7 +20,7 @@
 
 	const updateVisibleOptions = (newValue: string) => {
 		visibleOptions = newValue
-			? options.filter((name) => name.match(new RegExp(newValue, "i")))
+			? options.filter((name) => name.toLowerCase().includes(newValue.toLowerCase()))
 			: options;
 	};
 
@@ -42,13 +42,17 @@
 		}}
 	/>
 	<Menu bind:open>
-		<ul>
-			{#each visibleOptions as option}
-				<li>
-					<button class="body-2" on:click={() => outputValue(option)}>{option}</button>
-				</li>
-			{/each}
-		</ul>
+		{#if visibleOptions.length}
+			<ul>
+				{#each visibleOptions as option}
+					<li>
+						<button class="body-2" on:click={() => outputValue(option)}>{option}</button>
+					</li>
+				{/each}
+			</ul>
+		{:else}
+			<p class="tooltip">No matching fonts found</p>
+		{/if}
 	</Menu>
 </div>
 
