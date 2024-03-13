@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { PUB_FEATURE_FLAGS } from "$env/static/public";
-	import { accordionStates, sidebarOpen, windowWidth } from "../../stores/app";
-	import { isAuthenticated } from "../../stores/auth";
+	import { accordionStates, sidebarOpen } from "../../stores/app";
+	import { isAuthenticated, user } from "../../stores/auth";
 	import Accordion from "../Accordion.svelte";
 	import LoadControl from "../FileControls/LoadControl.svelte";
 	import SaveControl from "../FileControls/SaveControl.svelte";
@@ -16,7 +16,7 @@
 			<h2 class="title-6">Settings</h2>
 		</div>
 
-		{#if $isAuthenticated}
+		{#if $isAuthenticated && $user.email === "nacho.barbano.dev@gmail.com"}
 			<!-- WHO CAN SEE THIS? -->
 			<Accordion bind:open={$accordionStates.file}>
 				<span slot="title">File</span>

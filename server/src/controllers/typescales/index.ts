@@ -19,8 +19,7 @@ export async function getDefaultTypescales(req: Request, res: Response) {
 export async function getUserTypescales(req: Request, res: Response) {
 	try {
 		const typescales = await prisma.typescale.findMany({
-			// @ts-ignore
-			where: { authorId: { in: [req.auth?.payload.sub, "typescale-garden"] } },
+			where: { authorId: { in: [req.auth?.payload.sub || "none", "typescale-garden"] } },
 			orderBy: {
 				lastModifiedAt: "desc"
 			}
@@ -30,32 +29,22 @@ export async function getUserTypescales(req: Request, res: Response) {
 			typescales
 		});
 	} catch (error) {
-		// add rollbar
 		res.status(500).json({ message: "Unable to gather default typescales from database" });
 	}
 }
 
 export async function postNewTypescale(req: Request, res: Response) {
 	try {
-		// add limits
 		const { data } = req.body;
 		data.authorId = req.auth?.payload.sub;
+		const permissions = (req.auth?.payload?.permissions as string[]) || [];
+		const typescales = await prisma.typescale.findMany({
+			where: { authorId: data.authorId }
+		});
+		const maxTypescales = permissions?.includes("store:typescales-premium") ? 100 : 5;
 
-		try {
-			const typescales = await prisma.typescale.findMany({
-				where: { authorId: data.authorId }
-			});
-
-			const maxTypescales = 5;
-
-			if (typescales.length >= maxTypescales) {
-				res.status(401).json({ message: "You have reached the maximum amount of typescales" });
-
-				return;
-			}
-		} catch (e) {
-			console.error("Error when counting typescales", e);
-
+		if (typescales.length >= maxTypescales) {
+			res.status(401).json({ message: "You have reached the maximum amount of typescales" });
 			return;
 		}
 
@@ -65,11 +54,10 @@ export async function postNewTypescale(req: Request, res: Response) {
 
 		await getUserTypescales(req, res);
 	} catch (error) {
-		res.status(501).json({ message: "Server could not save the typescale", error });
+		res.status(500).json({ message: "Server could not save the typescale", error });
 	}
 }
 
-// WRITE THIS
 export async function putTypescale(req: Request, res: Response) {
 	try {
 		const { data } = req.body;
@@ -83,30 +71,19 @@ export async function putTypescale(req: Request, res: Response) {
 
 		await getUserTypescales(req, res);
 	} catch (error) {
-		res.status(501).json({ message: "Server could not save the typescale", error });
+		res.status(500).json({ message: "Server could not save the typescale", error });
 	}
 }
+
 export async function deleteTypescale(req: Request, res: Response) {
 	try {
 		const id = req.params.typescaleId;
 		const authorId = req.auth?.payload.sub;
 
-		try {
-			const typescales = await prisma.typescale.delete({ where: { id, authorId } });
-
-			// if (!typescales.id) {
-			// 	res.status(401).json({ message: "The typescale could not be deleted" });
-
-			// 	return;
-			// }
-		} catch (e) {
-			console.log("no existing typescales");
-
-			return;
-		}
+		await prisma.typescale.delete({ where: { id, authorId } });
 
 		await getUserTypescales(req, res);
 	} catch (error) {
-		res.status(501).json({ message: "Server could not save the typescale", error });
+		res.status(500).json({ message: "Server could not delete the typescale", error });
 	}
 }

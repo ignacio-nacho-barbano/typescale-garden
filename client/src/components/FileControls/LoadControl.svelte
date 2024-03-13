@@ -23,7 +23,12 @@
 						</span></button
 					>
 					{#if ts.authorId !== "typescale-garden"}
-						<Button size="s" leadIcon="Delete" on:click={() => deleteTypescale($fetch, ts.id)} />
+						<Button
+							size="s"
+							alt="delete this typescale"
+							leadIcon="Delete"
+							on:click={() => deleteTypescale($fetch, ts.id)}
+						/>
 					{/if}
 				</li>
 			{/each}
