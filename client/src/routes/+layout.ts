@@ -6,13 +6,14 @@ import { ENV } from "../services/env";
 import { logError } from "../services/errorLogger";
 import { initAnonymousAnalysis } from "../services/hotjar";
 import { authClient } from "../stores/auth";
+import { PUB_API_URL } from "$env/static/public";
 
 const authConfig: Auth0ClientOptions = {
 	domain: ENV.AUTH_DOMAIN,
 	clientId: ENV.AUTH_CLIENT_ID,
 	authorizationParams: {
 		redirect_uri: ENV.CLIENT_ORIGIN,
-		audience: ENV.API_URL
+		audience: PUB_API_URL
 	}
 };
 
