@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "vite dev --host",
 		"build": "vite build",
-		"build:wrangler": "npx wrangler pages dev .svelte-kit/cloudflare",
+		"wrangler": "npx wrangler pages dev .svelte-kit/cloudflare",
+		"build:wrangler": "vite build && npx wrangler pages dev .svelte-kit/cloudflare",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
