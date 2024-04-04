@@ -7,13 +7,14 @@ const config = {
 	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
 	// for more information about preprocessors
 	preprocess: [vitePreprocess(), preprocess()],
-	onwarn: (warning, handler) => {
-		if (warning.code === "css-unused-selector") {
-			return;
+	vitePlugin: {
+		onwarn: (warning, handler) => {
+			if (warning.code === "css-unused-selector") {
+				return;
+			}
+			handler(warning);
 		}
-		handler(warning);
 	},
-
 	kit: {
 		env: {
 			dir: "../",

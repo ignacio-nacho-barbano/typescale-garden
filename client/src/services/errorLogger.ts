@@ -15,7 +15,7 @@ export const rollbar = new Rollbar({
 
 export const logError = (message: string, error?: Record<string, any> | unknown) => {
 	if (PUB_APP_ENV !== "dev") {
-		rollbar.error(message, error);
+		// rollbar.error(message, error);
 	} else {
 		console.error("🚨 Error Logger: ", message, error);
 	}
