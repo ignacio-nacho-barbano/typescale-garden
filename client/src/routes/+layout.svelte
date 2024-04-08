@@ -10,6 +10,7 @@
 	import { mobileView, sidebarOpen, userSidebarOpen, windowWidth } from "../stores/app";
 	import { baseUnit, visibleGrid } from "../stores/config";
 	import type { LayoutData } from "./$types";
+	import { logError } from "../services/errorLogger";
 
 	export let data: LayoutData;
 	let showIcons = true;
@@ -36,7 +37,7 @@
 	});
 </script>
 
-<svelte:window bind:innerWidth />
+<svelte:window bind:innerWidth on:error={console.error} />
 <div
 	id="global-wrapper"
 	class:showIcons

@@ -1,3 +1,4 @@
+import { CONTACT } from "../constants";
 import type { Route } from "../models";
 
 export const routes: Route[] = [
@@ -15,5 +16,5 @@ export const routes: Route[] = [
 
 export const getInTouch = {
 	name: "Get in Touch",
-	url: "mailto:nacho.barbano.dev@gmail.com"
+	url: "mailto:" + CONTACT.mail
 };

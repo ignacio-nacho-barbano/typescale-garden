@@ -7,6 +7,10 @@ import {
 	PUB_CLIENT_ORIGIN
 } from "$env/static/public";
 
+if (!PUB_API_URL) {
+	throw new Error("There was an issue loading env variables");
+}
+
 export const ENV = {
 	API_URL: PUB_API_URL,
 	APP_ENV: PUB_APP_ENV,

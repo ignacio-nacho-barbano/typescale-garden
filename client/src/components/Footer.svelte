@@ -1,3 +1,7 @@
+<script>
+	import { CONTACT } from "../constants";
+</script>
+
 <footer>
 	<div class="container shadow-high">
 		<section class="encouragement">
@@ -27,8 +31,7 @@
 				<a target="_blank" href="https://github.com/ignacio-nacho-barbano/typescale-garden"
 					>GitHub repo</a
 				>. or send me a message at
-				<a target="_blank" href="mailto:nacho.barbano.dev@gmail.com">nacho.barbano.dev@gmail.com</a
-				>.
+				<a target="_blank" href="mailto:{CONTACT.mail}">{CONTACT.mail}</a>.
 			</p>
 		</section>
 		<div>
@@ -55,7 +58,7 @@
 						>
 					</li>
 					<li>
-						<a target="_blank" href="mailto:nacho.barbano.dev@gmail.com">Support Mail</a>
+						<a target="_blank" href="mailto:{CONTACT.mail}">Support Mail</a>
 					</li>
 				</ul>
 			</nav>
