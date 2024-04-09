@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  server:
+    env_file:
+      - ./.env.prod
+    build:
+      context: .
+      dockerfile: ./server/server.Dockerfile
+    ports:
+      - "3000:3000"
