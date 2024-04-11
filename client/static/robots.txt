@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+
+Sitemap: https://typescalegarden.uy/sitemap.txt

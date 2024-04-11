@@ -24,7 +24,14 @@
 			align-items: center;
 			display: flex;
 			width: 100%;
-			transition: margin-top ease-in-out 200ms;
+			background: linear-gradient(-30deg, $c-primary, transparent 60%);
+			transition: margin-top ease-in-out 200ms, background-position-x ease-in-out 300ms;
+			background-repeat: no-repeat;
+			background-position-x: 500px;
+
+			&:hover {
+				background-position-x: 0;
+			}
 
 			:global(.drop-icon) {
 				margin-left: auto;

@@ -87,7 +87,9 @@ ${typescale
 		max-width: 768px;
 	}
 
-	p {
+	p,
+	ul,
+	.mw-text {
 		max-width: 768px;
 	}
 

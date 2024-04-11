@@ -20,6 +20,16 @@
 	}
 }
 
+.card {
+	border-radius: $s5;
+	padding: $sd5;
+
+	&.green {
+		background: $c-primary-bg;
+		border: solid $c-accent $lw;
+	}
+}
+
 .main-page-section {
 	padding-top: $s6;
 	padding-bottom: $s8;

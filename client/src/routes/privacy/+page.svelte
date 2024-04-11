@@ -1,5 +1,5 @@
 <script>
-	import { CONTACT } from "../../constants";
+	import { RESOURCES } from "../../constants";
 </script>
 
 <article class="container">
@@ -59,7 +59,7 @@
 	<h3 class="space-text-above">5. Data Retention</h3>
 	<p>
 		We retain user data for the duration necessary for the outlined purposes. Users can request data
-		deletion by contacting <strong><a href="mailto:{CONTACT.mail}">{CONTACT.mail}</a></strong>.
+		deletion by contacting <strong><a href="mailto:{RESOURCES.mail}">{RESOURCES.mail}</a></strong>.
 	</p>
 
 	<h3>6. Third-Party Access</h3>
@@ -73,7 +73,7 @@
 	<h3>8. Contact Information</h3>
 	<p>
 		For any questions or concerns regarding your data, contact us at <strong
-			><a href="mailto:{CONTACT.mail}">{CONTACT.mail}</a></strong
+			><a href="mailto:{RESOURCES.mail}">{RESOURCES.mail}</a></strong
 		>.
 	</p>
 </article>

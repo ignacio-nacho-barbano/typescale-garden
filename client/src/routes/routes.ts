@@ -1,4 +1,4 @@
-import { CONTACT } from "../constants";
+import { RESOURCES } from "../constants";
 import type { Route } from "../models";
 
 export const routes: Route[] = [
@@ -16,5 +16,5 @@ export const routes: Route[] = [
 
 export const getInTouch = {
 	name: "Get in Touch",
-	url: "mailto:" + CONTACT.mail
+	url: "mailto:" + RESOURCES.mail
 };
