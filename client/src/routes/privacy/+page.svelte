@@ -1,6 +1,9 @@
 <script>
+	import SvelteHead from "../../components/SvelteHead.svelte";
 	import { RESOURCES } from "../../constants";
 </script>
+
+<SvelteHead title="TSG Data Policy | Privacy | Typescale Garden" />
 
 <article class="container">
 	<h1>Data Policy</h1>
