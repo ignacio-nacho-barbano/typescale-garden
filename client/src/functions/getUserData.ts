@@ -16,15 +16,15 @@ export async function getUserData(client: Auth0Client) {
 			authToken.set(token);
 
 			if (token) {
-				const loggedUser = await client.getUser();
+				const loggedUser = (await client.getUser()) || null;
 
-				if (loggedUser) {
-					user.set(loggedUser);
-					return loggedUser;
-				}
+				user.set(loggedUser);
+
+				return loggedUser;
 			}
 		} catch (e) {
-			return;
+			user.set(null);
+			return null;
 		}
 	}
 }

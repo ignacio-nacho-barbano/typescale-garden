@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Logo from "../../static/logo.svg";
 	import { mobileView, sidebarOpen, userSidebarOpen } from "../stores/app";
-	import { authClient, isAuthenticated } from "../stores/auth";
+	import { authClient, authState } from "../stores/auth";
 	import Button from "./Button.svelte";
 	import Icon from "./Icon.svelte";
 	import Switch from "./Switch.svelte";
@@ -45,7 +45,7 @@
 		<Switch size="s" name="mobile-view" label="Mobile View" bind:value={$mobileView} />
 	</div>
 
-	{#if $isAuthenticated}
+	{#if $authState.isAuthenticated}
 		<UserControls />
 	{:else}
 		<Button
