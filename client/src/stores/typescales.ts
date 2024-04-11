@@ -20,8 +20,6 @@ authState.subscribe(async ({ silentLoginReady, isAuthenticated }) => {
 			try {
 				const res = await GetTypescales(isAuthenticated, fetch);
 
-				console.log("subs", res);
-
 				if (res.data?.typescales) {
 					storedTypescales.set(res.data.typescales);
 				}
