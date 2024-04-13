@@ -8,9 +8,10 @@
 	import { Breakpoints } from "../constants";
 	import "../scss/global.scss";
 	import { mobileView, sidebarOpen, userSidebarOpen, windowWidth } from "../stores/app";
-	import { baseUnit, visibleGrid } from "../stores/config";
+	import { baseUnit, fontsApiData, visibleGrid } from "../stores/config";
 	import type { LayoutData } from "./$types";
 	import { logError } from "../services/errorLogger";
+	import { showNotification } from "../stores/notifications";
 
 	export let data: LayoutData;
 	let showIcons = true;
@@ -33,6 +34,15 @@
 	}
 
 	onMount(() => {
+		fetch("https://typescalegarden.uy/fonts-data.json")
+			.then(async (res) => {
+				const data = await res.json();
+				fontsApiData.set(data);
+			})
+			.catch((e) => {
+				logError("Unable to load fonts data: " + e);
+				showNotification("Unable to load fonts data, please reload the page.");
+			});
 		scrollContainer = document.getElementById("scrollable-area");
 	});
 </script>

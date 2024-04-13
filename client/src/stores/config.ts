@@ -38,19 +38,25 @@ export const mobileRatio = writable(1.15);
 export const letterSpacingRatio = writable(1.5);
 export const useUppercaseForTitles = writable(false);
 export const useItalicsForTitles = writable(false);
+export const fontsApiData = writable<{ fontNames: string[]; fonts: { items: ApiFont[] } }>();
 
 // deriveds
-export const currentFont = derived(fontName, ($fontName: string): ApiFont => {
-	const font = mockFontsApi.items.find(
-		({ family }) => $fontName.toLowerCase() === family.toLowerCase()
-	);
-	if (font) {
-		return font;
-	} else {
-		showNotification(`🚨 Unable to find font: ${$fontName}, make sure there aren't any typos.`);
-		return mockFontsApi.items[0];
+export const currentFont = derived(
+	[fontName, fontsApiData],
+	([$fontName, $fontsApiData]): ApiFont => {
+		const fontsArray = $fontsApiData?.fonts || mockFontsApi;
+
+		const font = fontsArray.items.find(
+			({ family }) => $fontName.toLowerCase() === family.toLowerCase()
+		);
+		if (font) {
+			return font;
+		} else {
+			showNotification(`🚨 Unable to find font: ${$fontName}, make sure there aren't any typos.`);
+			return mockFontsApi.items[0];
+		}
 	}
-});
+);
 export const availableWeights = derived(currentFont, ($currentFont) => {
 	const fontVariants = [...$currentFont.variants];
 
@@ -182,11 +188,11 @@ export const cssCode = derived(
 		generateCss($typescale, $breakpoint, $currentFont, $weightSteps)
 );
 
-export const randomFont = () => {
-	const random = mockFontsApi.items[Math.round(Math.random() * mockFontsApi.items.length)];
+// export const randomFont = () => {
+// 	const random = mockFontsApi.items[Math.round(Math.random() * mockFontsApi.items.length)];
 
-	fontName.set(random.family);
-};
+// 	fontName.set(random.family);
+// };
 
 export const designTokens = derived(
 	[typescale, breakpoint, currentFont],

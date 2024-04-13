@@ -7,6 +7,7 @@
 		breakpoint,
 		desktopRatio,
 		fontName,
+		fontsApiData,
 		headingsFinalWeight,
 		headingsInitialWeight,
 		letterSpacingRatio,
@@ -25,7 +26,7 @@
 		name="family"
 		label="Font Family (Google Fonts)"
 		bind:value={$fontName}
-		options={mockFontsApiNames}
+		options={$fontsApiData?.fontNames || mockFontsApiNames}
 	/>
 	<Input name="base-font" label="Base Font Size (px)" bind:value={$baseSize} />
 	<Input name="visual-size" label="Base Visual Unit" bind:value={$baseUnit} />

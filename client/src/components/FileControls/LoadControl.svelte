@@ -11,29 +11,33 @@
 <div class="wrapper">
 	<Button size="s" type="outline" on:click={() => (open = !open)}>Load</Button>
 	<Menu bind:open>
-		<ul class="typescales-list">
-			{#each $storedTypescales as ts}
-				<li>
-					<button
-						on:click={() => {
-							loadedTypescaleId.set(ts.id);
-							open = false;
-						}}
-						><b class="body-2">{ts.name}</b><span class="tooltip">
-							by {ts.authorId === "typescale-garden" ? "Typescale Garden" : "You"}
-						</span></button
-					>
-					{#if ts.authorId !== "typescale-garden"}
-						<Button
-							size="s"
-							alt="delete this typescale"
-							leadIcon="Delete"
-							on:click={() => deleteTypescale($fetch, ts.id)}
-						/>
-					{/if}
-				</li>
-			{/each}
-		</ul>
+		{#if !$storedTypescales?.length}
+			<p class="tooltip">The app could not load saved typescales, please reload the page.</p>
+		{:else}
+			<ul class="typescales-list">
+				{#each $storedTypescales as ts}
+					<li>
+						<button
+							on:click={() => {
+								loadedTypescaleId.set(ts.id);
+								open = false;
+							}}
+							><b class="body-2">{ts.name}</b><span class="tooltip">
+								by {ts.authorId === "typescale-garden" ? "Typescale Garden" : "You"}
+							</span></button
+						>
+						{#if ts.authorId !== "typescale-garden"}
+							<Button
+								size="s"
+								alt="delete this typescale"
+								leadIcon="Delete"
+								on:click={() => deleteTypescale($fetch, ts.id)}
+							/>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+		{/if}
 	</Menu>
 </div>
 

@@ -6,5 +6,5 @@ export async function GetTypescales(isAuth: boolean, fetch: Axios) {
 	let apiEndpoint = "/typescales/";
 	apiEndpoint += isAuth ? "saved" : "default";
 
-	return asyncRetry<{ data: { typescales: Typescale[] } }>(() => fetch.get(apiEndpoint));
+	return asyncRetry<{ data: { typescales: Typescale[] } }>(() => fetch.get(apiEndpoint), 10, 3);
 }
