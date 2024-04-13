@@ -107,7 +107,7 @@
 				</figcaption>
 			</figure>
 		</div>
-		<h2>What's Different About Typescale Garden</h2>
+		<h2>What's Different About this Typescale Generator</h2>
 		<p>
 			Typescale Garden stands out as a versatile tool for generating typographic scales based on
 			various relationships. What sets it apart is its superior configurability compared to other
