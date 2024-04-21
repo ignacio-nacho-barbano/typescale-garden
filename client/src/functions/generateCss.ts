@@ -88,8 +88,7 @@ ${typescale
 	}
 
 	p,
-	ul,
-	.mw-text {
+	.max-w-text {
 		max-width: 768px;
 	}
 
