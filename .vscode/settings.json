@@ -8,7 +8,16 @@
 	"[svg]": {
 		"editor.defaultFormatter": "jock.svg"
 	},
-	"cSpell.words": ["barbano", "oidc", "Panisello", "rollbar", "typescale", "typescales", "wght"],
+	"cSpell.words": [
+		"barbano",
+		"oidc",
+		"Panisello",
+		"rollbar",
+		"typescale",
+		"typescales",
+		"Webfont",
+		"wght"
+	],
 	"[prisma]": {
 		"editor.defaultFormatter": "Prisma.prisma"
 	}

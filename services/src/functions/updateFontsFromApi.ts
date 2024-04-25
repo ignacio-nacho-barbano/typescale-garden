@@ -1,11 +1,12 @@
 import * as fs from "fs";
+import type { WebfontList } from "../../../types/index";
 
 export async function updateFontsFromApi() {
 	try {
 		const fontsReq = await fetch(
 			"https://www.googleapis.com/webfonts/v1/webfonts?key=" + process.env.FONTS_API_KEY
 		);
-		const fonts = await fontsReq.json();
+		const fonts: WebfontList = await fontsReq.json();
 
 		const fontNames = fonts.items.map(({ family }) => family);
 
@@ -20,5 +21,3 @@ export async function updateFontsFromApi() {
 		console.error("could not create fonts file", { error });
 	}
 }
-
-updateFontsFromApi();

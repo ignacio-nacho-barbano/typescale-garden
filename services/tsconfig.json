@@ -1,0 +1,10 @@
+{
+	"include": ["./src"],
+	"compileOnSave": true,
+	"compilerOptions": {
+		"outDir": "dist",
+		"declaration": true,
+		"declarationMap": true,
+		"module": "ESNext"
+	}
+}

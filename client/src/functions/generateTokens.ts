@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { TypeVariant, ApiFont } from "../models";
+import { WEIGHTS_MAP } from "../../../services/dist/constants";
 
 export const generateTokens = (
 	typescale: TypeVariant[],
@@ -7,17 +8,6 @@ export const generateTokens = (
 	font: ApiFont
 ): string => {
 	const tokens: Record<string, TextStyle> = {};
-	const weightsMap: Record<number, string> = {
-		100: "Thin",
-		200: "ExtraLight",
-		300: "Light",
-		400: "Regular",
-		500: "Medium",
-		600: "SemiBold",
-		700: "Bold",
-		800: "ExtraBold",
-		900: "Black"
-	};
 
 	typescale.forEach(
 		({
@@ -33,7 +23,7 @@ export const generateTokens = (
 		}) => {
 			const base: Partial<TextStyle> = {
 				type: "TEXT",
-				fontName: { family: font.family, style: weightsMap[weight] + (italics ? " Italic" : "") },
+				fontName: { family: font.family, style: WEIGHTS_MAP[weight] + (italics ? " Italic" : "") },
 				textCase: uppercase ? "UPPER" : "ORIGINAL",
 				// fontWeight: weight,
 				letterSpacing: { value: letterSpacing * 10, unit: "PERCENT" }
@@ -55,11 +45,11 @@ export const generateTokens = (
 				lineHeight: { value: mobileLine, unit: "PIXELS" }
 			};
 
-			if (name.includes("body") && weightsMap[weight + 200]) {
+			if (name.includes("body") && WEIGHTS_MAP[weight + 200]) {
 				const boldSuffix = "-bold";
 				const fontName = {
 					family: font.family,
-					style: weightsMap[weight + 200] + (italics ? " Italic" : "")
+					style: WEIGHTS_MAP[weight + 200] + (italics ? " Italic" : "")
 				};
 				// @ts-ignore
 				tokens[desktopName + boldSuffix] = {

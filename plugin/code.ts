@@ -8,6 +8,7 @@ figma.ui.onmessage = async (msg) => {
 		const jsonStyles = msg.jsonStyles as Record<string, TextStyle>;
 
 		const fontsToLoad = new Set<string>();
+		const fontsUnableToBeLoaded = new Set<string>();
 
 		Object.keys(jsonStyles).forEach((textName) => {
 			const { fontName } = jsonStyles[textName];
@@ -16,16 +17,13 @@ figma.ui.onmessage = async (msg) => {
 		});
 
 		try {
-			console.log(
+			await Promise.allSettled(
 				Array.from(fontsToLoad.values()).map((font) => {
-					console.log(font);
-
-					return JSON.parse(font);
+					const parsedFont = JSON.parse(font);
+					return figma.loadFontAsync(parsedFont).catch(() => {
+						fontsUnableToBeLoaded.add(parsedFont.style);
+					});
 				})
-			);
-
-			await Promise.all(
-				Array.from(fontsToLoad.values()).map((font) => figma.loadFontAsync(JSON.parse(font)))
 			);
 		} catch (error) {
 			const message = `Unable to load one of the font weights: ${error}`;
@@ -34,8 +32,11 @@ figma.ui.onmessage = async (msg) => {
 		}
 
 		try {
+			let lastSuccessfulFontName: FontName;
+
 			Object.keys(jsonStyles).forEach((styleName) => {
 				const styleProps = jsonStyles[styleName];
+
 				let style = currentStyles.find(({ name }) => name === styleName);
 
 				if (!style) {
@@ -48,7 +49,22 @@ figma.ui.onmessage = async (msg) => {
 					const avoidedProps = ["type", "fontWeight"];
 
 					if (!avoidedProps.includes(property)) {
-						style[property as PropertyKeys] = styleProps[property as PropertyKeys] as never;
+						let valueToAssign = styleProps[property as PropertyKeys];
+
+						if (property === "fontName") {
+							const fontFamily = valueToAssign as FontName;
+
+							if (fontsUnableToBeLoaded.has(fontFamily.style)) {
+								valueToAssign = lastSuccessfulFontName || {
+									family: fontFamily.family,
+									style: "Regular"
+								};
+							} else {
+								lastSuccessfulFontName = fontFamily;
+							}
+						}
+
+						style[property as PropertyKeys] = valueToAssign as never;
 					}
 				});
 			});
@@ -57,7 +73,7 @@ figma.ui.onmessage = async (msg) => {
 		} catch (error) {
 			const message = "Unable to import styles 🙁";
 			figma.notify(message, { error: true });
-			console.error(message, fontsToLoad, error);
+			console.error(message, fontsToLoad, fontsUnableToBeLoaded, error);
 		}
 	} else if (msg.type === "cancel") {
 		figma.closePlugin();

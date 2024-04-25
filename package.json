@@ -19,6 +19,7 @@
 		"./client",
 		"./plugin",
 		"./server",
+		"./services",
 		"./docker"
 	],
 	"keywords": [

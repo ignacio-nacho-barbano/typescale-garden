@@ -1,5 +1,7 @@
 {
 	"compilerOptions": {
-		"typeRoots": ["./node_modules/@types", "./node_modules/@figma", "./@types"]
+		"baseUrl": ".",
+		"paths": { "@services/*": ["./services/dist/*"], "@tsg-types": ["types/index"] },
+		"typeRoots": ["./node_modules/@types", "./node_modules/@figma", "types"]
 	}
 }
