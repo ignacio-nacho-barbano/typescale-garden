@@ -6,8 +6,8 @@
     "build": "npm i && npx prisma generate && npx tsc",
     "start": "node --env-file=../.env dist/src/index.js",
     "dev": "nodemon --watch './src' -e .ts --exec ts-node -r ./env-loader.dev.js ./src/index.ts",
-    "db:migrate:dev": "dotenv -e ../.env npx prisma prisma db push seed",
-    "db:migrate:prod": "dotenv -e ../.env.prod npx prisma db push seed",
+    "db:migrate:dev": "node --env-file=../.env npx prisma prisma db push seed",
+    "db:migrate:prod": "node --env-file=../.env.prod npx prisma db push seed",
     "prisma:file": "ts-node --project ../tsconfig.json -r ./env-loader.prod.js ./prisma/seeds/typescales.ts"
   },
   "prisma": {
@@ -18,7 +18,6 @@
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
-    "dotenv": "^16.4.1",
     "express": "^4.18.2",
     "express-oauth2-jwt-bearer": "^1.6.0",
     "express-openid-connect": "^2.17.1",
