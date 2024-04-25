@@ -55,26 +55,29 @@
 <SvelteHead />
 <Accordion bind:open={newsOpen}>
 	<span slot="title">News! 🗞️</span>
-	<section slot="content" class="welcome-message shadow-high card green">
-		<h2 class="title-5">Hey you! Thanks so much for being here!</h2>
-		<h3 class="body-1 bold">
-			The Typescale Garden community is starting to grow and it makes me super happy!
-		</h3>
-		<h4 class="body-2 bold">I'm working hard on new features and improvements.</h4>
-		<p class="body-2">The following are:</p>
-		<ul class="body-2">
-			<li><b>Load and Save service reliability</b> for your stored typescale</li>
-			<li><b>Version de la app en español</b> para mis hermanos hispanohablantes</li>
-		</ul>
-		<p class="body-2">
-			Feel free to provide feedback 👇 or to get in touch through the <ContactMail />. And remember,
-			this is an open source project, consider supporting it through <GitHubSponsorsLink />.
-		</p>
-		<p class="body-2">
-			<b>Thanks for your support and patience!</b><br />
-			<i class="bold">- Nacho</i> | Creator of Typescale Garden
-		</p>
-	</section>
+	<div slot="content" class="container">
+		<section class="welcome-message shadow-high card green">
+			<h2 class="title-5">Hey you! Thanks so much for being here!</h2>
+			<h3 class="body-1 bold">
+				The Typescale Garden community is starting to grow and it makes me super happy!
+			</h3>
+			<h4 class="body-2 bold">I'm working hard on new features and improvements.</h4>
+			<p class="body-2">The following are:</p>
+			<ul class="body-2">
+				<li><b>Load and Save service reliability</b> for your stored typescale</li>
+				<li><b>Version de la app en español</b> para mis hermanos hispanohablantes</li>
+			</ul>
+			<p class="body-2">
+				Feel free to provide feedback 👇 or to get in touch through the <ContactMail />. And
+				remember, this is an open source project, consider supporting it through <GitHubSponsorsLink
+				/>.
+			</p>
+			<p class="body-2">
+				<b>Thanks for your support and patience!</b><br />
+				<i class="bold">- Nacho</i> | Creator of Typescale Garden
+			</p>
+		</section>
+	</div>
 </Accordion>
 <div bind:this={wrapper} class={wrapperClass}>
 	<section

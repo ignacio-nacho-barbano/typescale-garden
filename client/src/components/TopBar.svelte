@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Auth0Client } from "@auth0/auth0-spa-js";
 	import Logo from "../../static/logo.svg";
 	import { mobileView, sidebarOpen, userSidebarOpen } from "../stores/app";
 	import { authClient, authState } from "../stores/auth";
@@ -6,22 +7,7 @@
 	import Icon from "./Icon.svelte";
 	import Switch from "./Switch.svelte";
 	import UserControls from "./UserControls.svelte";
-
-	function logIn(e: Event, signUp?: boolean) {
-		e.preventDefault();
-
-		let config;
-
-		if (signUp) {
-			config = {
-				authorizationParams: {
-					screen_hint: "signup"
-				}
-			};
-		}
-
-		$authClient.loginWithRedirect(config);
-	}
+	import { logIn } from "../functions";
 </script>
 
 <div class="top-bar glass" class:sidebarOpen={$sidebarOpen}>
@@ -58,8 +44,9 @@
 			}}
 		/>
 		<div class="btn-gr {$userSidebarOpen ? 'shadow-high open' : ''}">
-			<Button size="s" type="outline" on:click={logIn}>Log In</Button>
-			<Button size="s" type="primary" on:click={(e) => logIn(e, true)}>Register</Button>
+			<Button size="s" type="outline" on:click={(e) => logIn(e, $authClient)}>Log In</Button>
+			<Button size="s" type="primary" on:click={(e) => logIn(e, $authClient, true)}>Register</Button
+			>
 		</div>
 	{/if}
 </div>

@@ -9,6 +9,8 @@
 	import Button from "../Button.svelte";
 	import Input from "../Input.svelte";
 	import Menu from "../Menu.svelte";
+	import { authClient, authState, user } from "../../stores/auth";
+	import { logIn } from "../../functions";
 
 	let open = false;
 	const maxChars = 30;
@@ -55,18 +57,28 @@
 
 	<Menu bind:open>
 		<div class="menu-content">
-			<Input name="typescale-name" label="Typescale Name" bind:value={$typescaleName} />
-			{#if $typescaleName.length > maxChars}
-				<p class="error-message tooltip">Sorry!<br />Max allowed length is {maxChars} chars</p>
+			{#if $authState.isAuthenticated}
+				<Input name="typescale-name" label="Typescale Name" bind:value={$typescaleName} />
+				{#if $typescaleName.length > maxChars}
+					<p class="error-message tooltip">Sorry!<br />Max allowed length is {maxChars} chars</p>
+				{/if}
+				<Button
+					disabled={!$typescaleName || $typescaleName.length > maxChars}
+					size="s"
+					type="primary"
+					on:click={() => {
+						save();
+					}}>Save</Button
+				>
+			{:else}
+				<p class="tooltip">Log In or Sign Up to save the Typescales you've created.</p>
+				<div class="account-buttons">
+					<Button size="s" type="outline" on:click={(e) => logIn(e, $authClient)}>Log In</Button>
+					<Button size="s" type="primary" on:click={(e) => logIn(e, $authClient, true)}
+						>Register</Button
+					>
+				</div>
 			{/if}
-			<Button
-				disabled={!$typescaleName || $typescaleName.length > maxChars}
-				size="s"
-				type="primary"
-				on:click={() => {
-					save();
-				}}>Save</Button
-			>
 		</div>
 	</Menu>
 </div>
@@ -85,6 +97,11 @@
 	.menu-content {
 		:global(.btn) {
 			margin-top: $s4;
+		}
+
+		:global(.account-buttons) {
+			display: flex;
+			gap: $s3;
 		}
 	}
 </style>

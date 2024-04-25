@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import { deleteTypescale } from "../../functions/deleteTypescale";
 	import { fetch } from "../../stores/fetch";
 	import { loadedTypescaleId, storedTypescales } from "../../stores/typescales";
@@ -6,12 +7,20 @@
 	import Menu from "../Menu.svelte";
 
 	let open = false;
+	let loading = true;
+	onMount(() => {
+		setTimeout(() => {
+			loading = false;
+		}, 30000);
+	});
 </script>
 
 <div class="wrapper">
 	<Button size="s" type="outline" on:click={() => (open = !open)}>Load</Button>
 	<Menu bind:open>
-		{#if !$storedTypescales?.length}
+		{#if loading && !$storedTypescales?.length}
+			<p class="tooltip">...Loading</p>
+		{:else if !$storedTypescales?.length}
 			<p class="tooltip">The app could not load saved typescales, please reload the page.</p>
 		{:else}
 			<ul class="typescales-list">
