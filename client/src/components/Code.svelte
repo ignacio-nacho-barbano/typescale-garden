@@ -1,7 +1,7 @@
 <script lang="ts">
 </script>
 
-<div class="code-block">
+<div class="code-block notranslate">
 	<div class="code-wrapper tooltip">
 		<code>
 			<slot />

@@ -34,7 +34,7 @@
 	<div class="controls-wrapper">
 		<input
 			aria-label={label}
-			class="body-2"
+			class="body-2 notranslate"
 			id={name}
 			bind:value={internalValue}
 			on:click

@@ -43,7 +43,7 @@
 	/>
 	<Menu bind:open>
 		{#if visibleOptions.length}
-			<ul>
+			<ul class="notranslate">
 				{#each visibleOptions as option}
 					<li>
 						<button class="body-2" on:click={() => outputValue(option)}>{option}</button>

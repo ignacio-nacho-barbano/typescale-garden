@@ -21,7 +21,7 @@
 		}}
 	/>
 
-	<a href="/" aria-label="go to homepage" class="logo-wrapper">
+	<a href="/" aria-label="go to homepage" class="notranslate logo-wrapper">
 		<Logo id="logo" aria-hidden />
 		<h1 class="logo body-2">Typescale Garden</h1>
 	</a>

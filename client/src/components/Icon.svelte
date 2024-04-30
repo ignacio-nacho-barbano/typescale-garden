@@ -3,7 +3,11 @@
 	export let cls = "";
 </script>
 
-<div role="img" style="font-size: {size}px; max-width: {size}px" class="{cls} material-icon">
+<div
+	role="img"
+	style="font-size: {size}px; max-width: {size}px"
+	class="{cls} notranslate material-icon"
+>
 	<slot />
 </div>
 

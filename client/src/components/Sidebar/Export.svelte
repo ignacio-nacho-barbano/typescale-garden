@@ -68,13 +68,14 @@
 		>Copy CSS</Button
 	>
 	<Button size="s" on:click={() => copyToClipboard($designTokens, "Design Tokens")} cls="copy-btn"
-		>Copy Tokens</Button
+		>Copy<span class="notranslate"> Tokens</span></Button
 	>
 	<Button
 		size="s"
 		to="https://www.figma.com/community/plugin/1318298863966194157/typescale-garden-import-tool"
-		cls="copy-btn">Use Figma Plugin</Button
-	>
+		cls="copy-btn"
+		>Use Figma<span class="notranslate"> Plugin</span>
+	</Button>
 </div>
 
 <style lang="scss">

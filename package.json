@@ -7,7 +7,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"format": "prettier --plugin-search-dir . --write .",
 		"server": "cd server && npm run dev",
-		"client": "cd client && npm start",
+		"client": "cd client && npm run dev",
 		"build:services": "tsc services/src/**/*.ts",
 		"create:fonts-file": "npm run build:services && node --env-file=.env.local services/src/functions/updateFontsFromApi.js"
 	},
