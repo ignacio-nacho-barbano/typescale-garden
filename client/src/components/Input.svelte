@@ -2,11 +2,15 @@
 	import type { Writable } from "svelte/store";
 	import type { FormValidator } from "../models";
 	import Button from "./Button.svelte";
+	import type { ChangeEventHandler, MouseEventHandler } from "svelte/elements";
 
 	export let name: string;
 	export let value: string | number;
 	export let label: string = name;
 	export let changeOnBlur: boolean = false;
+	export let autocomplete = "off";
+	export let onChange: ChangeEventHandler<HTMLInputElement> | undefined = undefined;
+	export let onClick: MouseEventHandler<HTMLInputElement> | undefined = undefined;
 	export let useSearch: boolean = false;
 	// export let validators: FormValidator<typeof value>[] = [];
 	let blurEvent: boolean = false;
@@ -33,11 +37,13 @@
 	<label class="body-2" for={name}>{label}</label>
 	<div class="controls-wrapper">
 		<input
+			{autocomplete}
 			aria-label={label}
 			class="body-2 notranslate"
 			id={name}
 			bind:value={internalValue}
-			on:click
+			on:input={onChange}
+			on:click={onClick}
 			on:blur={() => {
 				blurEvent = true;
 			}}

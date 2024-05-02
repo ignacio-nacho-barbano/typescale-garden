@@ -3,14 +3,17 @@
 
 	export let open = false;
 	export let position: "left" | "right" = "left";
+	export let noStyle = false;
+	export let cls = "";
 </script>
 
 {#if open}
 	<div
 		use:outsideListener
 		on:clickOutside={() => (open = false)}
-		style="border-top-{position}-radius: 0; top: calc(100% + 12px);  {position}: var(--size-4);"
-		class="floating-menu-wrapper glass shadow-high"
+		style="{!noStyle &&
+			`border-top-${position}-radius: 0; top: calc(100% + 12px);  ${position}: var(--size-4)`};"
+		class="{cls} floating-menu-wrapper glass shadow-high"
 	>
 		<slot />
 	</div>
