@@ -138,7 +138,7 @@
 			to have a strikingly growing typescale right?
 		</p>
 		<p>
-			We begin a new file in our new favorite design tool (figma in my case), we work trough picking
+			We begin a new file in our new favorite design tool (figma in my case), we work through picking
 			a font, a spacing system and many other pieces, day comes when we start working on the
 			typographic scale, we explore different ratios, weights, make visual adjustments and we even
 			test it on a couple test pages.
@@ -172,7 +172,7 @@
 		</p>
 		<p>
 			The problem has made obvious by now, the typographic scale you designed for desktop devices is
-			not going to be easy to adjust for mobile devices, but going trough all of the math,
+			not going to be easy to adjust for mobile devices, but going through all of the math,
 			observation and relationships again is going to introduce quite some work.
 		</p>
 		<p>

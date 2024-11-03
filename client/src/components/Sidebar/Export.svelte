@@ -32,7 +32,7 @@
 	<div class="modal-content">
 		<p class="body-2">
 			You're almost setup to use your new typescale, you'll need to use this css file in your code,
-			as well as to import the design tokens into Figma trough our plugin.
+			as well as to import the design tokens into Figma through our plugin.
 		</p>
 		<Tabs
 			><Tab active={activeTab === "css"} click={() => (activeTab = "css")}>{fileNames.css}</Tab><Tab

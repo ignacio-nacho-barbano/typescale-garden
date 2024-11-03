@@ -31,7 +31,7 @@
 			contents of Typescale Garden's users.
 		</li>
 		<li>
-			<strong>Usage Analytics:</strong> Anonymous and encrypted usage data trough Hotjar and Google Analytics
+			<strong>Usage Analytics:</strong> Anonymous and encrypted usage data through Hotjar and Google Analytics
 			(GA4).
 		</li>
 	</ul>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let title: string = "Typescale Garden";
 	export let description: string =
-		"Typescale Garden is a typescale creation tool. It allows you to generate a typographic scale and export css and figma tokens out of it, directly into design trough the official figma plugin. A useful tool for people working with design systems.";
+		"Typescale Garden is a typescale creation tool. It allows you to generate a typographic scale and export css and figma tokens out of it, directly into design through the official figma plugin. A useful tool for people working with design systems.";
 	const url = "https://typescalegarden.uy";
 </script>
 
