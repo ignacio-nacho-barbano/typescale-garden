@@ -12,6 +12,7 @@
 
 	let newsOpen = false;
 
+	const isServer = !globalThis.window;
 	const userGeneratedStyles = derived([cssCode, mobileView], ([code, mobile]) => {
 		newsOpen = false;
 		let styles = code;
@@ -83,6 +84,7 @@
 	<section
 		id={routes[0].id}
 		class:mobileView={$mobileView}
+		class:isServer
 		class="container how-it-works-page main-page-section"
 	>
 		<h1 class="title-1 space-text-below">A Typescale Creation Tool</h1>
@@ -138,8 +140,8 @@
 			to have a strikingly growing typescale right?
 		</p>
 		<p>
-			We begin a new file in our new favorite design tool (figma in my case), we work through picking
-			a font, a spacing system and many other pieces, day comes when we start working on the
+			We begin a new file in our new favorite design tool (figma in my case), we work through
+			picking a font, a spacing system and many other pieces, day comes when we start working on the
 			typographic scale, we explore different ratios, weights, make visual adjustments and we even
 			test it on a couple test pages.
 		</p>
@@ -199,7 +201,7 @@
 		overflow: hidden;
 		max-width: 100%;
 
-		&.mobileView {
+		@mixin mobile-view-rules {
 			min-width: unset;
 			margin: $s5 0;
 			padding: $s6 $s5;
@@ -212,6 +214,16 @@
 				max-width: 400px;
 				border: var(--c-accent) solid $lw;
 				border-radius: $s5;
+			}
+		}
+
+		&.mobileView {
+			@include mobile-view-rules;
+		}
+
+		&.isServer {
+			@media (max-width: 1000px) {
+				@include mobile-view-rules;
 			}
 		}
 	}

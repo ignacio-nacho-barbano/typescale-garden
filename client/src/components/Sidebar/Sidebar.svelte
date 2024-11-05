@@ -7,9 +7,11 @@
 	import Contrast from "./Contrast.svelte";
 	import Export from "./Export.svelte";
 	import Parameters from "./Parameters.svelte";
+
+	const isServer = !globalThis.window;
 </script>
 
-<section id="sidebar" class:open={$sidebarOpen} class="side-bar shadow-high">
+<section id="sidebar" class:open={$sidebarOpen} class:isServer class="side-bar shadow-high">
 	<div class="scrollable-area">
 		<div class="settings-title">
 			<h2 class="title-6">Settings</h2>
@@ -79,12 +81,18 @@
 			}
 		}
 
-		@media ($bp-xl) {
+		@mixin open-rules {
 			margin-left: 0;
 		}
 
+		&.isServer {
+			@media ($bp-xl) {
+				@include open-rules;
+			}
+		}
+
 		&.open {
-			margin-left: 0;
+			@include open-rules;
 		}
 
 		@media ($bp-m) {
