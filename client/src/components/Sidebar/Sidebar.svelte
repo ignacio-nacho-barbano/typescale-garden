@@ -79,6 +79,10 @@
 			}
 		}
 
+		@media ($bp-xl) {
+			margin-left: 0;
+		}
+
 		&.open {
 			margin-left: 0;
 		}
