@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import type { TypeVariant, ApiFont } from "../models";
-import { WEIGHTS_MAP } from "../../../services/dist/constants";
+import { WEIGHTS_MAP } from "../../../services/src/constants";
 
 export const generateTokens = (
 	typescale: TypeVariant[],
