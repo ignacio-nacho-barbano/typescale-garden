@@ -1,23 +1,18 @@
 <script lang="ts">
 	import Input from "./Input.svelte";
 	import Menu from "./Menu.svelte";
+	import type { KeyboardEventHandler } from "svelte/elements";
 
 	export let name: string;
 	export let value: string;
 	export let label: string = name;
+	export let onKeyPress: KeyboardEventHandler<HTMLDivElement> | undefined = undefined;
 	export let options: string[] = [];
 	let open = false;
 	// export let validators: FormValidator<typeof value>[] = [];
-	let internalValue: string = value;
+	let internalValue = "";
 	let visibleOptions = options;
 	let fresh = true;
-
-	// having this assures internal value will be updated when value changes from the outside
-	const updateInternalValue = (newValue: string) => {
-		internalValue = newValue;
-	};
-
-	$: updateInternalValue(value);
 
 	const updateVisibleOptions = (newValue: string) => {
 		visibleOptions =
@@ -27,11 +22,25 @@
 		fresh = false;
 	};
 
+	const internalOnKeyPress: KeyboardEventHandler<HTMLDivElement> = ({ key }) => {
+		console.log({ key });
+
+		const currentIndex = options.findIndex((optVal) => optVal === value);
+
+		if (currentIndex !== -1) {
+			if (key === "ArrowDown" && currentIndex + 1 < options.length) {
+				outputValue(options[currentIndex + 1]);
+			} else if (key === "ArrowUp" && currentIndex - 1 >= 0) {
+				outputValue(options[currentIndex - 1]);
+			}
+		}
+	};
+
 	$: updateVisibleOptions(internalValue);
 
 	const outputValue = (selected: string) => {
 		value = selected;
-		internalValue = selected;
+		internalValue = "";
 		open = false;
 	};
 
@@ -43,9 +52,15 @@
 	};
 </script>
 
-<div class:open class="tsg-autocomplete-wrapper" on:focus={openMenu}>
+<div
+	class:open
+	class="tsg-autocomplete-wrapper"
+	on:focus={openMenu}
+	on:keydown={internalOnKeyPress}
+>
 	<Input
 		autocomplete="off"
+		placeholder={value}
 		{...{ name, label }}
 		bind:value={internalValue}
 		onChange={openMenu}
