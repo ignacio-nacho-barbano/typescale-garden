@@ -13,7 +13,7 @@
 	export let to: string | null = null;
 	export let active: boolean | null = null;
 	export let type: "primary" | "outline" | "ghost" = "outline";
-	export let size: "m" | "s" = "m";
+	export let size: "m" | "s" | "xs" = "m";
 	let element: Node;
 	let name = alt;
 	let classes = `glass btn shadow-mid bold ${size} ${cls} ${type}`;
@@ -40,7 +40,7 @@
 		classes += " active";
 	}
 
-	classes += size === "m" ? " body-1" : " body-2";
+	classes += size === "m" ? " body-2" : " body-2";
 
 	onMount(() => {
 		if (element) {
@@ -84,13 +84,14 @@
 		display: flex;
 		border-radius: $s5;
 		text-transform: uppercase;
-		padding: 0 $s5;
+		padding: 0 $s4;
 		white-space: nowrap;
 		transition: 0.2s ease-in-out;
 		align-items: center;
 		justify-content: center;
 		color: $c-accent;
 		border: none;
+		flex-shrink: 0;
 
 		&[disabled] {
 			&,
@@ -122,6 +123,11 @@
 			max-height: 40px;
 		}
 
+		&.xs {
+			min-height: $s5;
+			max-height: $s5;
+		}
+
 		&.outline {
 			border: $lw solid $c-primary;
 			background: $c-base;
@@ -144,14 +150,18 @@
 			&.s {
 				width: 40px;
 			}
+
+			&.xs {
+				width: $s5;
+			}
 		}
 
 		&:global(.lead-icon-comp) {
-			padding-left: $s4;
+			flex: none;
 		}
 
 		&:global(.trail-icon-comp) {
-			padding-right: $s4;
+			flex: none;
 		}
 
 		&.big {
