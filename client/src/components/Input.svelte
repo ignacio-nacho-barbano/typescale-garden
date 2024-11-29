@@ -6,9 +6,11 @@
 
 	export let name: string;
 	export let value: string | number;
+	export let placeholder: string | undefined = undefined;
 	export let label: string = name;
 	export let changeOnBlur: boolean = false;
 	export let autocomplete = "off";
+
 	export let onChange: ChangeEventHandler<HTMLInputElement> | undefined = undefined;
 	export let onClick: MouseEventHandler<HTMLInputElement> | undefined = undefined;
 	export let useSearch: boolean = false;
@@ -38,6 +40,7 @@
 	<div class="controls-wrapper">
 		<input
 			{autocomplete}
+			{placeholder}
 			aria-label={label}
 			class="body-2 notranslate"
 			id={name}

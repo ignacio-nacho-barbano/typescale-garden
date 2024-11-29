@@ -29,7 +29,7 @@
 		options={$fontsApiData?.fontNames || mockFontsApiNames}
 	/>
 	<Input name="base-font" label="Base Font Size (px)" bind:value={$baseSize} />
-	<Input name="visual-size" label="Base Visual Unit" bind:value={$baseUnit} />
+	<Input name="visual-size" label="Base Visual Unit (px)" bind:value={$baseUnit} />
 	<Input name="desktop-ratio" label="Desktop Sizes Ratio" bind:value={$desktopRatio} />
 	<Input name="mobile-ratio" label="Mobile Sizes Ratio" bind:value={$mobileRatio} />
 	<fieldset>
