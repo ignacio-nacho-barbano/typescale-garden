@@ -13,7 +13,7 @@ import { loadedTypescale } from "./typescales";
 const headingPrefix = "title-";
 
 // constants
-const variants = [
+export const variants = [
 	{ isHeading: true, location: 7, name: headingPrefix + "1", mapsTo: "h1" },
 	{ isHeading: true, location: 6, name: headingPrefix + "2", mapsTo: "h2" },
 	{ isHeading: true, location: 5, name: headingPrefix + "3", mapsTo: "h3" },
