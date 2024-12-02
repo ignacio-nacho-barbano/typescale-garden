@@ -4,27 +4,30 @@
 	import type { KeyboardEventHandler } from "svelte/elements";
 
 	export let name: string;
-	export let value: string;
+	export let value: string = "";
+	export let placeholder: string | undefined = undefined;
+	export let initialValue: string | undefined = undefined;
 	export let label: string = name;
 	export let onKeyPress: KeyboardEventHandler<HTMLDivElement> | undefined = undefined;
 	export let options: string[] = [];
+	export let onSelect: ((newVal: string) => void) | undefined = undefined;
 	let open = false;
 	// export let validators: FormValidator<typeof value>[] = [];
 	let internalValue = "";
 	let visibleOptions = options;
 	let fresh = true;
+	let list: HTMLUListElement;
 
-	const updateVisibleOptions = (newValue: string) => {
+	const updateVisibleOptions = (newValue: string, optionsValues: string[]) => {
 		visibleOptions =
 			newValue && !fresh
-				? options.filter((name) => name.toLowerCase().includes(newValue.toLowerCase()))
-				: options;
+				? optionsValues.filter((name) => name.toLowerCase().includes(newValue.toLowerCase()))
+				: optionsValues;
+
 		fresh = false;
 	};
 
 	const internalOnKeyPress: KeyboardEventHandler<HTMLDivElement> = ({ key }) => {
-		console.log({ key });
-
 		const currentIndex = options.findIndex((optVal) => optVal === value);
 
 		if (currentIndex !== -1) {
@@ -36,9 +39,22 @@
 		}
 	};
 
-	$: updateVisibleOptions(internalValue);
+	$: updateVisibleOptions(internalValue, options);
+
+	const formatOptionToId = (option: string) => option.toLowerCase().replaceAll(" ", "-");
+
+	$: {
+		if (open && placeholder && list) {
+			const element = list?.querySelector(`#${formatOptionToId(placeholder)}`);
+
+			if (element) {
+				list.scrollTo(0, element.getBoundingClientRect().top - list.getBoundingClientRect().height);
+			}
+		}
+	}
 
 	const outputValue = (selected: string) => {
+		onSelect?.(selected);
 		value = selected;
 		internalValue = "";
 		open = false;
@@ -60,17 +76,18 @@
 >
 	<Input
 		autocomplete="off"
-		placeholder={value}
-		{...{ name, label }}
+		placeholder={value || placeholder}
+		{name}
+		{label}
 		bind:value={internalValue}
 		onChange={openMenu}
 		onClick={openMenu}
 	/>
 	<Menu bind:open noStyle cls="tsg-autocomplete-list">
 		{#if visibleOptions.length}
-			<ul class="notranslate">
+			<ul class="notranslate" bind:this={list}>
 				{#each visibleOptions as option}
-					<li>
+					<li id={formatOptionToId(option)} class:selected={placeholder === option}>
 						<button class="body-2" on:click={() => outputValue(option)}>{option}</button>
 					</li>
 				{/each}
@@ -136,6 +153,14 @@
 		ul {
 			height: 100%;
 			list-style: none;
+
+			li.selected {
+				background: $c-accent;
+
+				button {
+					color: $c-base;
+				}
+			}
 			button {
 				text-wrap: nowrap;
 				text-overflow: ellipsis;

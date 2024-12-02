@@ -25,7 +25,8 @@
 	<AutoComplete
 		name="family"
 		label="Font Family (Google Fonts)"
-		bind:value={$fontName}
+		placeholder={$fontName}
+		onSelect={(newVal) => ($fontName = newVal)}
 		options={$fontsApiData?.fontNames || mockFontsApiNames}
 	/>
 	<Input name="base-font" label="Base Font Size (px)" bind:value={$baseSize} />
