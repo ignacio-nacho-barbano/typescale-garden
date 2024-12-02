@@ -109,6 +109,8 @@
 		align-items: flex-end;
 
 		:global(.btn) {
+			border-radius: $s4;
+			box-shadow: none;
 		}
 	}
 
