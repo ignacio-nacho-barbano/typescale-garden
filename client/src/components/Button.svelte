@@ -160,6 +160,7 @@
 
 		&.active {
 			color: $c-base;
+			background-color: $c-primary;
 		}
 
 		&:hover:not(:active) {

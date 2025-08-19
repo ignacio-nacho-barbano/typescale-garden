@@ -85,6 +85,7 @@
 	/>
 	<Menu bind:open noStyle cls="tsg-autocomplete-list">
 		{#if visibleOptions.length}
+			<slot name="options-hint" class="options-hint" />
 			<ul class="notranslate" bind:this={list}>
 				{#each visibleOptions as option}
 					<li id={formatOptionToId(option)} class:selected={placeholder === option}>
@@ -99,6 +100,14 @@
 </div>
 
 <style lang="scss">
+	.options-hint {
+		position: sticky;
+		top: 0;
+
+		&.hidden {
+			display: none;
+		}
+	}
 	.tsg-autocomplete-wrapper {
 		position: relative;
 
