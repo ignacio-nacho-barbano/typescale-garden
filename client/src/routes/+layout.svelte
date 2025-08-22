@@ -22,7 +22,7 @@
 
 	let innerWidth: number;
 
-	let showOverlay = true;
+	let showOverlay = false;
 
 	const updateWidthDependencies = (width: number) => {
 		mobileView.set(width < 1000);
