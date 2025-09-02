@@ -50,7 +50,7 @@
 			"before-interactive-callback": () => {
 				showOverlay = true;
 			},
-			"error-callback": (errorCode: number) => {
+			"error-callback": (errorCode: string) => {
 				console.log("Challenge Error:", errorCode);
 			},
 			"expired-callback": () => {
