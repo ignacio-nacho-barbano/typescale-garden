@@ -24,7 +24,8 @@
 	"chat.tools.terminal.autoApprove": {
 		"npm install": true,
 		"npm run check": true,
-		"npm run dev": true
+		"npm run dev": true,
+		"pnpm": true
 	},
 	"copilot.mcp.servers": {
 		"chrome": {

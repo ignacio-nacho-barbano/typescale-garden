@@ -6,7 +6,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "typescale-garden"
-database_id = "YOUR_DATABASE_ID_HERE"  # Replace with actual ID from `wrangler d1 create typescale-garden`
+database_id = 4437243e-3261-4e82-95e1-f8a6cdf014d2
 
 # Environment Variables
 [env.development]
