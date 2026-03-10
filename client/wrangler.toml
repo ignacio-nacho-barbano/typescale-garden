@@ -3,17 +3,19 @@ compatibility_date = "2024-03-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".svelte-kit/cloudflare"
 
-# D1 Database Binding
-[[d1_databases]]
-binding = "DB"
-database_name = "typescale-garden"
-database_id = "4437243e-3261-4e82-95e1-f8a6cdf014d2"
-
 # Environment Variables
-[env.development]
+[env.preview]
 vars = { PUB_API_URL = "", PUB_CLIENT_ORIGIN = "http://localhost:5173", PUB_AUTH_DOMAIN = "https://your-auth0-domain.auth0.com/", PUB_APP_ENV = "dev" }
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "typescale-garden-dev"
+database_id = "4437243e-3261-4e82-95e1-f8a6cdf014d2"
 
 [env.production]
 vars = { PUB_API_URL = "https://your-domain.com", PUB_CLIENT_ORIGIN = "https://your-domain.com", PUB_AUTH_DOMAIN = "https://your-auth0-domain.auth0.com/", PUB_APP_ENV = "production" }
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "typescale-garden-prod"
+database_id = "51da3741-1647-4a65-b457-6809b31989c4"
 
 
