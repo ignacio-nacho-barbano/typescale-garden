@@ -20,5 +20,19 @@
 	],
 	"[prisma]": {
 		"editor.defaultFormatter": "Prisma.prisma"
+	},
+	"chat.tools.terminal.autoApprove": {
+		"npm install": true,
+		"npm run check": true,
+		"npm run dev": true
+	},
+	"copilot.mcp.servers": {
+		"chrome": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"chrome-mcp"
+			]
+		}
 	}
 }

@@ -1,0 +1,21 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model Typescale {
+    id             String   @id @default(cuid())
+    createdAt      DateTime @default(now())
+    lastModifiedAt DateTime @updatedAt
+    authorId       String
+    name           String
+    base           Json // TypescaleBase as JSON: { breakpoint, fontName, baseUnit, baseSize, desktopRatio, mobileRatio, letterSpacingRatio, useUppercaseForTitles, useItalicsForTitles, headingsInitialWeight, headingsFinalWeight }
+    overrides      Json?
+
+    @@index([authorId])
+}
