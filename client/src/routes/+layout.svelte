@@ -38,28 +38,28 @@
 	}
 
 	onMount(() => {
-		globalThis.turnstile?.render("#cf-turnstile", {
-			sitekey: PUB_TURNSTILE_SITE_KEY,
-			size: "flexible",
-			appearance: "interaction-only",
-			action: "page_load",
-			callback: (token: string) => {
-				console.log("Challenge Success:", token);
-				showOverlay = false;
-			},
-			"before-interactive-callback": () => {
-				showOverlay = true;
-			},
-			"error-callback": (errorCode: string) => {
-				console.log("Challenge Error:", errorCode);
-			},
-			"expired-callback": () => {
-				console.log("Token expired");
-			},
-			"timeout-callback": () => {
-				console.log("Challenge timed out");
-			}
-		});
+		// globalThis.turnstile?.render("#cf-turnstile", {
+		// 	sitekey: PUB_TURNSTILE_SITE_KEY,
+		// 	size: "flexible",
+		// 	appearance: "interaction-only",
+		// 	action: "page_load",
+		// 	callback: (token: string) => {
+		// 		console.log("Challenge Success:", token);
+		// 		showOverlay = false;
+		// 	},
+		// 	"before-interactive-callback": () => {
+		// 		showOverlay = true;
+		// 	},
+		// 	"error-callback": (errorCode: string) => {
+		// 		console.log("Challenge Error:", errorCode);
+		// 	},
+		// 	"expired-callback": () => {
+		// 		console.log("Token expired");
+		// 	},
+		// 	"timeout-callback": () => {
+		// 		console.log("Challenge timed out");
+		// 	}
+		// });
 
 		fetch("https://typescalegarden.uy/fonts-data.json")
 			.then(async (res) => {
