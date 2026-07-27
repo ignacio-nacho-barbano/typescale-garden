@@ -1,4 +1,4 @@
-import type { Typescale } from "@prisma/client";
+import type { Typescale } from "../models";
 import { Axios } from "axios";
 import { asyncRetry } from "./asyncRetry";
 

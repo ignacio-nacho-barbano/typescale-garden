@@ -6,8 +6,7 @@ import {
 	generateCss,
 	generateTokens
 } from "../functions";
-import type { Typescale } from "@prisma/client";
-import type { ApiFont, TypeVariant } from "../models";
+import type { ApiFont, Typescale, TypeVariant } from "../models";
 import { showNotification } from "./notifications";
 import { loadedTypescale } from "./typescales";
 const headingPrefix = "title-";
