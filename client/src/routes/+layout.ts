@@ -1,6 +1,6 @@
 import type { Auth0ClientOptions } from "@auth0/auth0-spa-js";
 import { createAuth0Client } from "@auth0/auth0-spa-js";
-import type { Typescale } from "@prisma/client";
+import type { Typescale } from "../models";
 import { getUserData } from "../functions";
 import { ENV } from "../services/env";
 import { logError } from "../services/errorLogger";

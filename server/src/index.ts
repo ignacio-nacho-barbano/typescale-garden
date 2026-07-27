@@ -11,7 +11,15 @@ import { loadErrorHandlers } from "./utils";
 const app = express();
 app.use(logger("dev"));
 
-app.use(cors({ origin: [CLIENT_ORIGIN!, "https://typescale-garden.netlify.app"] }));
+// Browsers report a missing Access-Control-Allow-Origin as a generic "CORS error",
+// so anything serving the client has to be listed here explicitly.
+const ALLOWED_ORIGINS = [
+	CLIENT_ORIGIN!, // https://typescalegarden.uy — the apex, from PUB_CLIENT_ORIGIN
+	"https://www.typescalegarden.uy", // www variant, in case the apex ever redirects here
+	"https://typescale-garden.netlify.app"
+];
+
+app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

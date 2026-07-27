@@ -1,0 +1,502 @@
+[
+  {
+    "_id": "65d6355a5510a67689dad9fd",
+    "name": "IBM Carbon Design",
+    "authorId": "typescale-garden",
+    "base": {
+      "breakpoint": 768,
+      "fontName": "IBM Plex Sans",
+      "baseSize": 16,
+      "baseUnit": 4,
+      "desktopRatio": 1.29,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.2,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 200,
+      "headingsFinalWeight": 400
+    },
+    "createdAt": "2024-02-21T17:39:36.454Z",
+    "lastModifiedAt": "2024-02-21T17:39:36.454Z"
+  },
+  {
+    "_id": "65d6355a5510a67689dad9fe",
+    "name": "Material Design 2",
+    "authorId": "typescale-garden",
+    "base": {
+      "breakpoint": 768,
+      "fontName": "Roboto",
+      "baseSize": 16,
+      "baseUnit": 4,
+      "desktopRatio": 1.29,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.7,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 200,
+      "headingsFinalWeight": 600
+    },
+    "createdAt": "2024-02-21T17:39:36.454Z",
+    "lastModifiedAt": "2024-02-21T17:39:36.454Z"
+  },
+  {
+    "_id": "674477f3f509e2040de8d05f",
+    "createdAt": "2024-11-25T13:13:23.635Z",
+    "lastModifiedAt": "2024-11-25T13:13:23.635Z",
+    "authorId": "auth0|674477eb770261f866390642",
+    "name": "test",
+    "base": {
+      "fontName": "Red Hat Text",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "67d19099caf770fa7511ec6d",
+    "createdAt": "2025-03-12T13:48:09.415Z",
+    "lastModifiedAt": "2025-03-12T13:48:09.415Z",
+    "authorId": "auth0|65e64e42debe6c8392fbeaef",
+    "name": "Papo",
+    "base": {
+      "fontName": "Roboto Serif",
+      "breakpoint": 768,
+      "baseSize": 20,
+      "baseUnit": 4,
+      "desktopRatio": 1.2,
+      "mobileRatio": 1.12,
+      "letterSpacingRatio": 1,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 800,
+      "headingsFinalWeight": 100
+    }
+  },
+  {
+    "_id": "682ffdb3caf770fa7511ec6f",
+    "createdAt": "2025-05-23T04:46:43.819Z",
+    "lastModifiedAt": "2025-05-23T04:46:43.819Z",
+    "authorId": "google-oauth2|112457770746909452062",
+    "name": "test",
+    "base": {
+      "fontName": "Space Grotesk",
+      "breakpoint": 768,
+      "baseSize": 16,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.4,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "6859e8093b960cca4cec3540",
+    "createdAt": "2025-06-23T23:49:29.244Z",
+    "lastModifiedAt": "2025-06-23T23:49:29.244Z",
+    "authorId": "google-oauth2|107501253178233355326",
+    "name": "I",
+    "base": {
+      "fontName": "Inter",
+      "breakpoint": 768,
+      "baseSize": 16,
+      "baseUnit": 8,
+      "desktopRatio": 1.24,
+      "mobileRatio": 1.2,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 100
+    }
+  },
+  {
+    "_id": "689cae733b960cca4cec3541",
+    "createdAt": "2025-08-13T15:25:39.294Z",
+    "lastModifiedAt": "2025-08-13T15:25:39.294Z",
+    "authorId": "auth0|65f1ef9d09bed337e47c0505",
+    "name": "Strange",
+    "base": {
+      "fontName": "Righteous",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 400,
+      "headingsFinalWeight": 400
+    }
+  },
+  {
+    "_id": "661479f7a6c8d4e248bfb3f3",
+    "createdAt": "2024-04-08T23:12:55.395Z",
+    "lastModifiedAt": "2024-04-08T23:12:55.395Z",
+    "authorId": "google-oauth2|114587969010331251588",
+    "name": "Groteske New",
+    "base": {
+      "fontName": "Darker Grotesque",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 900,
+      "headingsFinalWeight": 500
+    }
+  },
+  {
+    "_id": "66147a31a6c8d4e248bfb3f4",
+    "createdAt": "2024-04-08T23:13:53.268Z",
+    "lastModifiedAt": "2024-04-08T23:13:53.268Z",
+    "authorId": "google-oauth2|114587969010331251588",
+    "name": "elma marracho",
+    "base": {
+      "fontName": "Zilla Slab Highlight",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 700
+    }
+  },
+  {
+    "_id": "663210a53b315fdcb45773c2",
+    "createdAt": "2024-05-01T09:51:33.716Z",
+    "lastModifiedAt": "2024-05-01T09:51:33.716Z",
+    "authorId": "google-oauth2|112392550641314944981",
+    "name": "Raleway",
+    "base": {
+      "fontName": "Raleway",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "66f00de49e7aacddfc528267",
+    "createdAt": "2024-09-22T12:30:28.625Z",
+    "lastModifiedAt": "2024-09-22T12:30:28.625Z",
+    "authorId": "google-oauth2|105368605478914582267",
+    "name": "Succeeda Rubik",
+    "base": {
+      "fontName": "Red Hat Text",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "67365a5ab1135a980a6f86be",
+    "createdAt": "2024-11-14T20:15:22.191Z",
+    "lastModifiedAt": "2024-11-14T20:15:22.191Z",
+    "authorId": "google-oauth2|103158212892334647252",
+    "name": "Radius ",
+    "base": {
+      "fontName": "Lexend Deca",
+      "breakpoint": 768,
+      "baseSize": 18,
+      "baseUnit": 4,
+      "desktopRatio": 1.18,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "67cde372caf770fa7511ec6c",
+    "createdAt": "2025-03-09T18:52:34.065Z",
+    "lastModifiedAt": "2025-03-09T18:52:34.065Z",
+    "authorId": "auth0|65e64e42debe6c8392fbeaef",
+    "name": "This one fails",
+    "base": {
+      "fontName": "Bitter",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 800,
+      "headingsFinalWeight": 100
+    }
+  },
+  {
+    "_id": "68a5bd48e584295e1abac112",
+    "createdAt": "2025-08-20T12:19:20.353Z",
+    "lastModifiedAt": "2025-08-20T12:19:20.353Z",
+    "authorId": "auth0|65f1ef9d09bed337e47c0505",
+    "name": "Narrow cool",
+    "base": {
+      "fontName": "Big Shoulders Display",
+      "breakpoint": 768,
+      "baseSize": 30,
+      "baseUnit": 4,
+      "desktopRatio": 1.2,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": true,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 400,
+      "headingsFinalWeight": 400
+    }
+  },
+  {
+    "_id": "68ddb58be584295e1abac115",
+    "createdAt": "2025-10-01T23:13:15.483Z",
+    "lastModifiedAt": "2025-10-01T23:13:15.483Z",
+    "authorId": "google-oauth2|115849701472389134223",
+    "name": "Poppins",
+    "base": {
+      "fontName": "Poppins",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "67191266c2944d26e539b52a",
+    "createdAt": "2024-10-23T15:12:38.352Z",
+    "lastModifiedAt": "2024-10-23T15:12:38.352Z",
+    "authorId": "google-oauth2|116690986120195359041",
+    "name": "opean sans",
+    "base": {
+      "fontName": "Open Sans",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "6722da2e4dd4b61e2be8b38c",
+    "createdAt": "2024-10-31T01:15:26.354Z",
+    "lastModifiedAt": "2024-10-31T01:15:26.354Z",
+    "authorId": "google-oauth2|118407639257890672633",
+    "name": "Donmont",
+    "base": {
+      "fontName": "DM Sans",
+      "breakpoint": 768,
+      "baseSize": 18,
+      "baseUnit": 4,
+      "desktopRatio": 1.2,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 300,
+      "headingsFinalWeight": 700
+    }
+  },
+  {
+    "_id": "67b5dba6f509e2040de8d061",
+    "createdAt": "2025-02-19T13:24:54.675Z",
+    "lastModifiedAt": "2025-02-19T13:24:54.675Z",
+    "authorId": "auth0|67b5db973e0cdd865d3388fe",
+    "name": "test 3",
+    "base": {
+      "fontName": "Red Hat Text",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "67fac8b5caf770fa7511ec6e",
+    "createdAt": "2025-04-12T20:10:29.537Z",
+    "lastModifiedAt": "2025-04-12T20:10:29.537Z",
+    "authorId": "google-oauth2|115047616096046091806",
+    "name": "tile",
+    "base": {
+      "fontName": "Red Hat Text",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "68a5bcb2e584295e1abac111",
+    "createdAt": "2025-08-20T12:16:50.636Z",
+    "lastModifiedAt": "2025-08-20T12:16:50.636Z",
+    "authorId": "auth0|65f1ef9d09bed337e47c0505",
+    "name": "Coolfont",
+    "base": {
+      "fontName": "Agdasima",
+      "breakpoint": 768,
+      "baseSize": 24,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 400
+    }
+  },
+  {
+    "_id": "68acc03ee584295e1abac113",
+    "createdAt": "2025-08-25T19:57:50.883Z",
+    "lastModifiedAt": "2025-08-25T19:57:50.883Z",
+    "authorId": "google-oauth2|111133970542778046784",
+    "name": "Red Rose",
+    "base": {
+      "fontName": "Red Rose",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "68db17eee584295e1abac114",
+    "createdAt": "2025-09-29T23:36:14.127Z",
+    "lastModifiedAt": "2025-09-29T23:36:14.127Z",
+    "authorId": "google-oauth2|114587969010331251588",
+    "name": "La Ruta",
+    "base": {
+      "fontName": "Inter",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 300
+    }
+  },
+  {
+    "_id": "65d6355a5510a67689dad9fc",
+    "name": "Typescale Garden",
+    "authorId": "typescale-garden",
+    "base": {
+      "breakpoint": 768,
+      "fontName": "Red Hat Text",
+      "baseSize": 22,
+      "baseUnit": 4,
+      "letterSpacingRatio": 1.5,
+      "desktopRatio": 1.2,
+      "mobileRatio": 1.15,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 700,
+      "headingsFinalWeight": 500
+    },
+    "createdAt": "2024-02-21T17:39:36.454Z",
+    "lastModifiedAt": "2024-02-21T17:39:36.454Z"
+  },
+  {
+    "_id": "673fca4bf509e2040de8d05e",
+    "createdAt": "2024-11-22T00:03:23.332Z",
+    "lastModifiedAt": "2024-11-22T00:03:23.332Z",
+    "authorId": "auth0|65e64e42debe6c8392fbeaef",
+    "name": "8bit",
+    "base": {
+      "fontName": "Jersey 25",
+      "breakpoint": 768,
+      "baseSize": 22,
+      "baseUnit": 4,
+      "desktopRatio": 1.22,
+      "mobileRatio": 1.15,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 400,
+      "headingsFinalWeight": 400
+    }
+  },
+  {
+    "_id": "67ab766bf509e2040de8d060",
+    "createdAt": "2025-02-11T16:10:19.266Z",
+    "lastModifiedAt": "2025-02-11T16:11:35.591Z",
+    "authorId": "google-oauth2|101479574755537214015",
+    "name": "Cognyx",
+    "base": {
+      "fontName": "Source Sans 3",
+      "breakpoint": 768,
+      "baseSize": 14,
+      "baseUnit": 2,
+      "desktopRatio": 1.25,
+      "mobileRatio": 1.067,
+      "letterSpacingRatio": 1.5,
+      "useUppercaseForTitles": false,
+      "useItalicsForTitles": false,
+      "headingsInitialWeight": 600,
+      "headingsFinalWeight": 400
+    }
+  }
+]
