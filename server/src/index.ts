@@ -9,7 +9,22 @@ import { APP_PORT, CLIENT_ORIGIN } from "./secrets";
 import { loadErrorHandlers } from "./utils";
 
 const app = express();
-app.use(logger("dev"));
+// Morgan's named formats ("dev", "combined", …) are compiled with `new Function`,
+// which the Workers runtime forbids ("Code generation from strings disallowed").
+// The EvalError is thrown from the response's `finish` listener, so the request
+// context never settles and the runtime cancels it — surfacing to the browser as
+// an intermittent 503 with no CORS headers, i.e. a spurious "CORS error".
+// Passing a format *function* skips morgan's compile step entirely.
+app.use(
+	logger((tokens, req, res) =>
+		[
+			tokens.method(req, res),
+			tokens.url(req, res),
+			tokens.status(req, res),
+			`${tokens["response-time"](req, res)}ms`
+		].join(" ")
+	)
+);
 
 // Browsers report a missing Access-Control-Allow-Origin as a generic "CORS error",
 // so anything serving the client has to be listed here explicitly.
