@@ -10,6 +10,8 @@ dist/
 .env
 .env.*
 !.env.example
+.dev.vars
+.dev.vars.*
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 certificates/

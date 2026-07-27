@@ -5,7 +5,10 @@
   "scripts": {
     "build": "npm i && npx prisma generate && npx tsc",
     "start": "node --env-file=../.env dist/src/index.js",
-    "dev": "nodemon --watch './src' -e .ts --exec ts-node -r ./env-loader.dev.js ./src/index.ts",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "cf-typegen": "wrangler types",
+    "dev:node": "nodemon --watch './src' -e .ts --exec ts-node -r ./env-loader.dev.js ./src/index.ts",
     "db:migrate:dev": "node --env-file=../.env npx prisma prisma db push seed",
     "db:migrate:prod": "node --env-file=../.env.prod npx prisma db push seed",
     "prisma:file": "ts-node --project ../tsconfig.json -r ./env-loader.prod.js ./prisma/seeds/typescales.ts"
@@ -25,13 +28,15 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
-    "mongodb": "^6.3.0",
+    "mongodb": "^6.15.0",
     "morgan": "~1.9.1",
     "prisma": "^5.9.1",
     "rollbar": "^2.26.3",
     "typescript": "^5.3.3"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260714.1",
+    "wrangler": "^4.112.0",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",

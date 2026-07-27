@@ -38,5 +38,12 @@
 	"bugs": {
 		"url": "https://github.com/ignacio-nacho-barbano/typescale-garden/issues"
 	},
-	"homepage": "https://typescalegarden.uy"
+	"homepage": "https://typescalegarden.uy",
+	"overrides": {
+		"iconv-lite": "^0.6.3"
+	},
+	"allowScripts": {
+		"esbuild@0.24.2": true,
+		"esbuild@0.21.5": true
+	}
 }
