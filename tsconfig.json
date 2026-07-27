@@ -1,7 +1,11 @@
 {
+	// TS 7 removed `baseUrl`; `paths` values are resolved relative to this file and must
+	// therefore be written relatively. Nothing imports through these aliases yet — they are
+	// kept so `types/` and `services/dist/` stay reachable if something starts to.
 	"compilerOptions": {
-		"baseUrl": ".",
-		"paths": { "@services/*": ["./services/dist/*"], "@tsg-types": ["types/index"] },
-		"typeRoots": ["./node_modules/@types", "./node_modules/@figma", "types"]
+		"paths": { "@services/*": ["./services/dist/*"], "@tsg-types": ["./types/index"] },
+		// TS 7 no longer pulls in every package it can find under a type root, so these roots
+		// only serve to resolve the names each package lists in its own `types`.
+		"typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
 	}
 }

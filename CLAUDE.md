@@ -156,9 +156,30 @@ Mongo era. Consequences to respect when changing the schema:
 ### Types
 
 Root `tsconfig.json` maps `@tsg-types` → `types/index` (Google Fonts API shapes) and `@services/*` →
-`services/dist/*` — services must be compiled before its output can be imported. The client's
-`Typescale` type is hand-written at `client/src/models/typescale.ts` and must be kept in step with
-the server's interfaces in `db/d1.ts`; it is not generated.
+`services/dist/*` — services must be compiled before its output can be imported. Neither alias is
+imported anywhere yet. The client's `Typescale` type is hand-written at
+`client/src/models/typescale.ts` and must be kept in step with the server's interfaces in `db/d1.ts`;
+it is not generated.
+
+#### The TypeScript version is deliberately not uniform
+
+`server` and `services` are on **TypeScript 7**; `plugin` is on **6.0.3** and `client` on **5.x**. This
+split is forced, not an oversight. TS 7 is the native (Go) compiler and its npm package exports only
+`lib/version.cjs` — the JS compiler API is gone (moved to a different `typescript/unstable/*` surface)
+and there is no `tsserver`. So a package can be on 7 only if it uses nothing but the `tsc` CLI, which
+is true of `server` and `services`. Everything else in the toolchain — `typescript-eslint`
+(peer `>=4.8.4 <6.1.0`), `svelte-check` and `svelte-preprocess` (both `^5 || ^6`) — still calls
+`ts.createProgram` / the language service, so it hard-crashes on 7 with
+`Cannot read properties of undefined`. `plugin` sits at 6.0.3, the last release with the JS API,
+purely so its type-aware eslint keeps working; the client is capped by svelte-check. Revisit when
+those tools ship TS 7 support.
+
+TS 7 changed five things this repo relied on, all already handled — don't reintroduce them:
+`baseUrl` is removed (`paths` values are now relative to the file declaring them and must be written
+`./`-prefixed); `strict` defaults to **true**; `@types` packages are **no longer included implicitly**,
+so every package names what it needs in `types` (`node`, `plugin-typings`) and `typeRoots` now only
+serves to resolve those names; and `rootDir` must be explicit when emitting, which is why
+`services` pins `"rootDir": "./src"` to keep its output at `dist/functions/…`.
 
 ## Environment variables
 

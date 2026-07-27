@@ -3,7 +3,12 @@
 	"exclude": ["**/*.db.ts"],
 	"compilerOptions": {
 		"outDir": "./dist",
-		"typeRoots": ["./node_modules/@types", "./node_modules/@figma", "./@types"],
+		/* TS 7 dropped the implicit inclusion of every discoverable @types package, so the global
+		   type packages this Worker needs have to be named. Workers globals come from the generated
+		   worker-configuration.d.ts (picked up as an ambient file, not via typeRoots); `node` covers
+		   the nodejs_compat builtins. typeRoots is inherited from the root config — do not override
+		   it here, or `node` stops resolving once npm hoists @types/node to the repo root. */
+		"types": ["node"],
 		/* Visit https://aka.ms/tsconfig to read more about this file */
 
 		/* Projects */

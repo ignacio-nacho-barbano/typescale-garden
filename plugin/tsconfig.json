@@ -6,6 +6,10 @@
 		"lib": ["ES2023"],
 		"strict": true,
 		"esModuleInterop": true,
-		"typeRoots": ["../node_modules/@figma"]
+		// @figma/plugin-typings supplies the `figma` global (and Figma's own `console`), which is why
+		// no DOM lib is pulled in. TS 7 stopped auto-including packages found under a type root, so
+		// it has to be named. Both roots are listed so this survives npm hoisting it either way.
+		"typeRoots": ["./node_modules/@figma", "../node_modules/@figma"],
+		"types": ["plugin-typings"]
 	}
 }
