@@ -1,0 +1,48 @@
+{
+	"$schema": "https://turborepo.com/schema.json",
+	// Files outside any workspace that every task's cache key depends on.
+	// `types/` is imported through the `@tsg-types` path alias, and the single root
+	// `.env` feeds both the client (SvelteKit `env.dir: "../"`) and the local Worker.
+	"globalDependencies": ["tsconfig.json", "types/**", ".env", ".env.local", ".env.prod"],
+	"globalEnv": ["NODE_ENV"],
+	// Per-package overrides (chiefly `outputs`) live in each workspace's own
+	// turbo.json, which extends this file.
+	"tasks": {
+		"build": {
+			// `^build` = build this package's dependencies first, so `services/dist`
+			// exists before anything resolves `@services/*`.
+			"dependsOn": ["^build"],
+			// Every PUB_-prefixed var is inlined at build time, so it belongs in the
+			// cache key.
+			"env": ["PUB_*"],
+			"outputs": []
+		},
+		// Type checking. Emits nothing, but is still cacheable on its inputs.
+		"check": {
+			"dependsOn": ["^build"],
+			"outputs": []
+		},
+		"lint": {
+			"outputs": []
+		},
+		"test": {
+			"dependsOn": ["^build"],
+			"outputs": []
+		},
+		// Long-running tasks: never cached, hold the terminal.
+		"test:watch": {
+			"cache": false,
+			"persistent": true
+		},
+		"dev": {
+			"dependsOn": ["^build"],
+			"cache": false,
+			"persistent": true
+		},
+		"deploy": {
+			"dependsOn": ["build", "check"],
+			"env": ["PUB_*", "JWT_SECRET", "SESSION_SECRET"],
+			"cache": false
+		}
+	}
+}

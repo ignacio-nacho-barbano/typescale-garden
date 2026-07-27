@@ -1,15 +1,16 @@
 {
-  "name": "typescale-garden-services",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "typescript": "^5.4.5"
-  }
+	"name": "services",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "tsc --watch",
+		"build": "tsc",
+		"check": "tsc --noEmit"
+	},
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"typescript": "^5.4.5"
+	}
 }

@@ -1,0 +1,10 @@
+{
+	"$schema": "https://turborepo.com/schema.json",
+	"extends": ["//"],
+	"tasks": {
+		"build": {
+			// code.js is committed — it is what Figma loads.
+			"outputs": ["code.js"]
+		}
+	}
+}

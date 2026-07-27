@@ -3,13 +3,21 @@
 	"version": "1.0.0",
 	"description": "a monorepo for all of typescale-garden pieces, a project meant to aid designers working on creating typescales as part of a design system",
 	"main": "index.js",
+	"private": true,
+	"packageManager": "npm@11.17.0",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "turbo run build",
+		"check": "turbo run check",
+		"lint": "turbo run lint",
+		"test": "turbo run test",
+		"dev": "turbo run dev",
+		"client": "turbo run dev --filter=client",
+		"server": "turbo run dev --filter=server",
+		"deploy:server": "turbo run deploy --filter=server",
 		"format": "prettier --plugin-search-dir . --write .",
-		"server": "cd server && npm run dev",
-		"client": "cd client && npm run dev",
-		"build:services": "tsc services/src/**/*.ts",
-		"create:fonts-file": "npm run build:services && node --env-file=.env.local services/src/functions/updateFontsFromApi.js"
+		"format:check": "prettier --plugin-search-dir . --check .",
+		"build:services": "turbo run build --filter=services",
+		"create:fonts-file": "npm run build:services && node --env-file=.env.local services/dist/functions/updateFontsFromApi.js"
 	},
 	"repository": {
 		"type": "git",
@@ -19,8 +27,7 @@
 		"./client",
 		"./plugin",
 		"./server",
-		"./services",
-		"./docker"
+		"./services"
 	],
 	"keywords": [
 		"svelte",
@@ -45,5 +52,8 @@
 	"allowScripts": {
 		"esbuild@0.24.2": true,
 		"esbuild@0.21.5": true
+	},
+	"devDependencies": {
+		"turbo": "2.10.7"
 	}
 }

@@ -5,7 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 Typescale Garden (https://typescalegarden.uy) helps designers build typographic scales for a design
-system. An npm-workspaces monorepo with four packages:
+system. An npm-workspaces monorepo, task-run by **Turborepo** (`turbo.json` at the root, plus
+per-package `turbo.json` overrides), with four packages — the workspace names are the short directory
+names (`client`, `server`, `plugin`, `services`), which is what `--filter` takes:
 
 - `client/` — SvelteKit 4 app, the actual tool. Computes the scale and exports it as CSS or as Figma
   design tokens (JSON). Deployed to Cloudflare Pages (`@sveltejs/adapter-cloudflare`).
@@ -18,14 +20,24 @@ system. An npm-workspaces monorepo with four packages:
 
 ## Commands
 
-From the repo root:
+From the repo root — these fan out through turbo to every package that defines the script:
 
 ```bash
-npm run client            # cd client && vite dev --host
-npm run server            # cd server && wrangler dev
-npm run format            # prettier --write across the whole repo
+npm run build             # client bundle, worker dry-run, plugin code.js, services dist
+npm run check             # type check everything (svelte-check, tsc --noEmit ×3)
+npm run lint              # eslint / prettier per package
+npm test                  # vitest, single non-watch pass (only client has tests)
+npm run dev               # every dev server at once
+npm run client            # turbo run dev --filter=client   → vite dev --host
+npm run server            # turbo run dev --filter=server   → wrangler dev
+npm run deploy:server     # build + check first, then wrangler deploy
+npm run format            # prettier --write across the whole repo (not a turbo task)
 npm run create:fonts-file # rebuild client/static/fonts-data.json from the Google Fonts API
 ```
+
+Anything can be scoped without cd-ing: `npx turbo run check --filter=server`. Note turbo scopes to the
+package containing the **cwd**, so run root-level commands from the repo root. `--force` skips the
+cache, `npx turbo run build --dry` prints the resolved task graph.
 
 Client (`cd client`):
 
@@ -34,7 +46,7 @@ npm run dev
 npm run build
 npm run check             # svelte-kit sync && svelte-check — the type check for .svelte + .ts
 npm run lint              # prettier --check && eslint
-npm test                  # vitest (add -- --run for a single non-watch pass)
+npm test                  # vitest --run (one pass; `npm run test:watch` for watch mode)
 npx vitest src/stores/config.test.ts        # single test file
 npx vitest -t "letterSpacing"               # single test by name
 ```
@@ -43,7 +55,8 @@ Server (`cd server`):
 
 ```bash
 npm run dev               # local Worker + local SQLite under .wrangler/state
-npm run build             # tsc --noEmit && wrangler deploy --dry-run — this is the type check
+npm run check             # tsc --noEmit
+npm run build             # wrangler deploy --dry-run
 npm run deploy
 npm run cf-typegen        # regenerate worker-configuration.d.ts after editing wrangler.jsonc
 
@@ -52,9 +65,23 @@ npm run db:import:local   # load scripts/atlas-import.sql — a fresh local DB i
 ```
 
 Plugin (`cd plugin`): `npm run build` (tsc → `code.js`, which is committed and is what Figma loads),
-`npm run dev` for watch mode.
+`npm run check`, `npm run lint`, `npm run dev` for watch mode.
 
 There is no test suite for the server, plugin, or services; the only tests live in `client/src`.
+
+### Turborepo layout
+
+Root `turbo.json` declares the task shapes: `build`/`check`/`test` depend on `^build` (a package's
+dependencies build first), `dev` and `test:watch` are `persistent` + uncached, `deploy` depends on
+`build` and `check`. Cache keys include the root `tsconfig.json`, `types/**` and the root `.env*`
+files (`globalDependencies`) plus every `PUB_*` var, since those are inlined into the client bundle at
+build time. Cacheable outputs are declared per package in `client/turbo.json`, `plugin/turbo.json` and
+`services/turbo.json`; the server emits nothing (its build is a dry-run), so it needs no override. The
+`db:*` scripts are deliberately outside turbo — they mutate a real database and must never be cached.
+
+Known pre-existing failures, unrelated to turbo: `client#check` (18 svelte-check errors), `client#test`
+(3 letterSpacing assertions), and `client#lint` (the client's `.eslintrc.cjs` fails to load, plus wide
+prettier drift).
 
 ## Architecture
 

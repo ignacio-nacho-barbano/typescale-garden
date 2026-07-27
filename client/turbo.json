@@ -1,0 +1,18 @@
+{
+	"$schema": "https://turborepo.com/schema.json",
+	"extends": ["//"],
+	"tasks": {
+		"build": {
+			"dependsOn": ["^build"],
+			"env": ["PUB_*"],
+			// adapter-cloudflare writes the deployable bundle to .svelte-kit/cloudflare;
+			// `build/` is the legacy adapter-auto output kept around by older runs.
+			"outputs": [".svelte-kit/**", "build/**"]
+		},
+		"check": {
+			"dependsOn": ["^build"],
+			// svelte-kit sync regenerates .svelte-kit/types + tsconfig.json.
+			"outputs": [".svelte-kit/types/**", ".svelte-kit/tsconfig.json"]
+		}
+	}
+}

@@ -1,11 +1,14 @@
 {
-	"name": "typescale-garden-plugin",
+	"name": "plugin",
 	"version": "1.0.1",
+	"private": true,
 	"description": "An import tool for typescale-garden",
 	"main": "code.js",
 	"scripts": {
 		"build": "tsc -p ./tsconfig.json",
-		"dev": "npm run build -- --watch"
+		"check": "tsc -p ./tsconfig.json --noEmit",
+		"lint": "eslint .",
+		"dev": "tsc -p ./tsconfig.json --watch"
 	},
 	"author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
 	"license": "GPL-3.0",
