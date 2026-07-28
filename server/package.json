@@ -17,6 +17,7 @@
 		"db:export:atlas": "node --env-file=./.dev.vars ./scripts/export-atlas.mjs"
 	},
 	"dependencies": {
+		"core": "*",
 		"cookie-parser": "~1.4.4",
 		"cors": "^2.8.5",
 		"debug": "~2.6.9",

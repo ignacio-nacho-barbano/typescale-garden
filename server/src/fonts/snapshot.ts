@@ -94,8 +94,12 @@ export async function serveFontsSnapshot(
 	// an isolated namespace is the better fit for a key we manage ourselves anyway.
 	const cache = await caches.open(FONTS_CACHE);
 
+	// Only trust a successful hit. A URL-keyed cache can hand back a response this
+	// Worker never stored — Cloudflare caches 404s and other errors for that same URL
+	// briefly, and serving one of those as the catalogue looks exactly like a corrupt
+	// snapshot. Anything non-2xx falls through to KV, which is the source of truth.
 	const cached = await cache.match(cacheKey);
-	if (cached) {
+	if (cached?.ok) {
 		return cached;
 	}
 

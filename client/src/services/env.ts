@@ -20,4 +20,4 @@ export const ENV = {
 	IS_DEV: PUB_APP_ENV === "dev",
 	IS_PROD: PUB_APP_ENV === "prod",
 	IS_BROWSER: browser
-};
+} as const;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Auth0Client } from "@auth0/auth0-spa-js";
-	import Logo from "../../static/logo.svg";
+	import Logo from "./Logo.svelte";
 	import { mobileView, sidebarOpen, userSidebarOpen } from "../stores/app";
 	import { authClient, authState } from "../stores/auth";
 	import Button from "./Button.svelte";

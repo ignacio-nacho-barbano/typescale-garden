@@ -15,7 +15,7 @@ yarn.lock
 # Turborepo
 .turbo
 
-# Compiled output (core/dist, services/dist) — generated, and already gitignored
+# Compiled output (core/dist) — generated, and already gitignored
 dist
 
 # Captured golden fixtures: 200KB of machine-written JSON. Reformatting it to

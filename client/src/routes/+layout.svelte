@@ -10,6 +10,7 @@
 	import { mobileView, sidebarOpen, userSidebarOpen, windowWidth } from "../stores/app";
 	import { baseUnit, fontsApiData, visibleGrid } from "../stores/config";
 	import type { LayoutData } from "./$types";
+	import { ENV } from "../services/env";
 	import { logError } from "../services/errorLogger";
 	import { showNotification } from "../stores/notifications";
 	import { goto } from "$app/navigation";
@@ -61,9 +62,27 @@
 		// 	}
 		// });
 
-		fetch("https://typescalegarden.uy/fonts-data.json")
-			.then(async (res) => {
+		// The catalogue comes from the Worker, which refreshes it from Google daily and
+		// serves it out of KV (server/src/fonts/snapshot.ts). Plain `fetch`, not the
+		// $fetch axios instance — that one attaches an Authorization header, which would
+		// turn this into a preflighted request and defeat the response's static
+		// `Access-Control-Allow-Origin: *`.
+		fetch(`${ENV.API_URL}/api/fonts`)
+			.then((res) => {
+				if (!res.ok) {
+					throw new Error(`${res.status} ${res.statusText}`);
+				}
+				return res.json();
+			})
+			// Fall back to the snapshot committed in static/ if the API is unreachable.
+			// It is the pre-KV shape (`{ fonts, fontNames }`), hence the unwrap.
+			.catch(async (e) => {
+				logError("Unable to load fonts data from the API, falling back to static: " + e);
+				const res = await fetch("/fonts-data.json");
 				const data = await res.json();
+				return data.fonts ?? data;
+			})
+			.then((data) => {
 				fontsApiData.set(data);
 			})
 			.catch((e) => {

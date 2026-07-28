@@ -1,33 +1,16 @@
 import { sveltekit } from "@sveltejs/kit/vite";
-import { svelteSVG } from "rollup-plugin-svelte-svg";
 import { defineConfig } from "vitest/config";
 import { imagetools } from "vite-imagetools";
 
+// rollup-plugin-svelte-svg used to sit here, meant to turn `import Logo from "*.svg"`
+// into a component. It cannot work under Vite: `.svg` is a built-in asset extension, so
+// `vite:asset` loads the file as `export default "/logo.svg"` before any transform runs,
+// and the plugin registers a `transform` hook only — it never sees the markup, and threw
+// "svg file did not start with <svg> tag" on the one import that used it. `enforce: "pre"`
+// orders transforms, not loads, so it made no difference. The logo is now a real component
+// (src/components/Logo.svelte); SVGs referenced by URL are unaffected and still live in static/.
 export default defineConfig({
-	plugins: [
-		sveltekit(),
-		imagetools(),
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		svelteSVG({
-			// optional SVGO options
-			// pass empty object to enable defaults
-			svgo: {
-				plugins: [
-					{
-						name: "addAttributesToSVGElement",
-						params: { attributes: ['preserveAspectRatio="xMidYMid meet"'] }
-					},
-					{ name: "removeViewBox", active: false },
-					{ name: "removeAttrs", active: false }
-				]
-			},
-			// vite-specific
-			// https://vitejs.dev/guide/api-plugin.html#plugin-ordering
-			// enforce: 'pre' | 'post'
-			enforce: "pre"
-		})
-	],
+	plugins: [sveltekit(), imagetools()],
 	test: {
 		include: ["src/**/*.{test,spec}.{js,ts}"]
 	},

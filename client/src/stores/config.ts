@@ -1,28 +1,25 @@
-import { derived, get, writable, type Readable } from "svelte/store";
-import { mockFontsApi } from "../constants/mockFontsApi";
 import {
-	calculateDistributeWeights,
-	expectedRange,
+	HEADING_VARIANTS,
+	availableWeightsFor,
+	buildTypescale,
+	clampHeadingWeights,
+	distributeWeights,
+	findFont,
 	generateCss,
-	generateTokens
-} from "../functions";
-import type { ApiFont, Typescale, TypeVariant } from "../models";
+	generateTokens,
+	mockFontsApi,
+	weightStepsFor,
+	type ApiFont,
+	type Typescale
+} from "core";
+import { derived, get, writable, type Readable } from "svelte/store";
 import { showNotification } from "./notifications";
 import { loadedTypescale } from "./typescales";
-const headingPrefix = "title-";
 
-// constants
-const variants = [
-	{ isHeading: true, location: 7, name: headingPrefix + "1", mapsTo: "h1" },
-	{ isHeading: true, location: 6, name: headingPrefix + "2", mapsTo: "h2" },
-	{ isHeading: true, location: 5, name: headingPrefix + "3", mapsTo: "h3" },
-	{ isHeading: true, location: 4, name: headingPrefix + "4", mapsTo: "h4" },
-	{ isHeading: true, location: 3, name: headingPrefix + "5", mapsTo: "h5" },
-	{ isHeading: true, location: 2, name: headingPrefix + "6", mapsTo: "h6" },
-	{ isHeading: false, location: 0, name: "body-1", mapsTo: "p, button" },
-	{ isHeading: false, location: -1, name: "body-2", mapsTo: "label, figcaption, input" },
-	{ isHeading: false, location: -2, name: "tooltip" }
-];
+// The scale math, the variant table and the generators all live in `core` — this
+// file is only the reactive wiring around them, plus the two side effects core
+// deliberately refuses to own (the not-found toast, and writing the clamped
+// heading weights back into their writables).
 
 // writables
 
@@ -37,17 +34,21 @@ export const mobileRatio = writable(1.15);
 export const letterSpacingRatio = writable(1.5);
 export const useUppercaseForTitles = writable(false);
 export const useItalicsForTitles = writable(false);
-export const fontsApiData = writable<{ fontNames: string[]; fonts: { items: ApiFont[] } }>();
+// Google's WebfontList verbatim, as served by GET /api/fonts. The Worker stores the
+// upstream response unparsed (see server/src/fonts/snapshot.ts), so there is no
+// wrapper object around it — the shape matches `mockFontsApi`, which is what makes
+// the fallback in `currentFont` a plain `||`.
+export const fontsApiData = writable<{ items: ApiFont[] }>();
 
 // deriveds
 export const currentFont = derived(
 	[fontName, fontsApiData],
 	([$fontName, $fontsApiData]): ApiFont => {
-		const fontsArray = $fontsApiData?.fonts || mockFontsApi;
+		const fontsArray = $fontsApiData || mockFontsApi;
 
-		const font = fontsArray.items.find(
-			({ family }) => $fontName.toLowerCase() === family.toLowerCase()
-		);
+		// core's findFont reports absence by returning undefined; deciding that a
+		// miss means "warn the user and fall back" is this app's call, not core's.
+		const font = findFont(fontsArray.items, $fontName);
 		if (font) {
 			return font;
 		} else {
@@ -56,47 +57,32 @@ export const currentFont = derived(
 		}
 	}
 );
-export const availableWeights = derived(currentFont, ($currentFont) => {
-	const fontVariants = [...$currentFont.variants];
-
-	const regularIndex = fontVariants.findIndex((variant) => variant === "regular");
-	fontVariants[regularIndex] = "400";
-	const variants = Array.from(
-		new Set(fontVariants.map((variant) => parseInt(variant)).filter((variant) => variant))
-	);
-
-	return variants;
-});
+export const availableWeights = derived(currentFont, availableWeightsFor);
 
 export const headingsInitialWeight = writable(700);
 export const headingsFinalWeight = writable(300);
 
+// Snap the chosen endpoints onto weights the font actually offers. core computes
+// what they should be; the store write has to happen out here.
 availableWeights.subscribe(($aw) => {
-	if (!$aw.includes(get(headingsInitialWeight)))
-		headingsInitialWeight.set($aw[Math.floor($aw.length / 2)]);
-	if (!$aw.includes(get(headingsFinalWeight))) headingsFinalWeight.set($aw.at(-1) || $aw[0]);
+	const { initial, final } = clampHeadingWeights(
+		$aw,
+		get(headingsInitialWeight),
+		get(headingsFinalWeight)
+	);
+
+	if (initial !== get(headingsInitialWeight)) headingsInitialWeight.set(initial);
+	if (final !== get(headingsFinalWeight)) headingsFinalWeight.set(final);
 });
 
 export const weightSteps: Readable<number[]> = derived(
 	[headingsInitialWeight, headingsFinalWeight, availableWeights],
-	([$hiw, $hfw, $aw]) => {
-		const ascendingWeight = $hfw >= $hiw;
-		const starting = ascendingWeight ? $hiw : $hfw;
-		const finishing = ascendingWeight ? $hfw : $hiw;
-
-		const steps = $aw.filter((weight) => expectedRange(weight, starting, finishing));
-
-		if (ascendingWeight) steps.reverse();
-
-		return steps;
-	}
+	([$hiw, $hfw, $aw]) => weightStepsFor($aw, $hiw, $hfw)
 );
 
 export const distributedWeights = derived([weightSteps], ([$weightSteps]) =>
-	calculateDistributeWeights(
-		variants.filter(({ isHeading }) => isHeading),
-		$weightSteps
-	)
+	// Takes a count, not the variants array — the original only ever read its length.
+	distributeWeights(HEADING_VARIANTS.length, $weightSteps)
 );
 
 export const typescale = derived(
@@ -120,49 +106,18 @@ export const typescale = derived(
 		$useItalicsForTitles,
 		$distributedWeights
 	]) =>
-		variants.map(({ location, name, mapsTo, isHeading }, i) => {
-			const sortedWeights = [...new Set($distributedWeights)]
-				.filter((weight) => weight > 400)
-				.sort()
-				.reverse();
-			sortedWeights[0] = 400;
-			const desktopSizeMultiplier = Math.pow($desktopRatio, location);
-			const mobileSizeMultiplier = Math.pow($mobileRatio, location - 1);
-			const weight = isHeading
-				? $distributedWeights[i]
-				: sortedWeights.at(location) || sortedWeights[0];
-
-			const lineHeightMultiplier = Math.pow(1.1, 8 - location);
-			const desktopSize = Math.round(($baseSize * desktopSizeMultiplier) / 2) * 2;
-			const mobileSize = Math.round(($baseSize * mobileSizeMultiplier) / 2) * 2;
-			const desktopLine =
-				Math.round((desktopSize * (isHeading ? lineHeightMultiplier : 1.5)) / $baseUnit) *
-				$baseUnit;
-			const mobileLine =
-				Math.round((mobileSize * (isHeading ? lineHeightMultiplier : 1.5)) / $baseUnit) * $baseUnit;
-			const letterSpacing = parseFloat(
-				(
-					$letterSpacingRatio *
-					((desktopSize >= $baseSize ? -0.00005 : -0.00625) * desktopSize +
-						(desktopSize >= $baseSize ? 0.00033 : 0.14) +
-						weight! / 360000)
-				).toFixed(3)
-			);
-
-			return {
-				name,
-				isHeading,
-				desktopSize,
-				desktopLine,
-				mobileSize,
-				mobileLine,
-				letterSpacing,
-				mapsTo,
-				weight,
-				uppercase: isHeading ? $useUppercaseForTitles : false,
-				italics: isHeading ? $useItalicsForTitles : false
-			} as TypeVariant;
-		})
+		buildTypescale(
+			{
+				baseSize: $baseSize,
+				baseUnit: $baseUnit,
+				desktopRatio: $desktopRatio,
+				mobileRatio: $mobileRatio,
+				letterSpacingRatio: $letterSpacingRatio,
+				useUppercaseForTitles: $useUppercaseForTitles,
+				useItalicsForTitles: $useItalicsForTitles
+			},
+			$distributedWeights
+		)
 );
 
 // selPresetIndex.subscribe((i) => {

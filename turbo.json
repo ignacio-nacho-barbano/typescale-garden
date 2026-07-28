@@ -9,8 +9,8 @@
 	// turbo.json, which extends this file.
 	"tasks": {
 		"build": {
-			// `^build` = build this package's dependencies first, so `services/dist`
-			// exists before anything resolves `@services/*`.
+			// `^build` = build this package's dependencies first, so `core/dist` exists
+			// before the client, plugin or server resolve `core`.
 			"dependsOn": ["^build"],
 			// Every PUB_-prefixed var is inlined at build time, so it belongs in the
 			// cache key.

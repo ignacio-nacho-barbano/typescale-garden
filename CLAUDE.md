@@ -6,27 +6,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Typescale Garden (https://typescalegarden.uy) helps designers build typographic scales for a design
 system. An npm-workspaces monorepo, task-run by **Turborepo** (`turbo.json` at the root, plus
-per-package `turbo.json` overrides), with five packages — the workspace names are the short directory
-names (`client`, `core`, `server`, `plugin`, `services`), which is what `--filter` takes:
+per-package `turbo.json` overrides), with four packages — the workspace names are the short directory
+names (`client`, `core`, `server`, `plugin`), which is what `--filter` takes:
 
 - `core/` — the typescale math, the CSS/token generators and the shared types. Pure and
   runtime-agnostic; see "The scale itself lives in core/" below.
 - `client/` — SvelteKit 4 app, the actual tool. Computes the scale and exports it as CSS or as Figma
   design tokens (JSON). Deployed to Cloudflare Pages (`@sveltejs/adapter-cloudflare`).
 - `server/` — Express app running **as a Cloudflare Worker**, backed by **D1**. Stores users' saved
-  typescales. Deployed with wrangler to `api.typescalegarden.uy`.
+  typescales, and serves the Google Fonts catalogue it refreshes on a daily Cron Trigger. Deployed
+  with wrangler to `api.typescalegarden.uy`.
 - `plugin/` — Figma plugin ("Typescale Garden Import Tool") that turns the exported tokens JSON into
   Figma text styles.
-- `services/` — small standalone TS scripts run under Node, not shipped anywhere. Currently just the
-  Google Fonts snapshot generator.
+
+There used to be a fifth package, `services/`, holding standalone Node scripts. Its only two
+inhabitants both moved out — `WEIGHTS_MAP` into `core`, and the Google Fonts snapshot generator into
+the Worker's `scheduled` handler — so it was deleted along with the `@services/*` path alias and the
+`create:fonts-file` script.
 
 ## Commands
 
 From the repo root — these fan out through turbo to every package that defines the script:
 
 ```bash
-npm run build             # client bundle, worker dry-run, plugin code.js, services dist
-npm run check             # type check everything (svelte-check, tsc --noEmit ×5)
+npm run build             # client bundle, worker dry-run, plugin code.js, core dist
+npm run check             # type check everything (svelte-check, tsc --noEmit ×4)
 npm run lint              # eslint / prettier per package
 npm test                  # vitest, single non-watch pass (only client and core have tests)
 npm run dev               # every dev server at once
@@ -34,7 +38,6 @@ npm run client            # turbo run dev --filter=client   → vite dev --host
 npm run server            # turbo run dev --filter=server   → wrangler dev
 npm run deploy:server     # build + check first, then wrangler deploy
 npm run format            # prettier --write across the whole repo (not a turbo task)
-npm run create:fonts-file # rebuild client/static/fonts-data.json from the Google Fonts API
 ```
 
 Anything can be scoped without cd-ing: `npx turbo run check --filter=server`. Note turbo scopes to the
@@ -69,7 +72,7 @@ npm run db:import:local   # load scripts/atlas-import.sql — a fresh local DB i
 Plugin (`cd plugin`): `npm run build` (tsc → `code.js`, which is committed and is what Figma loads),
 `npm run check`, `npm run lint`, `npm run dev` for watch mode.
 
-There is no test suite for the server, plugin, or services; the only tests live in `client/src`.
+There is no test suite for the server or plugin; the tests live in `client/src` and `core/src`.
 
 ### Turborepo layout
 
@@ -77,13 +80,14 @@ Root `turbo.json` declares the task shapes: `build`/`check`/`test` depend on `^b
 dependencies build first), `dev` and `test:watch` are `persistent` + uncached, `deploy` depends on
 `build` and `check`. Cache keys include the root `tsconfig.json`, `types/**` and the root `.env*`
 files (`globalDependencies`) plus every `PUB_*` var, since those are inlined into the client bundle at
-build time. Cacheable outputs are declared per package in `client/turbo.json`, `plugin/turbo.json` and
-`services/turbo.json`; the server emits nothing (its build is a dry-run), so it needs no override. The
+build time. Cacheable outputs are declared per package in `client/turbo.json`, `core/turbo.json` and
+`plugin/turbo.json`; the server emits nothing (its build is a dry-run), so it needs no override. The
 `db:*` scripts are deliberately outside turbo — they mutate a real database and must never be cached.
 
-Known pre-existing failures, unrelated to turbo: `client#check` (18 svelte-check errors), `client#test`
-(3 letterSpacing assertions), and `client#lint` (the client's `.eslintrc.cjs` fails to load, plus wide
-prettier drift).
+Known pre-existing failures, unrelated to turbo: `client#check` (18 svelte-check errors) and
+`client#lint` (the client's `.eslintrc.cjs` fails to load, plus wide prettier drift). `client#test`
+used to fail on 3 letterSpacing assertions; rewiring the client onto `core` fixed those, and
+`build` and `test` are now green across every package.
 
 ## Architecture
 
@@ -119,8 +123,7 @@ Worker need the same answers, byte for byte. Rules that keep it usable from all 
   `clampHeadingWeights` returns what the weights _should_ be instead of setting a store. Callers own
   the effects.
 - **`module: Node16`, so relative imports carry `.js` extensions.** Extensionless ESM would be fine
-  for vite/esbuild but invalid for Node, and `services`/`server` are on TS 7 with NodeNext
-  resolution.
+  for vite/esbuild but invalid for Node, and `server` is on TS 7 with NodeNext resolution.
 - **Behaviour is pinned by golden fixtures** at `core/src/__tests__/fixtures/golden.json`, captured
   from the pre-extraction client store graph. `cssCode` and `designTokens` are asserted as exact
   strings because users copy, download and diff them. Two quirks are preserved on purpose and are
@@ -151,9 +154,11 @@ stores here rather than as component-local state. `typescaleObject` is the inver
 writables back into the `{ name, base }` shape the API accepts. Loading a saved scale works by
 `loadedTypescale.subscribe(...)` pushing each `base.*` field back into its writable.
 
-Fonts come from a build-time snapshot of the Google Fonts API committed at
-`client/static/fonts-data.json` (regenerated via `npm run create:fonts-file`), with
-`src/constants/mockFontsApi.ts` as the in-code fallback.
+Fonts come from `GET /api/fonts` on the Worker — see "The Google Fonts snapshot" below. `+layout.svelte`
+fetches it on mount into the `fontsApiData` writable, which holds Google's `WebfontList` verbatim
+(`{ kind, items }`). Two fallbacks sit behind it: the committed `client/static/fonts-data.json` if the
+API is unreachable, and `core`'s one-family `mockFontsApi` if that fails too — which is why
+`currentFont` can fall back with a plain `$fontsApiData || mockFontsApi`.
 
 ### Client → server
 
@@ -184,7 +189,42 @@ deliberately — read the comments in `src/index.ts` before re-adding anything:
 - MongoDB's driver keeps background monitors alive across requests → storage moved to D1.
 
 CORS origins are an explicit allowlist in `src/index.ts`; a missing entry surfaces in the browser as
-an opaque "CORS error", so add new client hosts there.
+an opaque "CORS error", so add new client hosts there. The one exception is `GET /api/fonts` — see
+below.
+
+### The Google Fonts snapshot
+
+`server/src/fonts/snapshot.ts` refreshes the catalogue from the Google Fonts API on a daily Cron
+Trigger (`triggers.crons` in `wrangler.jsonc`, 04:17 UTC) into the `FONTS` KV namespace, and serves it
+as `GET /api/fonts`. It replaced a committed `client/static/fonts-data.json` that could only be updated
+by a Pages rebuild — and that had gone 20 months stale because the generator it relied on was never
+actually invoked.
+
+Four things here are load-bearing:
+
+- **The cron never parses the payload.** A Cron Trigger gets 10ms of CPU on the free plan and the
+  response is ~1.9 MB, so it is stored verbatim and validated with string checks only (a length floor
+  plus the `"webfonts#webfontList"` marker). Waiting on fetch/KV I/O costs no CPU; `JSON.parse` would.
+  This is also why what lands in KV — and therefore in `fontsApiData` — is Google's raw
+  `{ kind, items }` with no wrapper.
+- **Validation fails closed.** A non-2xx or implausible body throws _before_ the `KV.put`, leaving the
+  previous snapshot serving. A missed day is invisible; an error page written over the catalogue would
+  not be. Do not soften this into a warning.
+- **`/api/fonts` is handled before Express**, in the `fetch` export rather than as a route, because
+  `helmet()` sets `Cross-Origin-Resource-Policy: same-origin` (which blocks the client's cross-origin
+  read) and Express's default weak ETag would hash 1.9 MB per request.
+- **It answers with a static `Access-Control-Allow-Origin: *`,** not the echoing `ALLOWED_ORIGINS`
+  allowlist. The response is cached, the Cache API keys on URL alone, and `Vary: Origin` is not
+  honoured below Enterprise — so an echoed origin could be served to the wrong one. Safe because the
+  catalogue is public, credential-free and GET-only. It also means the client must fetch it with plain
+  `fetch`, never the `$fetch` axios instance, whose `Authorization` header would force a preflight.
+
+`FONTS_API_KEY` is a Worker secret (`wrangler secret put`) and lives in `server/.dev.vars` locally.
+Note that file is the _only_ source of local secrets — wrangler does not read the root `.env`, so
+anything omitted from `.dev.vars` is simply undefined under `wrangler dev`. Trigger the cron by hand
+with `curl "http://localhost:8787/cdn-cgi/handler/scheduled"`; `wrangler dev` never fires it on
+schedule. The Cache API is a no-op on `*.workers.dev`, so cache behaviour is only observable on
+`api.typescalegarden.uy`.
 
 ### D1 access
 
@@ -203,19 +243,18 @@ Mongo era. Consequences to respect when changing the schema:
 
 ### Types
 
-Root `tsconfig.json` maps `@tsg-types` → `types/index` (Google Fonts API shapes) and `@services/*` →
-`services/dist/*` — services must be compiled before its output can be imported. Neither alias is
-imported anywhere yet. The client's `Typescale` type is hand-written at
-`client/src/models/typescale.ts` and must be kept in step with the server's interfaces in `db/d1.ts`;
-it is not generated.
+Root `tsconfig.json` maps `@tsg-types` → `types/index` (Google Fonts API shapes). The alias is not
+imported anywhere yet. `Typescale` now comes from `core` (the client's own
+`src/models/typescale.ts` is gone), but it is still hand-written and must be kept in step with the
+server's interfaces in `db/d1.ts`; nothing is generated from the other.
 
 #### The TypeScript version is deliberately not uniform
 
-`server` and `services` are on **TypeScript 7**; `plugin` is on **6.0.3** and `client` on **5.x**. This
+`server` is on **TypeScript 7**; `plugin` is on **6.0.3** and `client` on **5.x**. This
 split is forced, not an oversight. TS 7 is the native (Go) compiler and its npm package exports only
 `lib/version.cjs` — the JS compiler API is gone (moved to a different `typescript/unstable/*` surface)
 and there is no `tsserver`. So a package can be on 7 only if it uses nothing but the `tsc` CLI, which
-is true of `server` and `services`. Everything else in the toolchain — `typescript-eslint`
+is true of `server`. Everything else in the toolchain — `typescript-eslint`
 (peer `>=4.8.4 <6.1.0`), `svelte-check` and `svelte-preprocess` (both `^5 || ^6`) — still calls
 `ts.createProgram` / the language service, so it hard-crashes on 7 with
 `Cannot read properties of undefined`. `plugin` sits at 6.0.3, the last release with the JS API,
@@ -227,7 +266,7 @@ TS 7 changed five things this repo relied on, all already handled — don't rein
 `./`-prefixed); `strict` defaults to **true**; `@types` packages are **no longer included implicitly**,
 so every package names what it needs in `types` (`node`, `plugin-typings`) and `typeRoots` now only
 serves to resolve those names; and `rootDir` must be explicit when emitting, which is why
-`services` pins `"rootDir": "./src"` to keep its output at `dist/functions/…`.
+`core` pins `"rootDir": "./src"` to keep its output at `dist/functions/…` rather than `dist/src/…`.
 
 ## Environment variables
 
@@ -235,8 +274,13 @@ One root `.env` serves both apps. SvelteKit is configured with `env.dir: "../"` 
 `publicPrefix: "PUB_"`, so any `PUB_`-prefixed var is client-visible and imported from
 `$env/static/public` (wrapped by `client/src/services/env.ts`). The Worker reads the same names from
 `process.env`, sourced from `vars` in `wrangler.jsonc` (public) plus `wrangler secret put` / a local
-`.dev.vars` (`JWT_SECRET`, `SESSION_SECRET`). `PUB_FEATURE_FLAGS` is a substring-matched string
-(e.g. `"load-save"`, `"contrast"`).
+`server/.dev.vars` (`DB_STRING`, `JWT_SECRET`, `SESSION_SECRET`, `FONTS_API_KEY`).
+`PUB_FEATURE_FLAGS` is a substring-matched string (e.g. `"load-save"`, `"contrast"`).
+
+The root `.env` is **not** shared with the Worker, despite the name: wrangler only reads
+`server/.dev.vars`, so a secret that exists in the root `.env` alone is undefined under
+`wrangler dev`. `wrangler types` reflects whatever `.dev.vars` currently holds, which means deleting a
+key there silently drops it from the generated `Env` too.
 
 Note `server/src/secrets.ts`: `IS_PRODUCTION` fails closed — anything other than `PUB_APP_ENV=dev`
 is treated as production.

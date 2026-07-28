@@ -1,4 +1,4 @@
-import type { Typescale } from "../models";
+import type { Typescale } from "core";
 import { Axios } from "axios";
 import { asyncRetry } from "./asyncRetry";
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Typescale } from "../../models";
+	import type { Typescale } from "core";
 	import type { AxiosResponse } from "axios";
 	import { logError } from "../../services/errorLogger";
 	import { typescaleName, typescaleObject } from "../../stores/config";

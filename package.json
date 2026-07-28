@@ -15,9 +15,7 @@
 		"server": "turbo run dev --filter=server",
 		"deploy:server": "turbo run deploy --filter=server",
 		"format": "prettier --plugin-search-dir . --write .",
-		"format:check": "prettier --plugin-search-dir . --check .",
-		"build:services": "turbo run build --filter=services",
-		"create:fonts-file": "npm run build:services && node --env-file=.env.local services/dist/functions/updateFontsFromApi.js"
+		"format:check": "prettier --plugin-search-dir . --check ."
 	},
 	"repository": {
 		"type": "git",
@@ -27,8 +25,7 @@
 		"./client",
 		"./core",
 		"./plugin",
-		"./server",
-		"./services"
+		"./server"
 	],
 	"keywords": [
 		"svelte",

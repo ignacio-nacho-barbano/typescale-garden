@@ -1,4 +1,9 @@
 import { env } from "cloudflare:workers";
+// `base` is the nested object the client sends and expects back; Mongo stored it as
+// a subdocument, in D1 each field is its own column. Both shapes come from `core`,
+// the single definition shared with the client and the plugin — they used to be
+// hand-written here and kept in step by hand.
+import type { Typescale, TypescaleBase } from "core";
 
 // The D1 binding declared in wrangler.jsonc (typed via worker-configuration.d.ts,
 // regenerate with `npm run cf-typegen`). Express handlers run outside the Worker
@@ -12,31 +17,9 @@ function db(): D1Database {
 	return env.DB;
 }
 
-// The nested object the client sends and expects back under `base`. Mongo stored
-// it as a subdocument; in D1 each field is its own column.
-export interface TypescaleBase {
-	breakpoint: number;
-	fontName: string;
-	baseUnit: number;
-	baseSize: number;
-	desktopRatio: number;
-	mobileRatio: number;
-	letterSpacingRatio: number;
-	useUppercaseForTitles: boolean;
-	useItalicsForTitles: boolean;
-	headingsInitialWeight: number;
-	headingsFinalWeight: number;
-}
-
-export interface Typescale {
-	id: string;
-	authorId: string;
-	name: string;
-	base: TypescaleBase;
-	overrides: unknown | null;
-	createdAt: string;
-	lastModifiedAt: string;
-}
+// Re-exported so this module's public surface is unchanged for anything that
+// imported the types from here.
+export type { Typescale, TypescaleBase };
 
 // One row of the `typescales` table: base fields flattened, booleans as SQLite
 // 0/1 integers, `overrides` as a JSON string.
@@ -66,6 +49,16 @@ const BASE_COLUMNS = [
 	"headingsInitialWeight",
 	"headingsFinalWeight"
 ] as const;
+
+// Now that TypescaleBase comes from `core`, the "keep these in sync" note above can
+// be enforced instead of trusted: adding a field to TypescaleBase without adding
+// the column here is a compile error. It does NOT check the migration — that pairing
+// is still on you.
+type MissingBaseColumns = Exclude<keyof TypescaleBase, (typeof BASE_COLUMNS)[number]>;
+// Tuple-wrapped on purpose: a bare `MissingBaseColumns extends never` is a
+// distributive conditional, and distributing over the empty union yields `never`,
+// so the check would fail exactly when it should pass.
+const _assertEveryBaseFieldHasAColumn: [MissingBaseColumns] extends [never] ? true : never = true;
 
 const SELECT_COLUMNS = [
 	"id",

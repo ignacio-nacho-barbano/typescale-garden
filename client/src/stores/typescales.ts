@@ -1,5 +1,5 @@
 import { browser } from "$app/environment";
-import type { Typescale } from "../models";
+import type { Typescale } from "core";
 import { derived, writable } from "svelte/store";
 import { logError } from "../services/errorLogger";
 import { authState } from "./auth";

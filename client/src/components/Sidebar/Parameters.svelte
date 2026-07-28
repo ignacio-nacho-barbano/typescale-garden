@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { mockFontsApiNames } from "../../constants/mockFontsApi";
+	import { mockFontsApiNames } from "core";
 	import {
 		availableWeights,
 		baseSize,
@@ -28,9 +28,8 @@
 
 	$: {
 		filteredFonts =
-			$fontsApiData?.fonts?.items
-				?.filter((c) => activePills.includes(c.category))
-				?.map((c) => c.family) || [];
+			$fontsApiData?.items?.filter((c) => activePills.includes(c.category))?.map((c) => c.family) ||
+			[];
 	}
 </script>
 
