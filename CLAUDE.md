@@ -16,8 +16,9 @@ names (`client`, `core`, `server`, `plugin`), which is what `--filter` takes:
 - `server/` — Express app running **as a Cloudflare Worker**, backed by **D1**. Stores users' saved
   typescales, and serves the Google Fonts catalogue it refreshes on a daily Cron Trigger. Deployed
   with wrangler to `api.typescalegarden.uy`.
-- `plugin/` — Figma plugin ("Typescale Garden Import Tool") that turns the exported tokens JSON into
-  Figma text styles.
+- `plugin/` — Figma plugin ("Typescale Garden Import Tool"). Turns a scale into Figma text styles,
+  either from an exported tokens JSON pasted in by hand or — after pairing with an account — from the
+  user's saved scales, fetched from the Worker and computed locally with `core`.
 
 There used to be a fifth package, `services/`, holding standalone Node scripts. Its only two
 inhabitants both moved out — `WEIGHTS_MAP` into `core`, and the Google Fonts snapshot generator into
@@ -32,7 +33,7 @@ From the repo root — these fan out through turbo to every package that defines
 npm run build             # client bundle, worker dry-run, plugin code.js, core dist
 npm run check             # type check everything (svelte-check, tsc --noEmit ×4)
 npm run lint              # eslint / prettier per package
-npm test                  # vitest, single non-watch pass (only client and core have tests)
+npm test                  # client + core vitest (one pass) and the plugin's node script
 npm run dev               # every dev server at once
 npm run client            # turbo run dev --filter=client   → vite dev --host
 npm run server            # turbo run dev --filter=server   → wrangler dev
@@ -70,8 +71,9 @@ npm run db:import:local   # load scripts/atlas-import.sql — a fresh local DB i
 ```
 
 Plugin (`cd plugin`): `npm run build` (esbuild, via `build.mjs` → `code.js`, which is committed and is
-what Figma loads), `npm run check`, `npm run lint`, `npm run dev` for watch mode. Note `dev` no longer
-type checks — esbuild only transpiles, so run `npm run check:watch` alongside it if you want that.
+what Figma loads), `npm run check`, `npm run lint`, `npm test`, `npm run dev` for watch mode. Note
+`dev` no longer type checks — esbuild only transpiles, so run `npm run check:watch` alongside it if
+you want that. `plugin#test` runs the _bundle_, so `plugin/turbo.json` gives it `dependsOn: ["build"]`.
 
 `code.ts` is **bundled**, not merely transpiled. Figma's sandbox has no module loader — it evaluates
 `code.js` as one script — so the moment the plugin imports `core` the dependency graph has to be
@@ -81,7 +83,9 @@ which both follows core's `exports` map and tolerates the `.js` extensions core'
 esbuild is pinned to the `0.24.2` already hoisted at the root and already listed in the root
 `allowScripts`, so it needs no new install-script approval.
 
-There is no test suite for the server or plugin; the tests live in `client/src` and `core/src`.
+There is no test suite for the server. The others: `client/src` and `core/src` use vitest, and
+`plugin/test/plugin.test.mjs` is a single dependency-free node script (run by `npm test` like the
+rest) that executes the built `code.js` in a stubbed Figma sandbox.
 
 ### Turborepo layout
 
@@ -185,9 +189,30 @@ For **importing tokens** there is still no network link: the user copies/downloa
 from the Export modal and pastes it into the plugin UI, which messages `code.ts` to create/update
 Figma text styles.
 
-For **reading saved typescales** there now is one, via a pairing code — see below. Note
-`manifest.json` still declares `networkAccess.allowedDomains: ["none"]` and must gain the API host
-before the plugin can actually call it.
+For **reading saved typescales** there now is one, via a pairing code — see below.
+`manifest.json` allows `https://api.typescalegarden.uy`; to develop against a local Worker, change
+both that list and `API_BASE` in `code.ts` (a plugin has no env system).
+
+`code.ts` is the whole application — network, stored token, all document access — and `ui.html` is
+presentation talking to it over `postMessage`. Two reasons the fetches live in the sandbox rather
+than the iframe: Figma's sandbox `fetch` is not browser-CORS-governed (the manifest gates it
+instead, so no preflight and no origin allowlist), and it keeps the bearer token out of the iframe
+entirely. An unpaired install lists the community defaults rather than showing a login wall, and a
+401 — the connection was revoked from the website — drops the token and quietly degrades to those
+defaults.
+
+**The plugin derives `availableWeights` itself** from `GET /api/fonts`, rather than the API
+precomputing it. The Worker deliberately never parses that payload (see the fonts snapshot section:
+the whole design treats it as opaque bytes to stay inside the Cron CPU budget), and doing it in the
+plugin means the same core function runs over the same catalogue as the web app — which is what makes
+the two emit identical tokens. The catalogue is fetched lazily on the first import, never just to
+draw the list, and cached for the session.
+
+**One deliberate divergence from the web app:** when the font is missing from the catalogue, the
+website substitutes its fallback family and carries on, while the plugin refuses and imports nothing.
+Writing 22 text styles in the wrong font into someone's document is worse than an error message.
+core permits both — `findFont` returns `undefined` rather than falling back, so the caller decides
+what absence means. `plugin/test/plugin.test.mjs` asserts both behaviours.
 
 ### Plugin auth — the pairing code
 
