@@ -1,10 +1,15 @@
 /**
  * core — the typescale business logic.
  *
- * Pure and runtime-agnostic: no Node, no DOM, no Svelte, no Figma. Consumed by
- * the client (vite), the server (wrangler) and the Figma plugin (esbuild), so
- * anything added here has to stay free of ambient globals — tsconfig sets
- * `types: []` to enforce that.
+ * Pure and runtime-agnostic: no Node, no DOM, no Svelte. Consumed by the client
+ * (vite), the server (wrangler) and the Figma plugin (esbuild), so anything added
+ * here has to stay free of ambient globals — tsconfig pins `types` to the single
+ * entry `plugin-typings` to enforce that.
+ *
+ * That one exception is deliberate: design tokens exist to be imported into Figma,
+ * so `DesignTokenTextStyle` is a `Pick` of Figma's own `TextStyle` rather than a
+ * parallel interface that could drift from it. Types only — plugin-typings emits no
+ * runtime code, so nothing reaches any consumer's bundle.
  */
 
 export { HEADING_VARIANTS, VARIANTS, headingPrefix } from "./constants/variants.js";

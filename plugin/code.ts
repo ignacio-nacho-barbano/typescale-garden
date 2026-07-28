@@ -1,3 +1,5 @@
+import type { DesignTokenSet, DesignTokenTextStyle } from "core";
+
 figma.showUI(__html__, { themeColors: true, width: 450, height: 500 });
 
 figma.ui.onmessage = async (msg) => {
@@ -5,7 +7,9 @@ figma.ui.onmessage = async (msg) => {
 	const currentStyles = await figma.getLocalTextStylesAsync();
 
 	if (msg.type === "import-styles") {
-		const jsonStyles = msg.jsonStyles as Record<string, TextStyle>;
+		// The same type the generator emits, straight from core — so the payload shape is
+		// stated once instead of being asserted independently at each end.
+		const jsonStyles = msg.jsonStyles as DesignTokenSet;
 
 		const fontsToLoad = new Set<string>();
 		const fontsUnableToBeLoaded = new Set<string>();
@@ -45,7 +49,13 @@ figma.ui.onmessage = async (msg) => {
 				}
 
 				Object.keys(styleProps).forEach((property) => {
-					type PropertyKeys = keyof Omit<TextStyle, "id" | "key" | "consumers" | "remote">;
+					// Was `keyof Omit<TextStyle, "id" | "key" | "consumers" | "remote">` — an
+					// approximation of "the fields a token can carry". core's Pick is that set
+					// exactly, so the two can no longer drift apart.
+					type PropertyKeys = keyof DesignTokenTextStyle;
+					// `type` is readonly on TextStyle and `fontWeight` is not a token field at
+					// all; both are skipped defensively, since these keys come off a
+					// user-pasted object at runtime.
 					const avoidedProps = ["type", "fontWeight"];
 
 					if (!avoidedProps.includes(property)) {

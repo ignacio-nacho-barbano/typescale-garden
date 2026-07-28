@@ -69,8 +69,17 @@ npm run db:migrate:local  # apply migrations/ to local SQLite  (…:preview, …
 npm run db:import:local   # load scripts/atlas-import.sql — a fresh local DB is otherwise empty
 ```
 
-Plugin (`cd plugin`): `npm run build` (tsc → `code.js`, which is committed and is what Figma loads),
-`npm run check`, `npm run lint`, `npm run dev` for watch mode.
+Plugin (`cd plugin`): `npm run build` (esbuild, via `build.mjs` → `code.js`, which is committed and is
+what Figma loads), `npm run check`, `npm run lint`, `npm run dev` for watch mode. Note `dev` no longer
+type checks — esbuild only transpiles, so run `npm run check:watch` alongside it if you want that.
+
+`code.ts` is **bundled**, not merely transpiled. Figma's sandbox has no module loader — it evaluates
+`code.js` as one script — so the moment the plugin imports `core` the dependency graph has to be
+flattened into a single IIFE. `tsc` could not do that, which is why the emit moved to esbuild while
+`tsc --noEmit` stayed on as `check`. The plugin's tsconfig therefore uses `moduleResolution: Bundler`,
+which both follows core's `exports` map and tolerates the `.js` extensions core's `.d.ts` files carry.
+esbuild is pinned to the `0.24.2` already hoisted at the root and already listed in the root
+`allowScripts`, so it needs no new install-script approval.
 
 There is no test suite for the server or plugin; the tests live in `client/src` and `core/src`.
 

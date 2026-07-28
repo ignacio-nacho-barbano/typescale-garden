@@ -5,18 +5,23 @@
 	"description": "An import tool for typescale-garden",
 	"main": "code.js",
 	"scripts": {
-		"build": "tsc -p ./tsconfig.json",
+		"build": "node ./build.mjs",
 		"check": "tsc -p ./tsconfig.json --noEmit",
+		"check:watch": "tsc -p ./tsconfig.json --noEmit --watch",
 		"lint": "eslint .",
-		"dev": "tsc -p ./tsconfig.json --watch"
+		"dev": "node ./build.mjs --watch"
 	},
 	"author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
 	"license": "GPL-3.0",
+	"dependencies": {
+		"core": "*"
+	},
 	"devDependencies": {
 		"@figma/eslint-plugin-figma-plugins": "^0.14.0",
 		"@figma/plugin-typings": "^1.88.0",
 		"@typescript-eslint/eslint-plugin": "^8.65.0",
 		"@typescript-eslint/parser": "^8.65.0",
+		"esbuild": "^0.24.2",
 		"eslint": "^8.57.0",
 		"typescript": "^6.0.3"
 	}

@@ -6,6 +6,15 @@
 		"lib": ["ES2023"],
 		"strict": true,
 		"esModuleInterop": true,
+		// esbuild owns the emit now (see build.mjs); tsc is only ever run with --noEmit.
+		// `Bundler` resolution is what lets `import … from "core"` follow core's `exports`
+		// map, and it tolerates the `.js` extensions core's own .d.ts files carry (core is
+		// on Node16 resolution because the Worker needs real ESM).
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		// esbuild transpiles one file at a time and cannot know whether an import was a
+		// type, so anything ambiguous has to be an error here rather than a runtime miss.
+		"isolatedModules": true,
 		// @figma/plugin-typings supplies the `figma` global (and Figma's own `console`), which is why
 		// no DOM lib is pulled in. TS 7 stopped auto-including packages found under a type root, so
 		// it has to be named. Both roots are listed so this survives npm hoisting it either way.
