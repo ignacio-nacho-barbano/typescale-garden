@@ -5,6 +5,13 @@
 		"build": {
 			// code.js is committed — it is what Figma loads.
 			"outputs": ["code.js"]
+		},
+		"test": {
+			// The test executes the bundled code.js, not the TypeScript source, so this
+			// package's own build has to run first — the root's `^build` only covers
+			// dependencies. Core's golden fixtures are the expected output, hence the input.
+			"dependsOn": ["build"],
+			"inputs": ["test/**", "code.js", "../core/src/__tests__/fixtures/golden.json"]
 		}
 	}
 }

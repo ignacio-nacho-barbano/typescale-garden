@@ -83,10 +83,7 @@ async function apiGet<T>(path: string, token?: string | null): Promise<T> {
 }
 
 class ApiError extends Error {
-	constructor(
-		readonly status: number,
-		message: string
-	) {
+	constructor(readonly status: number, message: string) {
 		super(message);
 		this.name = "ApiError";
 	}
@@ -248,8 +245,16 @@ async function importTypescale(id: unknown): Promise<void> {
 		const catalogue = await getFontCatalogue();
 		const font = findFont(catalogue, typescale.base.fontName);
 
+		// A deliberate divergence from the website, which substitutes its fallback family
+		// and carries on. That is right for a live editor with a toast beside it; here
+		// the equivalent is writing 22 text styles in the wrong font into the user's
+		// document, so refusing is kinder. core permits both by design — findFont returns
+		// undefined rather than falling back, leaving the choice to the caller.
 		if (!font) {
-			figma.notify(`Could not find the font “${typescale.base.fontName}”.`, { error: true });
+			figma.notify(
+				`Could not find the font “${typescale.base.fontName}”, so nothing was imported.`,
+				{ error: true }
+			);
 			return;
 		}
 

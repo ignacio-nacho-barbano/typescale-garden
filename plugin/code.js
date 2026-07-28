@@ -314,7 +314,10 @@
       const catalogue = await getFontCatalogue();
       const font = findFont(catalogue, typescale.base.fontName);
       if (!font) {
-        figma.notify(`Could not find the font “${typescale.base.fontName}”.`, { error: true });
+        figma.notify(
+          `Could not find the font “${typescale.base.fontName}”, so nothing was imported.`,
+          { error: true }
+        );
         return;
       }
       const { typescale: variants } = computeTypescale(typescale.base, availableWeightsFor(font));

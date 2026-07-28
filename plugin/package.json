@@ -9,6 +9,7 @@
 		"check": "tsc -p ./tsconfig.json --noEmit",
 		"check:watch": "tsc -p ./tsconfig.json --noEmit --watch",
 		"lint": "eslint .",
+		"test": "node ./test/plugin.test.mjs",
 		"dev": "node ./build.mjs --watch"
 	},
 	"author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
