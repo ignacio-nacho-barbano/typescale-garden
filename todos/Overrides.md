@@ -1,0 +1,241 @@
+# Feature Name
+
+Allow for storing css overrides
+
+# Status
+
+PENDING_DEFINITION
+
+## Description
+
+There should be a new feature called css overrides.
+CSS overrides should be re-applied over generated code, allowing for the
+controls to continue to be functional while the overrides should be persisted.
+For this, it is necessary that overrides are stored on a block-based key pair,
+and for css to be cleaned up afterwards.
+
+Being that the the generated code looks like this sample:
+I should be able to store css overrides in a map that looks like:
+[selectorWithoutSpaces]: [extraLinesofCss]
+
+On each re-generation based on input changes, the overrides should be re-applied.
+Figma generated tokens should remain untouched.
+
+```css
+@import url("https://fonts.googleapis.com/css2?family=Afacad:wght@400&display=swap");
+
+body {
+	font-size: 20px;
+	font-family: "Afacad", sans-serif;
+	--paragraph-space: 2rem;
+	--title-space: 1rem;
+	font-weight: 400;
+}
+
+.space-text-above,
+p + h1,
+p + h2,
+p + h3,
+p + h4,
+p + h5,
+p + h6,
+h1 + h2,
+h2 + h3,
+h3 + h4,
+h4 + h5,
+h5 + h6 {
+	margin-top: var(--paragraph-space);
+}
+
+h1 + p,
+h2 + p,
+h3 + p,
+h4 + p,
+h5 + p,
+h6 + p {
+	margin-top: var(--title-space);
+}
+
+p + p {
+	margin-top: var(--title-space);
+}
+
+h1 + p,
+h2 + p,
+h3 + p,
+h4 + p,
+h5 + p,
+h6 + p,
+.space-text-below {
+	margin-bottom: var(--paragraph-space);
+}
+
+p.bold,
+span.bold,
+.body-1.bold,
+.body-2.bold,
+p .bold,
+span .bold,
+.body-1 .bold,
+.body-2 .bold,
+p strong,
+span strong,
+.body-1 strong,
+.body-2 strong,
+p b,
+span b,
+.body-1 b,
+.body-2 b {
+	font-weight: 700;
+}
+
+h1,
+.title-1,
+h2,
+.title-2,
+h3,
+.title-3,
+h4,
+.title-4,
+h5,
+.title-5,
+h6,
+.title-6 {
+	font-style: normal;
+	text-transform: none;
+	max-width: 768px;
+}
+
+p,
+.max-w-text {
+	max-width: 768px;
+}
+
+h1,
+.title-1 {
+	font-size: 50px;
+	line-height: 56px;
+	font-weight: 400;
+	letter-spacing: -0.004em;
+}
+
+h2,
+.title-2 {
+	font-size: 44px;
+	line-height: 52px;
+	font-weight: 400;
+	letter-spacing: -0.003em;
+}
+
+h3,
+.title-3 {
+	font-size: 38px;
+	line-height: 52px;
+	font-weight: 400;
+	letter-spacing: -0.002em;
+}
+
+h4,
+.title-4 {
+	font-size: 34px;
+	line-height: 48px;
+	font-weight: 400;
+	letter-spacing: -0.001em;
+}
+
+h5,
+.title-5 {
+	font-size: 30px;
+	line-height: 48px;
+	font-weight: 400;
+	letter-spacing: -0.001em;
+}
+
+h6,
+.title-6 {
+	font-size: 26px;
+	line-height: 48px;
+	font-weight: 400;
+	letter-spacing: 0em;
+}
+
+p,
+button,
+.body-1 {
+	font-size: 20px;
+	line-height: 32px;
+	font-weight: 400;
+	letter-spacing: 0.001em;
+}
+
+label,
+figcaption,
+input,
+.body-2 {
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 400;
+	letter-spacing: 0.043em;
+}
+
+.tooltip {
+	font-size: 14px;
+	line-height: 20px;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+}
+
+@media (min-width: 768px) {
+	body {
+		font-size: 22px;
+	}
+
+	h1,
+	.title-1 {
+		font-size: 88px;
+		line-height: 96px;
+	}
+	h2,
+	.title-2 {
+		font-size: 72px;
+		line-height: 88px;
+	}
+	h3,
+	.title-3 {
+		font-size: 60px;
+		line-height: 80px;
+	}
+	h4,
+	.title-4 {
+		font-size: 48px;
+		line-height: 72px;
+	}
+	h5,
+	.title-5 {
+		font-size: 40px;
+		line-height: 64px;
+	}
+	h6,
+	.title-6 {
+		font-size: 32px;
+		line-height: 56px;
+	}
+	p,
+	button,
+	.body-1 {
+		font-size: 22px;
+		line-height: 32px;
+	}
+	label,
+	figcaption,
+	input,
+	.body-2 {
+		font-size: 18px;
+		line-height: 28px;
+	}
+	.tooltip {
+		font-size: 14px;
+		line-height: 20px;
+	}
+}
+```
