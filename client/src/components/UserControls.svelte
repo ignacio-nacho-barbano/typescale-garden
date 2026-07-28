@@ -3,9 +3,11 @@
 	import Button from "./Button.svelte";
 	import Icon from "./Icon.svelte";
 	import Menu from "./Menu.svelte";
+	import PluginPairing from "./PluginPairing.svelte";
 
 	let userName = $user.name || $user.nickname || $user.name || $user.email;
 	let open = false;
+	let pairingOpen = false;
 
 	function logOut(e: Event) {
 		e.preventDefault();
@@ -30,11 +32,25 @@
 			<li class="body-2">Free Account:</li>
 			<li class="tooltip">{$user.email}</li>
 			<li>
+				<Button
+					size="s"
+					type="outline"
+					on:click={() => {
+						pairingOpen = true;
+						open = false;
+					}}>Connect Figma plugin</Button
+				>
+			</li>
+			<li>
 				<Button size="s" type="outline" on:click={logOut}>Log Out</Button>
 			</li>
 		</ul>
 	</Menu>
 </div>
+
+<!-- Outside the menu wrapper on purpose: the <dialog> must not inherit the menu's
+	 positioning context, and closing the menu must not unmount the open modal. -->
+<PluginPairing bind:open={pairingOpen} />
 
 <style lang="scss">
 	.user-profile-button-wrapper {

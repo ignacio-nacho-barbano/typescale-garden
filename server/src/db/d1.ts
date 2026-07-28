@@ -10,7 +10,9 @@ import type { Typescale, TypescaleBase } from "core";
 // `fetch(request, env, ctx)` signature, and `cloudflare:workers` is how you reach
 // bindings from anywhere in the module graph. Bindings are only populated inside a
 // request, which is fine: every caller here is on a request path.
-function db(): D1Database {
+// Exported so src/db/plugin-auth.ts can share it: the invariant worth keeping is
+// "one module resolves the binding", not "one module holds every query".
+export function db(): D1Database {
 	if (!env.DB) {
 		throw new Error("D1 binding DB is not available — check d1_databases in wrangler.jsonc");
 	}

@@ -181,9 +181,58 @@ from 5 to 100 (`server/src/controllers/typescales/index.ts`).
 
 ### Client → plugin
 
-There is no network link. The plugin's `manifest.json` declares `networkAccess: none`; the user
-copies/downloads the tokens JSON from the Export modal and pastes it into the plugin UI, which
-messages `code.ts` to create/update Figma text styles.
+For **importing tokens** there is still no network link: the user copies/downloads the tokens JSON
+from the Export modal and pastes it into the plugin UI, which messages `code.ts` to create/update
+Figma text styles.
+
+For **reading saved typescales** there now is one, via a pairing code — see below. Note
+`manifest.json` still declares `networkAccess.allowedDomains: ["none"]` and must gain the API host
+before the plugin can actually call it.
+
+### Plugin auth — the pairing code
+
+The plugin cannot run Auth0's login: Figma's sandbox has no redirect surface, and pasting a raw Auth0
+access token into a plugin would hand it a credential valid against every other API scope. So the web
+app (where the user is signed in) mints a short code, the user types it into the plugin once, and the
+plugin swaps it for its own token. `server/src/db/plugin-auth.ts` owns the whole credential lifecycle;
+`server/src/routes/plugin.ts` is deliberately the one router carrying more than one credential type,
+so they stay visible side by side:
+
+| route                                  | credential                              | why                                 |
+| -------------------------------------- | --------------------------------------- | ----------------------------------- |
+| `POST /api/plugin/pairing-codes`       | Auth0 (`checkUser`)                     | mints a code for the signed-in user |
+| `POST /api/plugin/tokens`              | **none** — the code _is_ the credential | the plugin has nothing else yet     |
+| `GET /api/plugin/typescales`           | plugin token (`checkPluginToken`)       | read-only, owner-scoped             |
+| `GET`/`DELETE /api/plugin/connections` | Auth0 (`checkUser`)                     | list / revoke from the web app      |
+
+Load-bearing details:
+
+- **The plugin token is strictly weaker than an Auth0 token.** `checkPluginToken` sets `req.pluginAuth`,
+  never `req.auth`, so a handler reading `req.auth?.payload.sub` cannot be reached with one by
+  accident. Keep the plugin router read-only; writes stay behind `checkUser`.
+- **Only hashes are stored**, for both codes and tokens, and every lookup is _by_ hash — so no app code
+  ever compares against stored secret material and there is no constant-time comparison to get wrong.
+  A 40-bit pairing code hash is admittedly brute-forceable offline; the real protections are its
+  ten-minute TTL and single use.
+- **Redemption is one conditional `UPDATE … RETURNING`** filtering on `consumedAt IS NULL AND
+expiresAt > now`. SQLite picks the winner, so concurrent submissions of the same code cannot mint
+  two tokens. Do not refactor this into a read-then-write.
+- **All four redemption failure modes answer identically** (malformed, unknown, expired, already used)
+  so the endpoint is not an oracle for which codes exist. Keep them identical.
+- **`POST /api/plugin/tokens` is the one guessable endpoint in the API** and it needs a Cloudflare WAF
+  rate-limiting rule on its path before the plugin goes to Figma review — application-level limiting
+  is not available here (see the `express-rate-limit` note in `src/index.ts`). Unthrottled, 8 symbols
+  over a 32-symbol alphabet gives ~1.1e12 possibilities against a ten-minute single-use window.
+- `lastUsedAt` is refreshed at most hourly, so a busy plugin does not turn every read into a D1 write.
+- Issuing a code sweeps that author's previous codes plus anyone's expired rows, so pairing needs no
+  scheduled cleanup job.
+
+**Testing this locally needs two env changes**, because the web app talks to the Worker for the first
+time on this path: `PUB_API_URL` points at `http://localhost:3000` while `wrangler dev` listens on
+**8787**, and `ALLOWED_ORIGINS` in `src/index.ts` does not include `http://localhost:5173`, so the
+browser will report a CORS error. The redeem side needs neither — Figma's sandbox `fetch` is not
+CORS-governed (it enforces `manifest.networkAccess` instead), and it can be exercised with `curl` by
+seeding a row into `plugin_pairing_codes` with a hash you compute yourself.
 
 ### Server on Workers — the constraints that shaped it
 
@@ -237,7 +286,10 @@ schedule. The Cache API is a no-op on `*.workers.dev`, so cache behaviour is onl
 
 ### D1 access
 
-`server/src/db/d1.ts` is the **only** module that touches the database, reaching the `DB` binding via
+`server/src/db/` is the **only** place that touches the database — `d1.ts` for typescales,
+`plugin-auth.ts` for pairing codes and plugin tokens. The binding itself is still resolved in exactly
+one function, `d1.ts`'s exported `db()`, which `plugin-auth.ts` imports; that is the invariant worth
+keeping, rather than "one module holds every query". `d1.ts` reaches the `DB` binding via
 `import { env } from "cloudflare:workers"` (Express handlers run outside the `fetch(request, env, ctx)`
 signature). SQLite has no nested documents, so the 11 `base.*` settings are real columns; that module
 flattens them going in and re-nests them going out, so the JSON on the wire is unchanged from the
