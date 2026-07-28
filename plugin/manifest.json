@@ -12,7 +12,8 @@
 	"documentAccess": "dynamic-page",
 	"networkAccess": {
 		"allowedDomains": [
-			"none"
-		]
+			"https://api.typescalegarden.uy"
+		],
+		"reasoning": "Reads the typographic scales the user saved on typescalegarden.uy, plus the public Google Fonts catalogue the plugin needs to work out which weights each font offers. Pairing is opt-in: the user copies a short code from the website, and the token the plugin receives in exchange can only read typescales — it cannot create, change or delete anything."
 	}
 }
