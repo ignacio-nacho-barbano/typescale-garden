@@ -1,65 +1,155 @@
+<!--
+	Presentation only. Every network call, the stored token and all Figma document
+	access live in code.ts — this iframe never sees a credential, and the only thing it
+	sends up is the pairing code the user typed.
+-->
 <div class="wrapper">
-	<h2 class="title">Typescale Garden <br />Token Import Tool</h2>
-	<label for="jsonStyles">Paste your JSON styles below:</label>
-	<textarea type="text" rows="5" id="jsonStyles"></textarea>
+	<h2 class="title">Typescale Garden</h2>
 
+	<!-- Signed out: pair with an account. -->
+	<section id="pairing" class="card">
+		<p class="lead">Connect your account to import the scales you saved.</p>
+		<ol class="steps">
+			<li>
+				Open <a target="_blank" href="https://typescalegarden.uy">typescalegarden.uy</a> and sign in.
+			</li>
+			<li>In the user menu, choose <b>Connect Figma plugin</b>.</li>
+			<li>Paste the code here.</li>
+		</ol>
+		<div class="pair-row">
+			<input id="pairing-code" type="text" placeholder="ABCD-EFGH" autocomplete="off" />
+			<button id="connect" class="primary">Connect</button>
+		</div>
+	</section>
 
-	<p>
-		<a href="https://typescalegarden.uy">Typescale Garden</a> is an Open Source project, please consider supporting!
-		You can do it through:
-		<a href="https://github.com/sponsors/ignacio-nacho-barbano">GitHub Sponsors</a> or
-		<a href="https://paypal.me/IgnacioRBarbano?country.x=UY&locale.x=es_XC">PayPal</a>
-	</p>
+	<!-- Signed in: show who we are and let them undo it. -->
+	<section id="connected" class="card hidden">
+		<p class="lead">✅ Connected to your Typescale Garden account.</p>
+		<button id="disconnect" class="link">Disconnect this plugin</button>
+	</section>
+
+	<p id="error" class="error hidden"></p>
+
+	<section class="list-section">
+		<div class="list-header">
+			<h3 id="list-title">Typescales</h3>
+			<button id="refresh" class="link">Refresh</button>
+		</div>
+		<p id="list-empty" class="muted hidden">Nothing to show yet.</p>
+		<p id="list-busy" class="muted">Loading…</p>
+		<ul id="typescales"></ul>
+	</section>
 
 	<div id="about-tsg">
-		<button id="about-tsg-btn">
-			<span class="btn-text-closed">What is This plugin? 🔽</span>
-			<span class="btn-text-open">Thanks! ⬆️</span>
+		<button id="about-tsg-btn" class="link">
+			<span class="btn-text-closed">Paste a token JSON instead 🔽</span>
+			<span class="btn-text-open">Hide ⬆️</span>
 		</button>
 		<div class="content">
-			<p>
-				This is the Typescale Garden official plugin; if you don't know what Typescale Garden is,
-				maybe check it out at
-				<a target="_blank" href="https://typescalegarden.uy">typescalegarden.uy</a>
-				and come back 😄.
-			</p>
+			<label for="jsonStyles">Paste the JSON from the website's Export panel:</label>
+			<textarea rows="5" id="jsonStyles"></textarea>
+			<button id="import" class="primary">Import pasted JSON</button>
 		</div>
 	</div>
 
+	<p class="support">
+		<a href="https://typescalegarden.uy">Typescale Garden</a> is Open Source — please consider
+		supporting it via
+		<a href="https://github.com/sponsors/ignacio-nacho-barbano">GitHub Sponsors</a> or
+		<a href="https://paypal.me/IgnacioRBarbano?country.x=UY&locale.x=es_XC">PayPal</a>.
+	</p>
+
 	<div class="btns-group">
-		<button id="cancel">Cancel</button>
-		<button id="import">Import</button>
+		<button id="cancel">Close</button>
 	</div>
 </div>
-<script>
-	const aboutSection = document.getElementById("about-tsg");
 
-	document.getElementById("import").onclick = () => {
-		const textbox = document.getElementById("jsonStyles");
+<script>
+	const $ = (id) => document.getElementById(id);
+	const post = (message) => parent.postMessage({ pluginMessage: message }, "*");
+	const toggle = (element, shown) => element.classList.toggle("hidden", !shown);
+
+	$("connect").onclick = () => post({ type: "pair", code: $("pairing-code").value });
+	$("disconnect").onclick = () => post({ type: "unpair" });
+	$("refresh").onclick = () => post({ type: "refresh" });
+	$("cancel").onclick = () => post({ type: "cancel" });
+	$("about-tsg-btn").onclick = () => $("about-tsg").classList.toggle("open");
+
+	// Enter is the natural way to submit an eight-character code.
+	$("pairing-code").onkeydown = (event) => {
+		if (event.key === "Enter") $("connect").click();
+	};
+
+	$("import").onclick = () => {
 		let jsonStyles;
 		try {
-			jsonStyles = JSON.parse(textbox.value);
+			jsonStyles = JSON.parse($("jsonStyles").value);
 		} catch (error) {
-			console.log("Error when parsing JSON");
+			$("error").textContent = "That does not look like valid JSON.";
+			toggle($("error"), true);
+			return;
 		}
-		parent.postMessage({ pluginMessage: { type: "import-styles", jsonStyles } }, "*");
+		post({ type: "import-styles", jsonStyles });
 	};
 
-	document.getElementById("cancel").onclick = () => {
-		parent.postMessage({ pluginMessage: { type: "cancel" } }, "*");
+	// code.ts owns all state; this just renders whatever it last sent.
+	onmessage = (event) => {
+		const message = event.data.pluginMessage;
+		if (!message || message.type !== "state") return;
+
+		const { signedIn, typescales, busy, error } = message;
+
+		toggle($("pairing"), !signedIn);
+		toggle($("connected"), signedIn);
+		toggle($("error"), !!error);
+		$("error").textContent = error || "";
+
+		toggle($("list-busy"), !!busy);
+		$("list-title").textContent = signedIn ? "Your typescales" : "Community typescales";
+
+		const list = $("typescales");
+		list.textContent = "";
+		toggle($("list-empty"), !busy && !typescales.length);
+
+		for (const typescale of typescales) {
+			const item = document.createElement("li");
+
+			const text = document.createElement("div");
+			const name = document.createElement("b");
+			name.textContent = typescale.name;
+			const meta = document.createElement("span");
+			meta.className = "muted";
+			meta.textContent = typescale.fontName + (typescale.isDefault ? " · community" : "");
+			text.append(name, meta);
+
+			const importButton = document.createElement("button");
+			importButton.className = "primary small";
+			importButton.textContent = "Import";
+			importButton.onclick = () => post({ type: "import-typescale", id: typescale.id });
+
+			item.append(text, importButton);
+			list.append(item);
+		}
 	};
 
-	document.getElementById("about-tsg-btn").onclick = () => {
-		aboutSection.classList.toggle("open");
-	};
+	post({ type: "init" });
 </script>
 
 <style>
 	* {
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 		margin: 0;
 		padding: 0;
 		box-sizing: border-box;
+	}
+
+	h2,
+	h3,
+	label,
+	p,
+	li,
+	b {
+		color: var(--figma-color-text);
 	}
 
 	h2 {
@@ -68,26 +158,20 @@
 
 	h3 {
 		font-weight: 600;
-	}
-
-	h2,
-	h3,
-	label,
-	p {
-		color: var(--figma-color-text);
+		font-size: 14px;
 	}
 
 	label {
 		font-weight: 600;
-		font-size: 16px;
+		font-size: 13px;
 	}
 
 	.wrapper {
 		padding: 20px;
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
-		height: 100%;
+		gap: 16px;
+		min-height: 100%;
 	}
 
 	a,
@@ -95,27 +179,136 @@
 		color: var(--figma-color-text-brand);
 	}
 
-	button {
-		padding: 12px 20px;
-		border: none;
-		border-radius: 20px;
-		font-weight: 600;
+	.hidden {
+		display: none !important;
 	}
 
-	#import {
+	.muted {
+		color: var(--figma-color-text-secondary);
+		font-size: 12px;
+	}
+
+	.error {
+		color: var(--figma-color-text-danger);
+		font-size: 13px;
+	}
+
+	.card {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		padding: 14px;
+		border-radius: 8px;
+		background-color: var(--figma-color-bg-secondary);
+	}
+
+	.lead {
+		font-size: 13px;
+	}
+
+	ol.steps {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding-left: 18px;
+		font-size: 12px;
+	}
+
+	.pair-row {
+		display: flex;
+		gap: 8px;
+	}
+
+	input#pairing-code {
+		flex: 1 1 auto;
+		font-family: monospace;
+		font-size: 16px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		padding: 8px 10px;
+		border-radius: 6px;
+		border: 1px solid var(--figma-color-border);
+		background-color: var(--figma-color-bg);
 		color: var(--figma-color-text);
+	}
+
+	button {
+		padding: 8px 16px;
+		border: none;
+		border-radius: 6px;
+		font-weight: 600;
+		font-size: 13px;
+		cursor: pointer;
+		color: var(--figma-color-text);
+		background-color: var(--figma-color-bg-secondary);
+	}
+
+	button.primary {
+		color: var(--figma-color-text-onbrand);
 		background-color: var(--figma-color-bg-brand);
 	}
 
-	#import:hover {
+	button.primary:hover {
 		background-color: var(--figma-color-bg-brand-hover);
 	}
 
-	textarea#jsonStyles {
-		font-family: monospace;
-		padding: 20px;
-		height: 136px;
-		resize: none;
+	button.small {
+		padding: 6px 12px;
+		font-size: 12px;
+	}
+
+	button.link {
+		align-self: flex-start;
+		padding: 0;
+		background: none;
+		font-weight: 500;
+		font-size: 12px;
+		color: var(--figma-color-text-brand);
+		text-decoration: underline;
+	}
+
+	.list-section {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.list-header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+	}
+
+	ul#typescales {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		list-style: none;
+		max-height: 220px;
+		overflow-y: auto;
+	}
+
+	ul#typescales li {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 8px 10px;
+		border-radius: 6px;
+		background-color: var(--figma-color-bg-secondary);
+	}
+
+	ul#typescales li div {
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	ul#typescales li b {
+		font-size: 13px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	#about-tsg .btn-text-open {
@@ -131,21 +324,36 @@
 	}
 
 	#about-tsg .content {
-		padding-top: 20px;
-		overflow: hidden;
-		height: 0;
+		display: none;
+		flex-direction: column;
+		gap: 8px;
+		padding-top: 10px;
 	}
 
 	#about-tsg.open .content {
-		height: unset;
+		display: flex;
+	}
+
+	textarea#jsonStyles {
+		font-family: monospace;
+		padding: 10px;
+		height: 110px;
+		resize: none;
+		border-radius: 6px;
+		border: 1px solid var(--figma-color-border);
+		background-color: var(--figma-color-bg);
+		color: var(--figma-color-text);
+	}
+
+	.support {
+		font-size: 11px;
+		color: var(--figma-color-text-secondary);
 	}
 
 	.btns-group {
 		margin-top: auto;
-		align-self: flex-end;
 		display: flex;
-		justify-self: stretch;
-		gap: 20px;
 		justify-content: flex-end;
+		gap: 12px;
 	}
 </style>
