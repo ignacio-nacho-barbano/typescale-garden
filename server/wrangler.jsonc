@@ -23,6 +23,29 @@
 			"migrations_dir": "migrations"
 		}
 	],
+	// The Google Fonts catalogue snapshot, refreshed by the Cron Trigger below and
+	// served as GET /api/fonts. Replaced the committed client/static/fonts-data.json,
+	// which could only be updated by a Pages rebuild. See src/fonts/snapshot.ts.
+	//
+	// KV and not D1: the payload is ~1.9 MB and growing (1951 families in July 2026),
+	// against a 2,000,000-byte ceiling on a D1 row and 25 MiB on a KV value.
+	"kv_namespaces": [
+		{
+			"binding": "FONTS",
+			"id": "0ac3373f7cf8459c8dffef715765cc46",
+			"preview_id": "00d48d5a982747579315b0743752d6bb"
+		}
+	],
+	// Daily refresh. 04:17 UTC — off the hour to avoid the cron thundering herd, and
+	// outside Montevideo waking hours.
+	//
+	// NOTE: `wrangler deploy` only PUTs the schedule when `crons` is set, so deleting
+	// this block does NOT remove the trigger — do that in the dashboard.
+	// Locally, `wrangler dev` does not fire crons; trigger one by hand with
+	// `curl "http://localhost:8787/cdn-cgi/handler/scheduled"`.
+	"triggers": {
+		"crons": ["17 4 * * *"]
+	},
 	// Non-sensitive, client-public config. Read via process.env under nodejs_compat.
 	// Secrets (JWT_SECRET, SESSION_SECRET) are NOT here — set them with
 	// `wrangler secret put <NAME>` (prod) or in .dev.vars (local).

@@ -4,6 +4,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import logger from "morgan";
+import { refreshFontsSnapshot, serveFontsSnapshot } from "./fonts/snapshot";
 import { MainRouter } from "./routes";
 import { APP_PORT, CLIENT_ORIGIN } from "./secrets";
 import { loadErrorHandlers } from "./utils";
@@ -56,4 +57,33 @@ app.listen(APP_PORT, () => {
 
 // Bridge the Express server into the Workers runtime. The port must match the
 // one passed to app.listen above.
-export default httpServerHandler({ port: APP_PORT });
+const nodeBridge = httpServerHandler({ port: APP_PORT });
+
+// The Node bridge only ever gives us a `fetch`, so a Cron Trigger needs a handler
+// object of our own that delegates to it. Wrapping rather than spreading
+// `httpServerHandler(...)` also lets a route be answered before Express sees it,
+// which /api/fonts relies on.
+//
+// Do NOT reach for the lower-level `handleAsNodeRequest` to do this instead: it
+// exists at runtime but is absent from @cloudflare/workers-types and the generated
+// worker-configuration.d.ts, so it breaks `npm run check`.
+export default {
+	async fetch(request, env, ctx) {
+		// The fonts snapshot is served here rather than as an Express route: helmet's
+		// Cross-Origin-Resource-Policy header would block the client's cross-origin
+		// read, and Express's weak ETag would hash ~1.9 MB per request. See
+		// src/fonts/snapshot.ts.
+		const url = new URL(request.url);
+		if (request.method === "GET" && url.pathname === "/api/fonts") {
+			return serveFontsSnapshot(request, ctx);
+		}
+
+		return nodeBridge.fetch!(request, env, ctx);
+	},
+	// Daily Google Fonts refresh — schedule lives in wrangler.jsonc. The runtime
+	// awaits this promise, so no ctx.waitUntil is needed. Throwing is the intended
+	// failure mode: it leaves the last good snapshot in KV.
+	async scheduled() {
+		await refreshFontsSnapshot();
+	}
+} satisfies ExportedHandler<Env>;
