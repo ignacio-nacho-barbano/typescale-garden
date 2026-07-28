@@ -1,0 +1,16 @@
+{
+	// Type-checks the tests without emitting them. Separate from tsconfig.json so
+	// the published dist/ never contains fixtures, and so vitest's globals stay out
+	// of the library's own type environment.
+	"extends": "./tsconfig.json",
+	"include": ["./src"],
+	"exclude": [],
+	"compilerOptions": {
+		"noEmit": true,
+		// No `types` override: it would have to restate the base config's
+		// ["plugin-typings"], and `typeRoots` is inherited too, so a bare
+		// "vitest/globals" here no longer resolves. The tests import describe/expect/it
+		// from "vitest" explicitly, so the globals package is not needed at all.
+		"resolveJsonModule": true
+	}
+}

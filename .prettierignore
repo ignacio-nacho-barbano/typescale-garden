@@ -14,3 +14,11 @@ yarn.lock
 
 # Turborepo
 .turbo
+
+# Compiled output (core/dist, services/dist) — generated, and already gitignored
+dist
+
+# Captured golden fixtures: 200KB of machine-written JSON. Reformatting it to
+# 100 columns on every `npm run format` is pure churn, and it is only ever
+# regenerated wholesale.
+core/src/__tests__/fixtures/golden.json

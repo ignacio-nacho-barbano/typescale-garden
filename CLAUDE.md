@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Typescale Garden (https://typescalegarden.uy) helps designers build typographic scales for a design
 system. An npm-workspaces monorepo, task-run by **Turborepo** (`turbo.json` at the root, plus
-per-package `turbo.json` overrides), with four packages — the workspace names are the short directory
-names (`client`, `server`, `plugin`, `services`), which is what `--filter` takes:
+per-package `turbo.json` overrides), with five packages — the workspace names are the short directory
+names (`client`, `core`, `server`, `plugin`, `services`), which is what `--filter` takes:
 
+- `core/` — the typescale math, the CSS/token generators and the shared types. Pure and
+  runtime-agnostic; see "The scale itself lives in core/" below.
 - `client/` — SvelteKit 4 app, the actual tool. Computes the scale and exports it as CSS or as Figma
   design tokens (JSON). Deployed to Cloudflare Pages (`@sveltejs/adapter-cloudflare`).
 - `server/` — Express app running **as a Cloudflare Worker**, backed by **D1**. Stores users' saved
@@ -24,9 +26,9 @@ From the repo root — these fan out through turbo to every package that defines
 
 ```bash
 npm run build             # client bundle, worker dry-run, plugin code.js, services dist
-npm run check             # type check everything (svelte-check, tsc --noEmit ×3)
+npm run check             # type check everything (svelte-check, tsc --noEmit ×5)
 npm run lint              # eslint / prettier per package
-npm test                  # vitest, single non-watch pass (only client has tests)
+npm test                  # vitest, single non-watch pass (only client and core have tests)
 npm run dev               # every dev server at once
 npm run client            # turbo run dev --filter=client   → vite dev --host
 npm run server            # turbo run dev --filter=server   → wrangler dev
@@ -85,7 +87,53 @@ prettier drift).
 
 ## Architecture
 
-### The scale lives in `client/src/stores/config.ts`
+### The scale itself lives in `core/`
+
+`core/` owns the computation: `buildTypescale` (sizes, line heights, letter spacing),
+`availableWeightsFor` / `clampHeadingWeights` / `weightStepsFor` / `distributeWeights`,
+`generateCss`, `buildTokens` / `generateTokens`, and `computeTypescale` — the composed
+`base + availableWeights → scale` entry point for consumers that just want the answer. The shared
+types (`TypescaleBase`, `Typescale`, `TypeVariant`, `ApiFont`, `DesignTokenSet`) live here too.
+
+It exists so the client is not the only thing that can compute a scale — the Figma plugin and the
+Worker need the same answers, byte for byte. Rules that keep it usable from all three:
+
+- **Almost no ambient globals.** `tsconfig.json` pins `types` to exactly one entry:
+  `plugin-typings`. No Node, no DOM, no Svelte. The Figma exception is deliberate — the design tokens
+  exist to be imported into Figma, so `DesignTokenTextStyle` is a
+  `Pick<TextStyle, "type" | "name" | "fontName" | "textCase" | "letterSpacing" | "lineHeight" | "fontSize">`
+  rather than a parallel interface that can drift from Figma's API. It is a `Pick` and not the whole
+  thing because `TextStyle` also carries a live style node's identity surface (`id`, `key`,
+  `consumers`, `getStyleConsumersAsync()`), which a token payload cannot supply; picking only the
+  emitted fields is what removes the four `@ts-ignore`s the original `generateTokens` needed. Widen a
+  token by adding a field name to that `Pick`. Types only — plugin-typings emits no runtime code, so
+  nothing reaches any consumer's bundle.
+  - **Caveat, worth knowing before you use tokens somewhere new:** `TextStyle` is an ambient global,
+    so `DesignTokenSet` is only type-safe in packages that have plugin-typings in scope — `core`,
+    `plugin`, and `client` (which picks it up through the root `typeRoots`). In a package that does
+    not, such as `server` with its explicit `types: ["node"]`, `skipLibCheck` hides the unresolved
+    name and the type silently degrades to `any` instead of erroring. That is harmless today because
+    tokens are generated in the plugin and the Worker never touches them; if the server ever does,
+    add `"plugin-typings"` to its `types`.
+- **No side effects.** `findFont` returns `undefined` instead of showing a notification;
+  `clampHeadingWeights` returns what the weights _should_ be instead of setting a store. Callers own
+  the effects.
+- **`module: Node16`, so relative imports carry `.js` extensions.** Extensionless ESM would be fine
+  for vite/esbuild but invalid for Node, and `services`/`server` are on TS 7 with NodeNext
+  resolution.
+- **Behaviour is pinned by golden fixtures** at `core/src/__tests__/fixtures/golden.json`, captured
+  from the pre-extraction client store graph. `cssCode` and `designTokens` are asserted as exact
+  strings because users copy, download and diff them. Two quirks are preserved on purpose and are
+  _not_ bugs to fix: sizes round to the nearest even pixel, and `body { font-weight }` in the
+  generated CSS is the _lowest_ weight (the original sorted its `weights` argument in place and then
+  read index 0). Structured values are compared through a JSON round trip, because the fixtures
+  cannot represent `-0` or `undefined`-valued keys.
+
+> **Transitional:** `core/` is built and tested but not yet imported anywhere — the client still
+> carries its own copy of the math in the files listed below. Rewiring it is the next change; until
+> then the two must be kept in step, and the golden fixtures are what proves they are.
+
+### The client's store graph in `client/src/stores/config.ts`
 
 This is the heart of the app. It is a graph of Svelte writables (baseSize, baseUnit, desktopRatio,
 mobileRatio, letterSpacingRatio, heading weights, …) feeding a chain of `derived` stores:

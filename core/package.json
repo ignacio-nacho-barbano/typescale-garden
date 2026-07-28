@@ -1,0 +1,32 @@
+{
+	"name": "core",
+	"version": "1.0.0",
+	"private": true,
+	"description": "The typescale math, token/CSS generators and shared types — pure, runtime-agnostic, shared by client, plugin and services",
+	"license": "GPL-3.0",
+	"type": "module",
+	"sideEffects": false,
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc -p ./tsconfig.json",
+		"dev": "tsc -p ./tsconfig.json --watch",
+		"check": "tsc -p ./tsconfig.json --noEmit && tsc -p ./tsconfig.test.json --noEmit",
+		"test": "vitest --run",
+		"test:watch": "vitest"
+	},
+	"devDependencies": {
+		"@figma/plugin-typings": "^1.88.0",
+		"typescript": "^5.9.3",
+		"vitest": "^1.6.1"
+	}
+}

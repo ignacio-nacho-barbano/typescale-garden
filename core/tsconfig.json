@@ -1,0 +1,41 @@
+{
+	// Deliberately does NOT extend ../tsconfig.json: the root config's `paths` and
+	// `typeRoots` exist for the apps, and core must not inherit them.
+	"include": ["./src"],
+	"exclude": ["./src/__tests__"],
+	"compilerOptions": {
+		"target": "ES2020",
+		// ES2022 is needed for Array.prototype.at — the typescale math indexes with
+		// NEGATIVE positions (sortedWeights.at(-1), .at(location) where location is
+		// -1/-2), and `at` is a lib method, not syntax, so `target` will not supply it.
+		"lib": ["ES2022"],
+		// Node16, not ESNext/Bundler. Emitting extensionless relative imports would be
+		// fine for vite/esbuild but INVALID Node ESM, so `services` and `server` (both
+		// on TS 7 with NodeNext resolution) would fail to resolve core's internals.
+		// The cost is writing `.js` suffixes in the source; every consumer accepts them.
+		"module": "Node16",
+		"moduleResolution": "Node16",
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"strict": true,
+		// core is transpiled per-file by esbuild (plugin) and vite (client), so the
+		// source has to be safe for single-file emit.
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
+		"noEmitOnError": true,
+		"skipLibCheck": true,
+		// Purity is still the rule — no @types/node, no DOM, no Svelte. The one
+		// exception is @figma/plugin-typings, because the design tokens are defined
+		// as a Pick of Figma's own TextStyle (see models/tokens.ts): the tokens exist
+		// to be imported into Figma, so tracking that interface is the point rather
+		// than a leak. Note it is TYPES ONLY — plugin-typings emits no runtime code,
+		// so nothing reaches any consumer's bundle.
+		"types": ["plugin-typings"],
+		// Needed for the bare name "plugin-typings" above to resolve; npm hoists the
+		// package to the repo root.
+		"typeRoots": ["../node_modules/@figma"]
+	}
+}
