@@ -55,6 +55,17 @@
 	}
 }
 
+@keyframes skeleton-pulse {
+	0%,
+	100% {
+		opacity: 0.35;
+	}
+
+	50% {
+		opacity: 0.7;
+	}
+}
+
 .fade-in {
 	animation: fade 600ms both;
 }

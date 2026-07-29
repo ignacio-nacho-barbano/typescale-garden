@@ -7,6 +7,7 @@
 	import Icon from "./Icon.svelte";
 	import Switch from "./Switch.svelte";
 	import UserControls from "./UserControls.svelte";
+	import UserControlsSkeleton from "./UserControlsSkeleton.svelte";
 	import { logIn } from "../functions";
 </script>
 
@@ -31,7 +32,14 @@
 		<Switch size="s" name="mobile-view" label="Mobile View" bind:value={$mobileView} />
 	</div>
 
-	{#if $authState.isAuthenticated}
+	<!--
+		Three branches, not two: until the silent login answers we know nothing, and
+		rendering the log-in buttons in that gap flashes "logged out" at users who are
+		not. The SSR pass always lands here, since auth is browser-only.
+	-->
+	{#if $authState.isResolving}
+		<UserControlsSkeleton />
+	{:else if $authState.isAuthenticated}
 		<UserControls />
 	{:else}
 		<Button
