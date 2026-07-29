@@ -14,10 +14,16 @@ import {
  * storage or the Figma document happens here; ui.html is presentation only and talks
  * to this file over postMessage.
  *
- * Network calls run here rather than in the iframe on purpose: Figma's sandbox `fetch`
- * is not browser-CORS-governed (the manifest's `networkAccess.allowedDomains` is what
- * gates it), so no preflight and no origin allowlist is involved. It also keeps the
- * bearer token out of the iframe entirely — the UI never sees a credential.
+ * Network calls run here rather than in the iframe on purpose: it keeps the bearer
+ * token out of the iframe entirely, so the UI never sees a credential.
+ *
+ * It does NOT exempt them from CORS, which an earlier version of this comment claimed.
+ * `networkAccess.allowedDomains` gates the request on Figma's side, but in the browser
+ * build this sandbox is itself a `data:` iframe, so requests go out with `Origin: null`
+ * and the browser still requires Access-Control-Allow-Origin on the response. Every
+ * endpoint reached from here is listed in `PLUGIN_REACHABLE_PATHS` in
+ * server/src/index.ts, which is what makes it answer `*`; adding a new one without
+ * adding it there works in the desktop app and fails in the browser.
  */
 
 // No env system in a Figma plugin, so this is a constant. Point it at

@@ -245,12 +245,25 @@ For **reading saved typescales** there now is one, via a pairing code — see be
 both that list and `API_BASE` in `code.ts` (a plugin has no env system).
 
 `code.ts` is the whole application — network, stored token, all document access — and `ui.html` is
-presentation talking to it over `postMessage`. Two reasons the fetches live in the sandbox rather
-than the iframe: Figma's sandbox `fetch` is not browser-CORS-governed (the manifest gates it
-instead, so no preflight and no origin allowlist), and it keeps the bearer token out of the iframe
-entirely. An unpaired install lists the community defaults rather than showing a login wall, and a
-401 — the connection was revoked from the website — drops the token and quietly degrades to those
-defaults.
+presentation talking to it over `postMessage`. The fetches live in the sandbox rather than the iframe
+to keep the bearer token out of the iframe entirely — the UI never sees a credential. An unpaired
+install lists the community defaults rather than showing a login wall, and a 401 — the connection was
+revoked from the website — drops the token and quietly degrades to those defaults.
+
+**The sandbox is not exempt from CORS**, which earlier versions of this file and of `code.ts` both
+claimed. `networkAccess.allowedDomains` gates the request on Figma's side, but in the **browser**
+build the sandbox is itself a `data:` iframe, so requests go out with the literal `Origin: null` and
+the browser still demands `Access-Control-Allow-Origin` on the response. Only the desktop app skips
+that check, which is why this shipped looking fine. Every endpoint the plugin reaches is therefore
+listed in `PLUGIN_REACHABLE_PATHS` in `server/src/index.ts`, which makes those routes answer `*`
+rather than the origin allowlist; adding a new one without adding it there works on the desktop and
+fails in the browser.
+
+**Nothing in `ui.html` may load a subresource,** for the same manifest reason from the other side:
+Figma derives the UI iframe's CSP from `allowedDomains`, so a webfont, stylesheet or image from any
+other host is blocked. The UI used to `@import` Red Hat Text from fonts.googleapis.com and silently
+fell back; it now uses the system UI stack. Widening `allowedDomains` for presentation is the wrong
+trade — that field is what Figma review reads most closely.
 
 **The plugin derives `availableWeights` itself** from `GET /api/fonts`, rather than the API
 precomputing it. The Worker deliberately never parses that payload (see the fonts snapshot section:
@@ -306,9 +319,10 @@ expiresAt > now`. SQLite picks the winner, so concurrent submissions of the same
 **Testing this locally needs two env changes**, because the web app talks to the Worker for the first
 time on this path: `PUB_API_URL` points at `http://localhost:3000` while `wrangler dev` listens on
 **8787**, and `ALLOWED_ORIGINS` in `src/index.ts` does not include `http://localhost:5173`, so the
-browser will report a CORS error. The redeem side needs neither — Figma's sandbox `fetch` is not
-CORS-governed (it enforces `manifest.networkAccess` instead), and it can be exercised with `curl` by
-seeding a row into `plugin_pairing_codes` with a hash you compute yourself.
+browser will report a CORS error. The redeem side can be exercised with `curl` — which sends no
+`Origin` at all, so it will not reproduce the browser-Figma CORS behaviour described above — by
+seeding a row into `plugin_pairing_codes` with a hash you compute yourself. Reproducing that
+behaviour needs Figma in a browser, or a request with `Origin: null` set by hand.
 
 ### Server on Workers — the constraints that shaped it
 
@@ -323,8 +337,11 @@ deliberately — read the comments in `src/index.ts` before re-adding anything:
 - MongoDB's driver keeps background monitors alive across requests → storage moved to D1.
 
 CORS origins are an explicit allowlist in `src/index.ts`; a missing entry surfaces in the browser as
-an opaque "CORS error", so add new client hosts there. The one exception is `GET /api/fonts` — see
-below.
+an opaque "CORS error", so add new client hosts there. Two things sit outside the allowlist, both on
+purpose: `GET /api/fonts` (see below), and the routes in `PLUGIN_REACHABLE_PATHS`, which answer `*`
+because the Figma plugin's origin is the literal `null` and cannot be allowlisted. That list is
+mounted _before_ the allowlist `cors()` — the strict one terminates preflights itself, so it would
+otherwise answer a null-origin `OPTIONS` with no headers before the permissive one ran.
 
 ### The Google Fonts snapshot
 

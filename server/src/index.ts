@@ -35,6 +35,31 @@ const ALLOWED_ORIGINS = [
 	"https://typescale-garden.netlify.app"
 ];
 
+// The Figma plugin is not an origin that can be allowlisted. In the browser build of
+// Figma, plugin code runs inside a sandboxed `data:` iframe, so its requests arrive
+// with the literal `Origin: null` and are subject to CORS exactly like a web page's.
+// (Only the desktop app's sandbox is exempt, which is why this failed for some users
+// and not others.) Echoing `null` back would grant every other sandboxed document the
+// same access, so these routes answer `*` instead — safe because nothing in the API is
+// cookie-authenticated: the plugin sends a bearer token in a header, and `*` is
+// incompatible with credentialed requests by construction.
+//
+// Listed route by route rather than as the whole `/api/plugin` prefix: the pairing-code
+// and connection-management routes there are reached from the web app only, and they
+// stay behind the allowlist above. `GET /api/fonts` needs no entry — it never reaches
+// Express and sets its own `*` (see src/fonts/snapshot.ts).
+const PLUGIN_REACHABLE_PATHS = [
+	"/api/typescales/default", // unpaired installs list the community defaults
+	"/api/plugin/tokens", // redeeming a pairing code
+	"/api/plugin/typescales" // reading the user's own scales
+];
+
+// Order matters: the strict `cors()` below terminates preflights itself
+// (`preflightContinue` defaults to false), so it would answer OPTIONS for a null
+// origin with no headers before this ever ran. On non-preflight requests both run, and
+// the later one overwrites Access-Control-Allow-Origin when the origin *is* allowlisted
+// — so the web app keeps getting its own origin echoed on these paths, not `*`.
+app.use(PLUGIN_REACHABLE_PATHS, cors({ origin: "*" }));
 app.use(cors({ origin: ALLOWED_ORIGINS }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
