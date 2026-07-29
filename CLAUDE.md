@@ -27,6 +27,33 @@ the Worker's `scheduled` handler — so it was deleted along with the `@services
 
 ## Commands
 
+### `package-lock.json` is committed, and has to stay that way
+
+It used to be gitignored, which broke the Cloudflare Pages build for the client: Pages runs a bare
+`npm install`, so with no lockfile it resolved the tree from scratch and hit `ERESOLVE`. Two of the
+client's devDependencies declare peers this repo has outgrown —
+`@sveltejs/vite-plugin-svelte@3` peers `vite@^5` while the client is on `vite@^8`, and
+`@typescript-eslint@5` peers `eslint@^6 || ^7 || ^8` while the client is on `eslint@^10`. Neither can
+be fixed by upgrading: the first `vite-plugin-svelte` that accepts vite 8 is 7.x, which requires
+**Svelte 5** (the client is on 4), and downgrading vite to 5 would break `vitest@4`, whose peer is
+`^6 || ^7 || ^8`.
+
+A local `node_modules` never notices, because npm resolves the conflict positionally — vite 5 and
+eslint 8 hoisted to the root to satisfy the stale peers, vite 8 and eslint 10 nested under
+`client/node_modules`. The lockfile records exactly that arrangement, and installing _from_ it is
+conflict-free even on npm 9. So the lockfile is the only thing making CI reproduce a working tree.
+Consequences:
+
+- **Don't re-ignore it, and commit it whenever it changes.**
+- `npm install <new-package>` can force a re-resolve and resurrect the `ERESOLVE`. If that happens,
+  the fix is upstream (Svelte 5 + `vite-plugin-svelte@7`; eslint flat config + `typescript-eslint@8`),
+  not `--legacy-peer-deps`.
+- The eslint half of this is the same root cause as the known `client#lint` failure below: eslint 10
+  dropped `.eslintrc` support entirely, so `client/.eslintrc.cjs` cannot load.
+
+`.node-version` pins **22.20.0** for the same build. Pages otherwise defaults to node 18.17.1, which
+is below the engines of vite 8 (`^20.19.0 || >=22.12.0`), vitest 4 and eslint 10.
+
 From the repo root — these fan out through turbo to every package that defines the script:
 
 ```bash
