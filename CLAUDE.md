@@ -51,8 +51,32 @@ Consequences:
 - The eslint half of this is the same root cause as the known `client#lint` failure below: eslint 10
   dropped `.eslintrc` support entirely, so `client/.eslintrc.cjs` cannot load.
 
-`.node-version` pins **22.20.0** for the same build. Pages otherwise defaults to node 18.17.1, which
-is below the engines of vite 8 (`^20.19.0 || >=22.12.0`), vitest 4 and eslint 10.
+### The Cloudflare Pages build does not go through turbo
+
+Pages is configured with **`client/` as the root directory** and `npm run build` as the build command,
+under what its log calls the "v2 root directory strategy": it installs at the **repo root** (so
+workspaces resolve) but runs the build command **inside `client/`**. So the thing Pages executes is
+`client`'s own `build` script — `vite build` — and turbo, along with its `dependsOn: ["^build"]` edge,
+never runs. Two consequences, both of which bit a real deploy:
+
+- **`core` must be built by `client#build` itself.** `core`'s `exports` map points at `dist/`, which is
+  gitignored, so without turbo the client build died on
+  `Rolldown failed to resolve import "core"`. Hence `client`'s **`prebuild`** script,
+  `npm run build --prefix ../core`. It is deliberately an npm lifecycle hook rather than a turbo task,
+  because npm is the only thing Pages invokes. The cost is that `turbo run build` builds `core` twice —
+  once as client's declared dependency, once again via `prebuild` — which is wasted time but not
+  incorrect. It also means `cd client && npm run build` works standalone, which it previously did not.
+- **The node version file must live in `client/`, not the repo root.** Pages reads it from the
+  configured root directory; a `.node-version` at the repo root was committed, ignored, and the build
+  ran on node 18.17.1 anyway, where vite 8's rolldown dies on
+  `'node:util' does not provide an export named 'styleText'`. `client/.node-version` is the one Pages
+  honours; the copy at the repo root is only there for local version managers. Both pin **22.20.0** —
+  above the engines of vite 8 (`^20.19.0 || >=22.12.0`), eslint 10 (`^22.13.0`) and wrangler
+  (`>=22.0.0`). Keep the two in step, or set `NODE_VERSION` in the Pages dashboard instead.
+
+Switching the Pages build command to `npx turbo run build --filter=client` would make both of these
+unnecessary (it works from `client/`, and builds `core` first through the task graph) and would give
+the deploy turbo's cache. The committed setup avoids depending on a dashboard change.
 
 From the repo root — these fan out through turbo to every package that defines the script:
 

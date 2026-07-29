@@ -5,6 +5,7 @@
 	"license": "GPL-3.0",
 	"scripts": {
 		"dev": "vite dev --host",
+		"prebuild": "npm run build --prefix ../core",
 		"build": "vite build",
 		"wrangler": "npx wrangler pages dev .svelte-kit/cloudflare",
 		"build:wrangler": "vite build && npx wrangler pages dev .svelte-kit/cloudflare",
