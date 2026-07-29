@@ -1,6 +1,10 @@
 // Generated from code.ts by `npm run build` (plugin/build.mjs). Do not edit by hand.
 "use strict";
 (() => {
+  var __defProp = Object.defineProperty;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+
   // ../core/dist/constants/variants.js
   var headingPrefix = "title-";
   var VARIANTS = [
@@ -197,7 +201,7 @@
   var ApiError = class extends Error {
     constructor(status, message) {
       super(message);
-      this.status = status;
+      __publicField(this, "status", status);
       this.name = "ApiError";
     }
   };
@@ -214,7 +218,7 @@
   }
   async function loadTypescales() {
     postState({ signedIn: false, typescales: [], busy: true });
-    let token = await getToken();
+    const token = await getToken();
     if (token) {
       try {
         const { typescales } = await apiGet(
@@ -227,7 +231,6 @@
       } catch (error) {
         if (error instanceof ApiError && error.status === 401) {
           await figma.clientStorage.deleteAsync(TOKEN_KEY);
-          token = null;
           figma.notify("This Figma plugin was disconnected from your account.");
         } else {
           console.error(error);

@@ -120,7 +120,7 @@ function toListed(typescale: Typescale): ListedTypescale {
 async function loadTypescales(): Promise<void> {
 	postState({ signedIn: false, typescales: [], busy: true });
 
-	let token = await getToken();
+	const token = await getToken();
 
 	if (token) {
 		try {
@@ -133,8 +133,9 @@ async function loadTypescales(): Promise<void> {
 			return;
 		} catch (error) {
 			if (error instanceof ApiError && error.status === 401) {
+				// Only clientStorage needs clearing — `token` is never read past this point, so
+				// nulling the local would be dead (eslint's no-useless-assignment catches it).
 				await figma.clientStorage.deleteAsync(TOKEN_KEY);
-				token = null;
 				figma.notify("This Figma plugin was disconnected from your account.");
 			} else {
 				console.error(error);

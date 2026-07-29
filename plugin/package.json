@@ -1,6 +1,6 @@
 {
 	"name": "plugin",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"private": true,
 	"description": "An import tool for typescale-garden",
 	"main": "code.js",
@@ -18,12 +18,12 @@
 		"core": "*"
 	},
 	"devDependencies": {
+		"@eslint/js": "^10.0.1",
 		"@figma/eslint-plugin-figma-plugins": "^0.14.0",
 		"@figma/plugin-typings": "^1.88.0",
-		"@typescript-eslint/eslint-plugin": "^8.65.0",
-		"@typescript-eslint/parser": "^8.65.0",
-		"esbuild": "^0.24.2",
-		"eslint": "^8.57.0",
-		"typescript": "^6.0.3"
+		"esbuild": "^0.28.1",
+		"eslint": "^10.8.0",
+		"typescript": "^6.0.3",
+		"typescript-eslint": "^8.65.0"
 	}
 }

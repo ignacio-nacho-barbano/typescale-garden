@@ -9,6 +9,11 @@
 	"observability": {
 		"enabled": true
 	},
+	// NOTE: do NOT pin `dev.port` to 3000 to match APP_PORT / PUB_API_URL. Under
+	// nodejs_compat the `app.listen(APP_PORT)` in src/index.ts binds a *real* socket, so
+	// workerd already owns 127.0.0.1:3000 by the time wrangler tries to open its own dev
+	// server there, and startup dies with "Address already in use". `wrangler dev` has to
+	// stay on a different port (8787 by default); point PUB_API_URL at that instead.
 	// Typescale storage. Replaced MongoDB Atlas — see migrations/ for the schema
 	// and scripts/export-atlas.mjs for the one-off data transfer.
 	//

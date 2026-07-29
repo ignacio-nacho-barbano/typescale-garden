@@ -1,6 +1,8 @@
 {
 	// "extends": "../tsconfig.json",
-	"include": ["./code.ts", "./.eslintrc.cjs"],
+	// code.ts is the only source file. The old `.eslintrc.cjs` entry went with the flat-config
+	// migration; eslint.config.mjs is not type checked (it is in the config's own `ignores`).
+	"include": ["./code.ts"],
 	"compilerOptions": {
 		"target": "ESNext",
 		"lib": ["ES2023"],

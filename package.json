@@ -13,6 +13,7 @@
 		"dev": "turbo run dev",
 		"client": "turbo run dev --filter=client",
 		"server": "turbo run dev --filter=server",
+		"plugin": "turbo run dev --filter=plugin",
 		"deploy:server": "turbo run deploy --filter=server",
 		"format": "prettier --plugin-search-dir . --write .",
 		"format:check": "prettier --plugin-search-dir . --check ."
@@ -48,8 +49,10 @@
 		"iconv-lite": "^0.6.3"
 	},
 	"allowScripts": {
+		"esbuild@0.28.1": true,
 		"esbuild@0.24.2": true,
-		"esbuild@0.21.5": true
+		"esbuild@0.21.5": true,
+		"esbuild@0.17.19": true
 	},
 	"devDependencies": {
 		"turbo": "2.10.7"
