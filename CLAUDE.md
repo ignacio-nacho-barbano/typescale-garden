@@ -376,7 +376,11 @@ is treated as production.
 Prettier with **tabs**, double quotes, no trailing commas, 100 columns (`.prettierrc`). Client styles
 are SCSS; `client/src/scss/design-system.scss` is auto-injected into every component's styles by the
 vite config, so its variables/mixins are available without importing, and CSS custom properties
-(`--size-*`, `--c-*`) are the design tokens for the UI itself.
+(`--size-*`, `--c-*`) are the design tokens for the UI itself. That injected `@use` carries an
+**absolute** path, computed from `import.meta.url` — vite 8 compiles SCSS with sass's modern API,
+which resolves a relative `@use` against the importing stylesheet rather than the project root, so
+the relative path it used to carry failed for every file not sitting at `client/` and broke the
+build. Details in the comment in `client/vite.config.ts`.
 
 `.claude/worktrees/` contains stale snapshots of an older (Express-on-Fly, Prisma/Mongo) layout —
 ignore them when searching; they are not the current code.

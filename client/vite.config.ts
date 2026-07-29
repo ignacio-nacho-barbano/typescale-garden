@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vitest/config";
 import { imagetools } from "vite-imagetools";
@@ -17,11 +18,18 @@ export default defineConfig({
 	css: {
 		preprocessorOptions: {
 			scss: {
-				additionalData: `
-				@use 'sass:map' as *;
-                @use './src/scss/design-system' as *;
-
-                `
+				// design-system.scss is injected into every component's styles so its variables and
+				// mixins need no import. The path is **absolute** on purpose. Vite 8 compiles SCSS
+				// through sass's modern compiler API, where a relative `@use` resolves against the
+				// stylesheet doing the importing, not the project root — so the `./src/scss/…` this
+				// used to carry resolved only for a stylesheet sitting at client/, and broke the
+				// build under vite 8 for src/scss/global.scss and for every component under
+				// src/routes. A bare specifier plus `loadPaths` does not work either: vite installs
+				// its own importer as sass's entrypoint importer, so the specifier is canonicalized
+				// by vite's resolver and never reaches sass's load paths.
+				additionalData: `@use "sass:map" as *;\n@use "${fileURLToPath(
+					new URL("./src/scss/design-system.scss", import.meta.url)
+				)}" as *;\n`
 			}
 		}
 	}
