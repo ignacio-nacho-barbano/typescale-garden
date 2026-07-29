@@ -91,3 +91,17 @@ $sd9: var(--size-9);
 @mixin shadow-high {
 	box-shadow: var(--shadow-elevation-high);
 }
+
+/// Placeholder shape for content that has not resolved yet. Pulses, unless the user
+/// asked for less motion, in which case it holds a flat mid tone.
+/// `skeleton-pulse` is declared in animations.scss.
+@mixin skeleton {
+	background: $c-accent;
+	border-radius: $s3;
+	animation: skeleton-pulse 1600ms ease-in-out infinite;
+
+	@media (prefers-reduced-motion: reduce) {
+		animation: none;
+		opacity: 0.45;
+	}
+}
