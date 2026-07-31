@@ -43,7 +43,13 @@
 <style lang="scss">
 	.modal {
 		margin: auto;
-		height: calc(100vh - 5vh);
+		// A cap, not a fixed height: a short modal (the pairing one) should be as tall as
+		// its content rather than a 95vh box with everything crammed at the top, and a
+		// tall one (the export code) still gets the whole viewport minus the margin.
+		// `fit-content` and not `auto`: a modal <dialog> is `position: fixed; inset: 0`,
+		// so `height: auto` resolves against that and fills the viewport regardless.
+		height: fit-content;
+		max-height: calc(100vh - 5vh);
 		flex-direction: column;
 		padding: $sd5;
 		border-radius: $s5;
@@ -64,7 +70,10 @@
 
 	.title-bar {
 		display: flex;
-		flex: 1 1;
+		// Natural height. It used to be `flex: 1 1`, which made the header absorb every
+		// spare pixel of the dialog and pushed the content down by whatever was left over
+		// — a ~140px gap under the title in any modal whose content does not itself grow.
+		flex: 0 0 auto;
 		justify-content: space-between;
 		margin-bottom: $s4;
 		gap: $sd6;
@@ -72,6 +81,11 @@
 	.content {
 		display: flex;
 		flex-direction: column;
+		// Takes the leftover height and is allowed to be shorter than its contents, so
+		// whatever inside it declares `overflow: auto` becomes the scroller instead of
+		// the content spilling out of the dialog.
+		flex: 1 1 auto;
+		min-height: 0;
 		overflow: hidden;
 	}
 </style>
