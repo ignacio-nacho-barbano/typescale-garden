@@ -433,5 +433,16 @@ which resolves a relative `@use` against the importing stylesheet rather than th
 the relative path it used to carry failed for every file not sitting at `client/` and broke the
 build. Details in the comment in `client/vite.config.ts`.
 
+`client/vite.config.ts` carries two other workarounds for the same underlying bind — vite 8 pinned
+against `@sveltejs/vite-plugin-svelte@3` and Svelte 4. Both are load-bearing and commented at length
+in the file; **`pinKitToSvelte4`** and **`keepInlineQueryOnSvelteStyles`**. The second is what makes
+`npm run dev` work at all: SvelteKit's dev server inlines component CSS by re-requesting each style
+module with `?inline`, vite-plugin-svelte 3 rebuilds `type=style` ids from scratch and throws that
+query away, and vite ≥6 no longer hands a server-consumer environment the CSS string unless the id
+still carries the flag — so every request answered `500 TypeError: css is not a function` from inside
+`kit/src/runtime/server/page/render.js`. The plugin re-attaches `inline` after the resolve, splicing
+it in _before_ `lang.css` because vite gates its CSS pipeline on `/\.(css|…)(?:$|\?)/`. This was never
+turbo-specific; `npm run client` and a bare `cd client && npm run dev` failed identically.
+
 `.claude/worktrees/` contains stale snapshots of an older (Express-on-Fly, Prisma/Mongo) layout —
 ignore them when searching; they are not the current code.

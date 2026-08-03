@@ -49,6 +49,68 @@ function pinKitToSvelte4(): Plugin {
 	};
 }
 
+// `vite dev` answered `500 TypeError: css is not a function` on every request without this.
+//
+// To avoid a flash of unstyled content, SvelteKit's dev server inlines component CSS into the SSR'd
+// document. `kit/src/exports/vite/dev/index.js` does it by walking the SSR module graph for CSS deps
+// and re-requesting each one with `?inline` bolted on:
+//
+//   dep.url.replace("?", "?inline&")   →  Foo.svelte?inline&svelte&type=style&lang.css
+//   styles[dep.url] = (await vite.ssrLoadModule(inlineCssUrl)).default
+//
+// then `kit/src/runtime/server/page/render.js` treats each value as a string, or else calls it as a
+// function. Under vite 8 the value is `undefined`, so it calls `undefined(...)` — hence the message,
+// which names neither CSS nor the file it failed on.
+//
+// It is `undefined` because two upstream changes meet here:
+//
+//  1. Vite's css-post transform used to special-case SSR *ahead* of `?inline`, so any CSS module
+//     loaded on the server got `export default "<css>"` whether or not it was asked for inline.
+//     Vite 6 dropped that branch; a server-consumer environment now gets a bare `export {}` unless
+//     the id itself carries `?inline`. (Plain `.css` files still work — `src/scss/global.scss` is
+//     inlined fine — because their ids reach that transform untouched.)
+//  2. `@sveltejs/vite-plugin-svelte@3` resolves every `type=style` request to a canonical id built
+//     from scratch by `createVirtualImportId` — `${filename}?svelte&type=style&lang.css`. Every
+//     other query param is discarded, `inline` included. So kit asks for the inline variant and
+//     vite's transform never sees the flag.
+//
+// Neither half can be upgraded away here: vite 8 is required by vitest 4, and the first
+// vite-plugin-svelte that accepts vite 8 needs Svelte 5 (see the peer-dependency note in CLAUDE.md).
+// So re-attach the flag after the plugin has stripped it. `this.resolve` delegates to the plugin for
+// the canonical id rather than reimplementing its root-prefixing, and `inline` is spliced in *before*
+// `lang.css` because vite gates the whole CSS pipeline on `/\.(css|…)(?:$|\?)/` — appending it would
+// leave the id ending in `&inline` and quietly drop the module out of the CSS plugins altogether.
+//
+// This only ever fires for ids that already asked for `inline`, which in practice is kit's dev
+// inliner alone; the client-side `import "./Foo.svelte?svelte&type=style&lang.css"` that compiled
+// components emit is untouched. Delete this plugin along with pinKitToSvelte4() when the app moves to
+// Svelte 5 and vite-plugin-svelte can be upgraded.
+function keepInlineQueryOnSvelteStyles(): Plugin {
+	const CANONICAL_SUFFIX = "?svelte&type=style&lang.css";
+
+	return {
+		name: "keep-inline-query-on-svelte-styles",
+		enforce: "pre",
+		async resolveId(importee, importer, options) {
+			const [file, query] = importee.split("?");
+			if (!file.endsWith(".svelte") || !query) return;
+
+			const params = query.split("&");
+			if (!params.includes("inline") || !params.includes("type=style")) return;
+
+			// Resolve the id the plugin already understands, then put `inline` back.
+			const withoutInline = `${file}?${params.filter((p) => p !== "inline").join("&")}`;
+			const resolved = await this.resolve(withoutInline, importer, { ...options, skipSelf: true });
+			if (!resolved?.id.endsWith(CANONICAL_SUFFIX)) return resolved ?? undefined;
+
+			return {
+				...resolved,
+				id: resolved.id.replace(CANONICAL_SUFFIX, "?svelte&type=style&inline&lang.css")
+			};
+		}
+	};
+}
+
 // rollup-plugin-svelte-svg used to sit here, meant to turn `import Logo from "*.svg"`
 // into a component. It cannot work under Vite: `.svg` is a built-in asset extension, so
 // `vite:asset` loads the file as `export default "/logo.svg"` before any transform runs,
@@ -57,7 +119,7 @@ function pinKitToSvelte4(): Plugin {
 // orders transforms, not loads, so it made no difference. The logo is now a real component
 // (src/components/Logo.svelte); SVGs referenced by URL are unaffected and still live in static/.
 export default defineConfig({
-	plugins: [pinKitToSvelte4(), sveltekit(), imagetools()],
+	plugins: [pinKitToSvelte4(), keepInlineQueryOnSvelteStyles(), sveltekit(), imagetools()],
 	test: {
 		include: ["src/**/*.{test,spec}.{js,ts}"]
 	},

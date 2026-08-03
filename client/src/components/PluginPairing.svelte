@@ -117,7 +117,7 @@
 					<Button
 						size="s"
 						type="primary"
-						leadIcon="ContentCopy"
+						leadIcon="content_copy"
 						on:click={() => copyToClipboard(displayCode, "Pairing code")}>Copy</Button
 					>
 					<p class="tooltip">Expires in {countdown}</p>
@@ -150,7 +150,7 @@
 							<Button
 								size="s"
 								alt="disconnect this plugin"
-								leadIcon="LinkOff"
+								leadIcon="link_off"
 								on:click={() => disconnect(connection.id)}>Disconnect</Button
 							>
 						</li>
@@ -165,8 +165,21 @@
 	.pairing {
 		display: flex;
 		flex-direction: column;
-		gap: $s5;
+		gap: $sd5;
+		// The modal hands this a definite height; the connections list below is what
+		// flexes into whatever is left. This scroller is only the fallback for when even
+		// the fixed chrome (steps + code box) is taller than the dialog — on a short
+		// desktop window that is what keeps the code box reachable instead of clipped.
+		flex: 1 1 auto;
+		min-height: 0;
 		overflow-y: auto;
+	}
+
+	// Everything except the connections section keeps its natural height. Without this
+	// they all get flex-shrunk when the dialog is short, and since none of them clip
+	// their own contents the result is overlapping text rather than the scrollbar above.
+	.pairing > * {
+		flex: 0 0 auto;
 	}
 
 	ol.steps {
@@ -181,45 +194,69 @@
 		flex-direction: column;
 		gap: $s3;
 		align-items: center;
-		padding: $s4;
+		padding: $sd4;
 		border-radius: $s4;
 		border: $lw solid $c-accent;
 	}
 
 	p.code {
 		font-family: monospace;
-		font-size: $s6;
+		// Steps down to 32px below $bp-m: at 52px an eight-symbol code with this much
+		// letter spacing is wider than a narrow viewport, and it must never be the thing
+		// that forces the dialog to scroll sideways.
+		font-size: $sd6;
+		line-height: 1.1;
 		letter-spacing: 0.2em;
+		// The trailing letter-space would otherwise push the code off centre.
+		text-indent: 0.2em;
+		text-align: center;
+		overflow-wrap: anywhere;
 		user-select: all;
 	}
 
 	.code-actions {
 		display: flex;
 		align-items: center;
-		gap: $s4;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: $s3 $s4;
 	}
 
 	.connections {
 		display: flex;
 		flex-direction: column;
 		gap: $s3;
+		// The one part that flexes: it takes the leftover height, and `min-height: 0` is
+		// what lets the list inside it be shorter than its rows and scroll them.
+		flex: 1 1 auto;
+		min-height: 0;
 
 		ul {
 			display: flex;
 			flex-direction: column;
 			gap: $s3;
 			list-style: none;
+			// Takes the leftover height and scrolls its rows, but never shrinks past about
+			// a row and a half — squeezed to zero it would be a list you cannot reach at
+			// all, and below this floor `.pairing` scrolls instead.
+			flex: 1 1 auto;
+			min-height: $s7;
+			overflow-y: auto;
+			// Don't hand the scroll on to `.pairing` when the list hits its end.
+			overscroll-behavior: contain;
 		}
 
 		li {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			gap: $s4;
+			flex-wrap: wrap;
+			gap: $s2 $s4;
 
 			div {
 				display: flex;
 				flex-direction: column;
+				min-width: 0;
 			}
 		}
 	}
