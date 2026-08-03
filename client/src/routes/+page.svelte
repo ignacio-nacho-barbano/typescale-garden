@@ -54,7 +54,7 @@
 </script>
 
 <SvelteHead />
-<Accordion bind:open={newsOpen}>
+<!-- <Accordion bind:open={newsOpen}>
 	<span slot="title">News! 🗞️</span>
 	<div slot="content" class="container">
 		<section class="welcome-message shadow-high card green">
@@ -79,7 +79,7 @@
 			</p>
 		</section>
 	</div>
-</Accordion>
+</Accordion> -->
 <div bind:this={wrapper} class={wrapperClass}>
 	<section
 		id={routes[0].id}
