@@ -29,6 +29,13 @@
 			"dependsOn": ["^build"],
 			"outputs": []
 		},
+		// Browser tests. Never cached: they boot a real dev server and drive a real
+		// Chromium, so a cache hit would report a pass without having proved anything.
+		// `PUB_*` is not in the cache key for the same reason — the values come from
+		// e2e/support/env.ts, not the environment.
+		"test:e2e": {
+			"cache": false
+		},
 		// Long-running tasks: never cached, hold the terminal.
 		"test:watch": {
 			"cache": false,

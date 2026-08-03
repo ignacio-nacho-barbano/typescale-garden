@@ -6,8 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Typescale Garden (https://typescalegarden.uy) helps designers build typographic scales for a design
 system. An npm-workspaces monorepo, task-run by **Turborepo** (`turbo.json` at the root, plus
-per-package `turbo.json` overrides), with four packages — the workspace names are the short directory
-names (`client`, `core`, `server`, `plugin`), which is what `--filter` takes:
+per-package `turbo.json` overrides), with five packages — the workspace names are the short directory
+names (`client`, `core`, `e2e`, `server`, `plugin`), which is what `--filter` takes:
 
 - `core/` — the typescale math, the CSS/token generators and the shared types. Pure and
   runtime-agnostic; see "The scale itself lives in core/" below.
@@ -19,6 +19,9 @@ names (`client`, `core`, `server`, `plugin`), which is what `--filter` takes:
 - `plugin/` — Figma plugin ("Typescale Garden Import Tool"). Turns a scale into Figma text styles,
   either from an exported tokens JSON pasted in by hand or — after pairing with an account — from the
   user's saved scales, fetched from the Worker and computed locally with `core`.
+- `e2e/` — Playwright browser tests that drive the real client and assert its exported CSS and design
+  tokens against core's golden fixtures. No source of its own ships anywhere; see "The e2e suite"
+  below.
 
 There used to be a fifth package, `services/`, holding standalone Node scripts. Its only two
 inhabitants both moved out — `WEIGHTS_MAP` into `core`, and the Google Fonts snapshot generator into
@@ -85,6 +88,7 @@ npm run build             # client bundle, worker dry-run, plugin code.js, core 
 npm run check             # type check everything (svelte-check, tsc --noEmit ×4)
 npm run lint              # eslint / prettier per package
 npm test                  # client + core vitest (one pass) and the plugin's node script
+npm run test:e2e          # Playwright, in a real Chromium against a real dev server
 npm run dev               # every dev server at once
 npm run client            # turbo run dev --filter=client   → vite dev --host
 npm run server            # turbo run dev --filter=server   → wrangler dev
@@ -134,9 +138,57 @@ which both follows core's `exports` map and tolerates the `.js` extensions core'
 esbuild is pinned to the `0.24.2` already hoisted at the root and already listed in the root
 `allowScripts`, so it needs no new install-script approval.
 
-There is no test suite for the server. The others: `client/src` and `core/src` use vitest, and
+There is no test suite for the server. The others: `client/src` and `core/src` use vitest,
 `plugin/test/plugin.test.mjs` is a single dependency-free node script (run by `npm test` like the
-rest) that executes the built `code.js` in a stubbed Figma sandbox.
+rest) that executes the built `code.js` in a stubbed Figma sandbox, and `e2e/` is Playwright.
+
+### The e2e suite
+
+`e2e/` drives the real client in a real Chromium and asserts the bytes it exports. It exists because
+`core`'s golden test proves the pure functions turn a `TypescaleBase` into those bytes but cannot
+prove the sidebar is _wired_ to them — every input could be bound to the wrong store and every unit
+test would still pass.
+
+```bash
+npm run test:e2e                    # from the repo root (turbo builds core first)
+cd e2e && npm run test:e2e:ui       # the Playwright UI, for debugging
+npx playwright test -g "roboto"     # one fixture
+npx playwright install chromium     # once per machine; browsers are not an npm dep
+```
+
+Things worth knowing before changing it:
+
+- **Nothing real is on the other end.** `support/fakeAuth0.ts` is a whole fake Auth0 tenant and
+  `support/fakeApi.ts` a fake Worker, both served by route interception, and
+  `support/thirdParty.ts` installs a **guard** that aborts and records any request nothing expected
+  (asserted empty after every test). Both fakes are mounted under path prefixes on our _own_ origin
+  (`/idp`, `/mock-api`) rather than on their real hostnames, because a cross-origin request carrying
+  `Authorization` or `Auth0-Client` triggers a preflight that Chromium does not reliably surface to
+  `page.route`.
+- **`app.open()` waits for `.user-controls-skeleton` to disappear, and that is load-bearing.** The
+  sidebar is server-rendered, so every control is present and visible long before hydration; a
+  `fill` in that window writes to the DOM and no store hears it. The skeleton is rendered
+  unconditionally by the SSR pass and can only vanish once hydration _and_ the silent login have
+  settled.
+- **The generated CSS/tokens are read off the clipboard,** not out of the modal. `copyToClipboard`
+  hands the store value straight to `navigator.clipboard.writeText`, so the clipboard is byte-exact;
+  Svelte trims the whitespace around `{$cssCode}` in the template, so the modal's `<code>` is only
+  good for "the modal shows the same thing".
+- **`workers` is capped at 2 and there is a `globalSetup` that warms the dev server.** All workers
+  share one vite dev server, and a parallel cold start queues module transforms long enough that
+  hydration outlives the assertion waiting for it — a flake that reads as an auth bug.
+- **The numeric writables hold strings.** The sidebar's inputs have no `type="number"`, so after any
+  UI edit `$baseSize` is `"22"`, and that is what goes on the wire; the Worker coerces per column in
+  `baseBindValues`. `typescales.spec.ts` asserts through `Number(...)` for that reason.
+- One family is deliberately unreachable from the UI (`unknown-font-falls-back`): the picker only
+  emits a value when a listed option is clicked, so an unknown family cannot be typed into the store.
+  It stays covered by core's unit test — see `UI_UNREACHABLE` in `support/golden.ts`.
+
+CI runs it on every PR via `.github/workflows/e2e.yml` — the repo's only workflow. It deliberately
+does not also run `check`/`lint`, which are known-failing on main (below) and would make the signal
+permanently red. The workflow's one non-obvious step is `npm rebuild sharp`: vite-imagetools needs
+sharp's native binary to transform the image `+page.svelte` imports, and sharp is not in the root
+`allowScripts`, so npm ≥ 11 skips the install script that fetches it.
 
 ### Turborepo layout
 
@@ -147,6 +199,13 @@ files (`globalDependencies`) plus every `PUB_*` var, since those are inlined int
 build time. Cacheable outputs are declared per package in `client/turbo.json`, `core/turbo.json` and
 `plugin/turbo.json`; the server emits nothing (its build is a dry-run), so it needs no override. The
 `db:*` scripts are deliberately outside turbo — they mutate a real database and must never be cached.
+
+`test:e2e` is `cache: false` for the same reason as `dev`: it boots a real dev server and drives a
+real browser, so a cache hit would report a pass without having proved anything. `e2e/turbo.json`
+gives it `dependsOn: ["core#build"]` specifically — not `^build` — because Playwright starts the
+client's dev server itself (`webServer.command`), bypassing turbo, so nothing else would produce the
+`core/dist` that the client's `import "core"` resolves into. `client#build` would be the wrong
+dependency: the suite drives the dev server, not the bundle.
 
 Known pre-existing failures, unrelated to turbo: `client#check` (18 svelte-check errors) and
 `client#lint` (the client's `.eslintrc.cjs` fails to load, plus wide prettier drift). `client#test`

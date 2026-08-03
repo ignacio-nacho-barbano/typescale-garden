@@ -1,0 +1,94 @@
+# Browser tests for the client, on every pull request.
+#
+# Deliberately a job of its own rather than a step in a wider "CI" workflow: it is the only
+# check that boots a dev server and a real browser, it is the slowest, and `client#check`
+# and `client#lint` are both known-failing on main (see CLAUDE.md), so folding them in here
+# would make this signal permanently red and therefore ignored.
+name: e2e
+
+on:
+  pull_request:
+  # Also on main, so a scale-changing merge is caught even if the PR predated it.
+  push:
+    branches: [main]
+
+# A new push supersedes the run in flight for the same ref; nobody needs the old answer.
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # The repo's pinned version, above the engines of vite 8, eslint 10 and wrangler.
+          node-version-file: .node-version
+          cache: npm
+
+      # `npm ci`, never `npm install`: the committed lockfile is the only thing that makes
+      # this tree installable at all. Two of the client's devDependencies declare peers the
+      # repo has outgrown, and a fresh resolve hits ERESOLVE — installing *from* the
+      # lockfile is conflict-free. See CLAUDE.md.
+      - name: Install
+        run: npm ci
+
+      # vite-imagetools transforms the image `+page.svelte` imports, which needs sharp's
+      # native binary — and sharp is not in the root `allowScripts`, so npm ≥ 11 skips the
+      # install script that fetches it. Without this the dev server cannot compile the page
+      # and every spec fails on a blank screen. Explicit rather than relying on whichever
+      # npm ships with the pinned node.
+      - name: Build sharp's native binary
+        run: npm rebuild sharp
+
+      - name: Resolve the Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache browsers
+        id: browser-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      # Only chromium: the suite pins one engine on purpose. It asserts exact generated
+      # bytes and computed pixel values, and the point is the app's own wiring, not
+      # cross-browser rendering — three engines would triple the runtime to re-assert the
+      # same strings.
+      - name: Install Chromium
+        if: steps.browser-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      # System libraries are outside the cached browser directory, so they are needed even
+      # on a cache hit.
+      - name: Install Chromium's system dependencies
+        if: steps.browser-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # Through turbo, so `core#build` runs first — Playwright boots the client's dev
+      # server itself and nothing else would produce `core/dist`.
+      #
+      # No `.env` is written: `e2e/support/env.ts` passes every `PUB_*` the client imports
+      # through `webServer.env`, which vite's `loadEnv` applies over any `.env` file. The
+      # suite is meant to be independent of local secrets, and this is where that pays off.
+      - name: Run the browser tests
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload the report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 14
+          if-no-files-found: ignore

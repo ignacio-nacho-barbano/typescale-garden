@@ -1,0 +1,22 @@
+{
+	// Standalone, not extending the root config: Playwright transpiles these files
+	// itself (CommonJS — the package deliberately has no `"type": "module"`), so this
+	// config only has to describe what `tsc --noEmit` should check.
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		// DOM because the page.evaluate callbacks run in the browser and touch
+		// `document` / `getComputedStyle`; node for `fs`, `path` and `__dirname`.
+		"lib": ["ES2022", "DOM"],
+		"types": ["node"],
+		"strict": true,
+		"noUncheckedIndexedAccess": false,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"forceConsistentCasingInFileNames": true,
+		"noEmit": true
+	},
+	"include": ["**/*.ts"]
+}

@@ -1,0 +1,19 @@
+{
+	"name": "e2e",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Browser tests that drive the client and assert the generated CSS and design tokens against core's golden fixtures",
+	"license": "GPL-3.0",
+	"scripts": {
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed",
+		"report": "playwright show-report",
+		"check": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.49.0",
+		"@types/node": "^20.11.16",
+		"typescript": "^5.9.3"
+	}
+}
