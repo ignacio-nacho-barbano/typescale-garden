@@ -81,3 +81,21 @@ export async function installThirdParty(context: BrowserContext): Promise<void> 
 export async function installStaticFontsFallback(context: BrowserContext): Promise<void> {
 	await context.route(STATIC_FONTS, (route) => route.fulfill({ json: fontsStaticPayload }));
 }
+
+/**
+ * The only interception a **live** run performs. Everything else — the real API, the real
+ * Auth0 tenant, Google's webfonts — goes through untouched, because the point of a live run
+ * is that they are real.
+ *
+ * Telemetry is the exception, and it is not about noise in the report. A deployed build runs
+ * with `PUB_APP_ENV=prod`, which is the condition on both `initAnonymousAnalysis()` in
+ * `+layout.ts` and the Rollbar branch of `logError`. Left alone, an hourly cron would inject
+ * 24 sessions a day into the analytics someone actually reads, and file real error reports
+ * for failures that are tests. Answered rather than aborted, so no `net::ERR_FAILED` lands
+ * in the console.
+ */
+export async function installTelemetryGuard(context: BrowserContext): Promise<void> {
+	await context.route(ANALYTICS, (route) =>
+		route.fulfill({ status: 200, contentType: "application/javascript", body: "" })
+	);
+}

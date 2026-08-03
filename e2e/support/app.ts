@@ -1,12 +1,14 @@
 import { expect, test as base, type Locator, type Page } from "@playwright/test";
 import fs from "fs";
-import { BASE_URL } from "./env";
 import { installFakeAuth0, newSession, type AuthSession } from "./fakeAuth0";
 import { installFakeApi, newApiHandle, type ApiHandle } from "./fakeApi";
 import type { GoldenInputs } from "./golden";
+import { optionId } from "./subjects";
+import { IS_LIVE, TARGET, liveCredentials } from "./target";
 import {
 	installGuard,
 	installStaticFontsFallback,
+	installTelemetryGuard,
 	installThirdParty,
 	type UnexpectedRequests
 } from "./thirdParty";
@@ -68,6 +70,22 @@ export class App {
 		}).toPass({ timeout: 15_000 });
 	}
 
+	/**
+	 * Dismisses the family menu.
+	 *
+	 * By clicking elsewhere, not with Escape: `Menu.svelte` closes on `clickOutside` and has
+	 * no key handler at all. It matters because the open list is absolutely positioned over
+	 * the category pills directly beneath it, so leaving it open makes those pills
+	 * unclickable — Playwright reports it as the list "intercepting pointer events".
+	 *
+	 * The click itself is swallowed by the capture-phase handler in
+	 * `actions/clickOutside.ts`, which is why the target can be any inert element.
+	 */
+	async closeFontMenu(): Promise<void> {
+		await this.page.locator("#sidebar .settings-title").click();
+		await expect(this.page.locator(".tsg-autocomplete-list")).toBeHidden();
+	}
+
 	/** Flips one of the four category pills above the family list. */
 	async toggleFontCategory(category: string): Promise<void> {
 		await this.page.locator(".buttons-group button", { hasText: category }).click();
@@ -86,11 +104,16 @@ export class App {
 		const list = this.page.locator(".tsg-autocomplete-list");
 
 		await this.openFontMenu();
+
+		// Typed a character at a time, not filled. AutoComplete suppresses filtering for the
+		// first input event after opening (its `fresh` flag), so a single `fill` leaves the
+		// whole list rendered — 6 items hermetically, but ~1951 against the real catalogue,
+		// which is a lot of DOM to build before the click. Two characters is enough to get
+		// the filter working and cuts it to a handful.
+		await input.pressSequentially(family.slice(0, 2));
 		await input.fill(family);
 
-		// AutoComplete's own id scheme: `option.toLowerCase().replaceAll(" ", "-")`.
-		const optionId = family.toLowerCase().replaceAll(" ", "-");
-		await list.locator(`li#${optionId} button`).click();
+		await list.locator(`li#${optionId(family)} button`).click();
 
 		// The picker reports the selection by becoming the input's placeholder.
 		await expect(input).toHaveAttribute("placeholder", family);
@@ -169,6 +192,21 @@ export class App {
 		return this.page.locator(`#headings-${which}-weight option`);
 	}
 
+	/**
+	 * `$availableWeights` as the app itself computed it, read out of the control it populates.
+	 *
+	 * This is the only observable window onto which font catalogue the page is actually
+	 * holding, which is what makes it the live target's snapshot-rotation check — see
+	 * `catalogueDisagreement` in support/subjects.ts.
+	 */
+	async reportedAvailableWeights(): Promise<number[]> {
+		const values = await this.weightOptions().evaluateAll((options) =>
+			options.map((option) => (option as HTMLOptionElement).value)
+		);
+
+		return values.map(Number).filter((weight) => !Number.isNaN(weight));
+	}
+
 	// ── the sidebar's accordions ────────────────────────────────────────────────────
 
 	private accordion(title: string): Locator {
@@ -238,18 +276,30 @@ export class App {
 	 */
 	async copyCss(): Promise<string> {
 		const panel = await this.openExportPanel();
+		await this.focus();
 		await panel.locator("button", { hasText: "Copy CSS" }).click();
 		return this.readClipboard();
 	}
 
 	async copyTokens(): Promise<string> {
 		const panel = await this.openExportPanel();
+		await this.focus();
 		await panel.locator("button", { hasText: "Copy" }).filter({ hasText: "Tokens" }).click();
 		return this.readClipboard();
 	}
 
 	async readClipboard(): Promise<string> {
 		return this.page.evaluate(() => navigator.clipboard.readText());
+	}
+
+	/**
+	 * `navigator.clipboard.writeText` rejects when the document is not focused, and
+	 * `copyToClipboard` catches that and shows "Failed to copy text to clipboard." instead —
+	 * so the symptom is a missing confirmation, not an error. With two workers driving
+	 * separate contexts, whichever page last had focus is not reliably this one.
+	 */
+	private async focus(): Promise<void> {
+		await this.page.bringToFront();
 	}
 
 	/**
@@ -362,13 +412,19 @@ interface Fixtures {
 	unexpected: UnexpectedRequests;
 	api: ApiHandle;
 	session: AuthSession;
+	/**
+	 * Every API request the browser made, as `METHOD /path`, recorded from the wire rather
+	 * than from the fake — so a spec that asserts on it reads the same in both modes.
+	 */
+	apiCalls: string[];
 	app: App;
 }
 
 /**
  * The suite's `test`. Every spec imports this rather than Playwright's, so no spec can
- * accidentally run without the guard installed — which would mean silently talking to
- * the real API, the real Auth0 tenant and the real Google Fonts.
+ * accidentally run without its target's wiring installed — hermetically that means the
+ * fakes, and live it means the telemetry guard that keeps a test run out of Hotjar and
+ * Rollbar.
  */
 export const test = base.extend<Options & Fixtures>({
 	auth: [{}, { option: true }],
@@ -388,30 +444,86 @@ export const test = base.extend<Options & Fixtures>({
 		await use(handle);
 	},
 
-	app: async ({ context, page, unexpected, api, session, fontsApiDown }, use) => {
-		// Guard first — it is the fallback handler, and Playwright consults handlers in
-		// reverse registration order.
-		await installGuard(context, unexpected);
-		await installThirdParty(context);
-		await installFakeAuth0(context, session);
-		await installFakeApi(context, api);
+	apiCalls: async ({ context }, use) => {
+		const calls: string[] = [];
+		const prefix = `${TARGET.apiUrl}/api/`;
 
-		if (fontsApiDown) {
-			await installStaticFontsFallback(context);
+		context.on("request", (request) => {
+			const url = request.url();
+			if (url.startsWith(prefix)) {
+				calls.push(`${request.method()} ${new URL(url).pathname.replace(/^.*(\/api\/)/, "$1")}`);
+			}
+		});
+
+		await use(calls);
+	},
+
+	app: async ({ context, page, unexpected, api, session, fontsApiDown, apiCalls }, use) => {
+		// Referenced so Playwright builds the fixture before the first navigation; the
+		// listener has to be attached before any request goes out.
+		void apiCalls;
+
+		if (IS_LIVE) {
+			// Nothing is faked. The one thing that must still be intercepted is telemetry:
+			// a deployed build runs with PUB_APP_ENV=prod, so `+layout.ts` calls
+			// `initAnonymousAnalysis()` and `logError` posts to Rollbar. Left alone, the
+			// hourly cron would file 24 real error reports a day and inject 24 sessions
+			// into the analytics the site's owner actually reads.
+			await installTelemetryGuard(context);
+		} else {
+			// Guard first — it is the fallback handler, and Playwright consults handlers in
+			// reverse registration order.
+			await installGuard(context, unexpected);
+			await installThirdParty(context);
+			await installFakeAuth0(context, session);
+			await installFakeApi(context, api);
+
+			if (fontsApiDown) {
+				await installStaticFontsFallback(context);
+			}
 		}
 
 		// The generated CSS and tokens are read back off the clipboard, which is the only
 		// path that yields them byte for byte. See `copyCss`.
-		await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: BASE_URL });
+		await context.grantPermissions(["clipboard-read", "clipboard-write"], {
+			origin: TARGET.baseUrl
+		});
 
 		await use(new App(page, api));
 
 		// A request nothing expected is a bug in the app or a hole in this harness, and
 		// either way the spec that provoked it is the one that should report it. Aborted
 		// requests are otherwise easy to miss: `GetTypescales` retries for 30s before
-		// giving up, so the symptom would be a timeout somewhere unrelated.
+		// giving up, so the symptom would be a timeout somewhere unrelated. Live runs do
+		// not have a catch-all, so this is trivially satisfied there.
 		expect(unexpected, "unexpected outbound requests").toEqual([]);
 	}
 });
 
+/**
+ * Marks a test or a `describe` group as unrunnable against a deployed environment.
+ *
+ * The reason is not decoration: it prints in the live run's report next to the skip, so the
+ * live run documents its own coverage gap instead of quietly having one. Every use of this
+ * is a case that needs to *control* something a real environment owns — a tenant's timing,
+ * a user's permissions, a row count, or an endpoint's failure.
+ */
+export const hermeticOnly = (reason: string): void => {
+	test.skip(IS_LIVE, `hermetic-only: ${reason}`);
+};
+
+/** The mirror image: a case that only means anything against a real deployment. */
+export const liveOnly = (reason: string): void => {
+	test.skip(!IS_LIVE, `live-only: ${reason}`);
+};
+
+/** Skips when a live run has no Auth0 credentials to sign in with. */
+export const needsLiveCredentials = (): void => {
+	test.skip(
+		IS_LIVE && liveCredentials() === null,
+		"live-only: set E2E_AUTH0_USERNAME and E2E_AUTH0_PASSWORD to exercise the signed-in paths"
+	);
+};
+
+export { IS_LIVE, LIVE_WRITES, TARGET } from "./target";
 export { expect } from "@playwright/test";

@@ -1,5 +1,9 @@
+import { LOCAL_PORT } from "./target";
+
 /**
- * The environment the client is booted with for e2e runs.
+ * The environment the **hermetic** target's client is booted with, and the fake origins
+ * that go with it. None of this applies to a live target, which runs an already-built app
+ * whose `PUB_*` values were inlined at build time and cannot be influenced from here.
  *
  * `client/svelte.config.js` sets `env.dir: "../"` and `publicPrefix: "PUB_"`, and vite's
  * `loadEnv` applies `process.env` after the `.env` files, so passing these through
@@ -10,7 +14,7 @@
  * module built from what is defined, so a missing name is a build error, and
  * `client/src/services/env.ts` additionally throws when `PUB_API_URL` is falsy.
  */
-export const PORT = 5199;
+export const PORT = LOCAL_PORT;
 export const BASE_URL = `http://localhost:${PORT}`;
 
 /**
