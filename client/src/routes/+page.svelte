@@ -87,7 +87,7 @@
 		class:isServer
 		class="container how-it-works-page main-page-section"
 	>
-		<h1 class="title-1 space-text-below">A Typescale Creation Tool</h1>
+		<h1 class="title-1 space-text-below">A Typescale<br />Creation Tool</h1>
 
 		<div class="text-and-image space-text-below">
 			<div>
