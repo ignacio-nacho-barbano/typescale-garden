@@ -16,7 +16,11 @@
 		if (activeTab === "css") {
 			downloadFile(fileNames.css, $cssCode);
 		} else {
-			downloadFile(fileNames.json, $cssCode);
+			// $designTokens, not $cssCode: the JSON tab used to download the stylesheet
+			// under a .json name, which the Figma plugin can only answer with a JSON
+			// parse error. `onCopy` below always had this right, which is why it went
+			// unnoticed — the copy button is the path most people use.
+			downloadFile(fileNames.json, $designTokens);
 		}
 	};
 	const onCopy = () => {

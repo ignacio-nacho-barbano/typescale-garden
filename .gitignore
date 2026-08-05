@@ -16,3 +16,10 @@ vite.config.ts.timestamp-*
 certificates/
 .ssh
 .turbo/
+# Playwright's run artifacts: the HTML report, and the traces/screenshots kept for
+# failures. CI uploads them as an artifact instead.
+playwright-report/
+test-results/
+# Per-run scratch: the resolved test subjects, and the live target's signed-in session.
+# The latter is a real credential — it must never be committed.
+e2e/playwright/

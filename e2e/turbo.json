@@ -1,0 +1,25 @@
+{
+	"$schema": "https://turborepo.com/schema.json",
+	"extends": ["//"],
+	"tasks": {
+		"test:e2e": {
+			// `core#build`, not `^build`: Playwright boots the client's dev server itself
+			// (`webServer.command`), which bypasses turbo — so nothing else would build
+			// `core/dist`, and the client's `import "core"` resolves through core's
+			// `exports` map into it. A full `client#build` would be the wrong dependency:
+			// the suite drives the dev server, not the bundle.
+			"dependsOn": ["core#build"],
+			// `core/dist` is needed for a second reason too: against a live target the suite
+			// imports core directly to derive its expected bytes at runtime, since the
+			// committed fixtures cannot describe a catalogue that changes under it.
+			//
+			// `E2E_*` selects the target and carries the live credentials. Declared for
+			// documentation rather than for hashing — the task is uncached either way.
+			"env": ["E2E_*", "CI"],
+			// Playwright's HTML report and traces. Not worth caching the task itself
+			// (see the root turbo.json), but declaring the outputs keeps them out of
+			// any future cache key by accident.
+			"outputs": ["playwright-report/**", "test-results/**"]
+		}
+	}
+}
