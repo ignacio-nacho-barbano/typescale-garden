@@ -233,8 +233,19 @@ const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? [];
 
 check(
 	"…as one event envelope carrying the DSN",
-	JSON.parse(header ?? "{}").dsn?.includes("sentry.io") === true &&
-		JSON.parse(itemHeader ?? "{}").type === "event"
+	(() => {
+		const dsn = JSON.parse(header ?? "{}").dsn;
+		if (typeof dsn !== "string") return false;
+		try {
+			const { hostname } = new URL(dsn);
+			return (
+				(hostname === "sentry.io" || hostname.endsWith(".sentry.io")) &&
+				JSON.parse(itemHeader ?? "{}").type === "event"
+			);
+		} catch {
+			return false;
+		}
+	})()
 );
 check(
 	"…tagged with the plugin surface",
