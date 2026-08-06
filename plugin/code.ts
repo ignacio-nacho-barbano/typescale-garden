@@ -8,6 +8,7 @@ import {
 	type DesignTokenTextStyle,
 	type Typescale
 } from "core";
+import { captureError } from "./sentry";
 
 /**
  * The plugin sandbox, not the UI iframe. Everything that touches the network, client
@@ -65,6 +66,7 @@ async function getToken(): Promise<string | null> {
 		return (await figma.clientStorage.getAsync(TOKEN_KEY)) ?? null;
 	} catch (error) {
 		console.error("Could not read the stored token", error);
+		captureError(error, "get-token");
 		return null;
 	}
 }
@@ -139,6 +141,9 @@ async function loadTypescales(): Promise<void> {
 				figma.notify("This Figma plugin was disconnected from your account.");
 			} else {
 				console.error(error);
+				// The 401 above is deliberately not reported: a revoked connection is a normal
+				// outcome, not a fault. Anything else reaching here is.
+				captureError(error, "load-typescales", { paired: true });
 				postState({
 					signedIn: true,
 					typescales: [],
@@ -155,6 +160,7 @@ async function loadTypescales(): Promise<void> {
 		postState({ signedIn: false, typescales: typescales.map(toListed) });
 	} catch (error) {
 		console.error(error);
+		captureError(error, "load-typescales", { paired: false });
 		postState({
 			signedIn: false,
 			typescales: [],
@@ -198,6 +204,10 @@ async function pair(rawCode: unknown): Promise<void> {
 		await loadTypescales();
 	} catch (error) {
 		console.error(error);
+		// The rejected-code path above returns before this; only a transport failure or a
+		// malformed response gets here. The code itself is never included — it is a
+		// credential.
+		captureError(error, "pair");
 		postState({
 			signedIn: false,
 			typescales: [],
@@ -263,6 +273,13 @@ async function importTypescale(id: unknown): Promise<void> {
 		tokens = buildTokens(variants, typescale.base.breakpoint, font);
 	} catch (error) {
 		console.error(error);
+		// Worth reporting in detail: this is core failing to turn a saved scale into tokens,
+		// which would be a real bug rather than a network hiccup. The font family is the
+		// single most useful thing for reproducing it.
+		captureError(error, "import-typescale", {
+			fontName: typescale.base.fontName,
+			catalogueLoaded: fontCatalogue !== null
+		});
 		figma.notify("Could not work out that scale — see the console.", { error: true });
 		return;
 	}
@@ -301,6 +318,7 @@ async function applyTokens(jsonStyles: DesignTokenSet): Promise<void> {
 		const message = `Unable to load one of the font weights: ${error}`;
 		figma.notify(message, { error: true });
 		console.error(message, fontsToLoad, error);
+		captureError(error, "load-fonts", { fonts: Array.from(fontsToLoad.values()) });
 	}
 
 	try {
@@ -351,10 +369,47 @@ async function applyTokens(jsonStyles: DesignTokenSet): Promise<void> {
 		const message = "Unable to import styles 🙁";
 		figma.notify(message, { error: true });
 		console.error(message, fontsToLoad, fontsUnableToBeLoaded, error);
+		// The document write itself failed, so styles may be half-applied. The most
+		// actionable failure the plugin has.
+		captureError(error, "apply-tokens", {
+			styleCount: Object.keys(jsonStyles).length,
+			fontsUnableToBeLoaded: Array.from(fontsUnableToBeLoaded.values())
+		});
 	}
 }
 
+/**
+ * The sandbox's only entry point, and therefore the only place a global error handler can
+ * live: Figma's sandbox has no `window`, so there is no `onerror` or
+ * `unhandledrejection` to hook. Every flow above is reached from this switch, so wrapping
+ * it catches whatever their own `try`/`catch` blocks did not anticipate — which before
+ * this was an unhandled rejection that vanished silently.
+ */
 figma.ui.onmessage = async (msg) => {
+	try {
+		await handleMessage(msg);
+	} catch (error) {
+		console.error(error);
+		captureError(error, msg && msg.type ? String(msg.type) : "unknown-message");
+		figma.notify("Something went wrong — see the console.", { error: true });
+	}
+};
+
+/**
+ * Whatever ui.html posted. The shape varies per `type`, so every field is optional and
+ * read defensively — this crosses a postMessage boundary and is not to be trusted.
+ */
+interface UiMessage {
+	type?: string;
+	code?: unknown;
+	id?: unknown;
+	jsonStyles?: unknown;
+	message?: unknown;
+	stack?: unknown;
+	source?: unknown;
+}
+
+async function handleMessage(msg: UiMessage): Promise<void> {
 	switch (msg.type) {
 		case "init":
 			await loadTypescales();
@@ -382,8 +437,19 @@ figma.ui.onmessage = async (msg) => {
 			await applyTokens(msg.jsonStyles as DesignTokenSet);
 			break;
 
+		// Reported by ui.html's own error handlers. The iframe is a real browser context and
+		// could reach Sentry directly, but routing it through here keeps every report going
+		// out of one place under one manifest-allowed host — and keeps the DSN out of the
+		// iframe, the same reasoning that keeps the bearer token out of it.
+		case "ui-error":
+			captureError(new Error(String(msg.message)), "ui", {
+				stack: msg.stack,
+				source: msg.source
+			});
+			break;
+
 		case "cancel":
 			figma.closePlugin();
 			break;
 	}
-};
+}

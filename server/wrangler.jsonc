@@ -55,6 +55,14 @@
 	// Secrets (JWT_SECRET, SESSION_SECRET) are NOT here — set them with
 	// `wrangler secret put <NAME>` (prod) or in .dev.vars (local).
 	"vars": {
+		// Sentry's ingest endpoint for this Worker — see src/sentry.ts. A DSN is a public
+		// identifier that only grants "write an event", so it belongs here rather than
+		// behind `wrangler secret put`. The `de` in the host is the org's region; it is
+		// part of the DSN, not something to normalise away.
+		//
+		// Setting this to "" is a supported state and means "report nothing":
+		// `SENTRY_ENABLED` in src/secrets.ts is a truthiness check on it.
+		"SENTRY_DSN": "https://d67d38563f6359c0766c81e5126ad044@o4511689468608512.ingest.de.sentry.io/4511809570144336",
 		"APP_PORT": "3000",
 		"PUB_APP_ENV": "prod",
 		"PUB_CLIENT_ORIGIN": "https://typescalegarden.uy",

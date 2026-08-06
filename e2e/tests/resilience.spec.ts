@@ -30,7 +30,7 @@ test.describe("console hygiene", () => {
 		await app.closeCodeModal();
 
 		// `logError` writes "🚨 Error Logger:" to the console in dev rather than posting to
-		// Rollbar, so anything the app considers an error lands here — including a failed
+		// Sentry, so anything the app considers an error lands here — including a failed
 		// catalogue fetch, which would otherwise pass silently on the wrong font data.
 		expect(errors).toEqual([]);
 	});

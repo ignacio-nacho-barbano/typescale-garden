@@ -424,7 +424,7 @@ interface Fixtures {
  * The suite's `test`. Every spec imports this rather than Playwright's, so no spec can
  * accidentally run without its target's wiring installed — hermetically that means the
  * fakes, and live it means the telemetry guard that keeps a test run out of Hotjar and
- * Rollbar.
+ * Sentry.
  */
 export const test = base.extend<Options & Fixtures>({
 	auth: [{}, { option: true }],
@@ -466,9 +466,10 @@ export const test = base.extend<Options & Fixtures>({
 		if (IS_LIVE) {
 			// Nothing is faked. The one thing that must still be intercepted is telemetry:
 			// a deployed build runs with PUB_APP_ENV=prod, so `+layout.ts` calls
-			// `initAnonymousAnalysis()` and `logError` posts to Rollbar. Left alone, the
-			// hourly cron would file 24 real error reports a day and inject 24 sessions
-			// into the analytics the site's owner actually reads.
+			// `initAnonymousAnalysis()` and the Sentry SDK is initialised — which reports
+			// uncaught errors whether or not the app asks it to. Left alone, the hourly
+			// cron would file 24 real Sentry issues a day and inject 24 sessions into the
+			// analytics the site's owner actually reads.
 			await installTelemetryGuard(context);
 		} else {
 			// Guard first — it is the fallback handler, and Playwright consults handlers in

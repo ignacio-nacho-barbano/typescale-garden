@@ -47,7 +47,10 @@
 			if (hasText) {
 				name = element.textContent || undefined;
 			} else {
-				if (!alt && ENV.IS_DEV) {
+				// Any non-production build, so the nag reaches a developer whether they are
+				// on `local` or looking at a Pages preview. (Was `IS_DEV`, back when that
+				// was the only non-prod value.)
+				if (!alt && !ENV.IS_PROD) {
 					console.warn(
 						"it's recommended for buttons that have only icons to have an alt, please provide one",
 						{ leadIcon, trailIcon, element }

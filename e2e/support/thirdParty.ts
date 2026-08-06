@@ -10,7 +10,11 @@ import { fontsStaticPayload } from "./golden";
  * fakeApi.ts. What is left is genuinely third-party — webfont files, analytics, favicon.
  */
 const GOOGLE_FONTS = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
-const ANALYTICS = /googletagmanager\.com|google-analytics\.com|hotjar\.com|api\.rollbar\.com/;
+// `sentry.io` covers both the ingest subdomain a DSN points at
+// (`o<orgId>.ingest.<region>.sentry.io`) and the plain `sentry.io` the Figma plugin's
+// hand-rolled reporter would use, so a DSN region change cannot quietly un-guard it.
+const ANALYTICS =
+	/googletagmanager\.com|google-analytics\.com|hotjar\.com|api\.rollbar\.com|sentry\.io/;
 const FAVICON = /typescalegarden\.uy\/ico\.ico$/;
 
 /** The committed snapshot `+layout.svelte` falls back to when `/api/fonts` fails. */
@@ -88,11 +92,15 @@ export async function installStaticFontsFallback(context: BrowserContext): Promi
  * is that they are real.
  *
  * Telemetry is the exception, and it is not about noise in the report. A deployed build runs
- * with `PUB_APP_ENV=prod`, which is the condition on both `initAnonymousAnalysis()` in
- * `+layout.ts` and the Rollbar branch of `logError`. Left alone, an hourly cron would inject
- * 24 sessions a day into the analytics someone actually reads, and file real error reports
- * for failures that are tests. Answered rather than aborted, so no `net::ERR_FAILED` lands
- * in the console.
+ * with `PUB_APP_ENV=prod`, which is the condition on `initAnonymousAnalysis()` in
+ * `+layout.ts` and half the condition on `SENTRY_ENABLED` (services/sentry.ts). Left alone,
+ * an hourly cron would inject 24 sessions a day into the analytics someone actually reads,
+ * and file real Sentry issues for failures that are tests. Answered rather than aborted, so
+ * no `net::ERR_FAILED` lands in the console.
+ *
+ * Sentry matters more here than Rollbar did: the SDK reports *uncaught* errors on its own,
+ * so a live run does not need the app to call `logError` for a test failure to become an
+ * issue in someone's inbox.
  */
 export async function installTelemetryGuard(context: BrowserContext): Promise<void> {
 	await context.route(ANALYTICS, (route) =>
