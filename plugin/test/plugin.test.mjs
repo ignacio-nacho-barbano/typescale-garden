@@ -53,12 +53,22 @@ const communityDefaults = [
 
 let tokenRevoked = false;
 
+/** Raw envelope bodies the plugin POSTed to Sentry, in order. */
+const sentryEnvelopes = [];
+
 /** Stands in for the API. Mirrors the real status codes, not just the happy path. */
 const figmaFetch = async (url, init = {}) => {
 	const ok = (body) => ({ ok: true, status: 200, json: async () => body });
 	const fail = (status) => ({ ok: false, status, json: async () => ({}) });
 	const path = url.replace(/^https?:\/\/[^/]+/, "");
 	const authorized = !tokenRevoked && (init.headers?.Authorization ?? "") === `Bearer ${TOKEN}`;
+
+	// Sentry ingest. Captured rather than merely tolerated: what the plugin sends is asserted
+	// at the end of this file.
+	if (path.includes("/envelope/")) {
+		sentryEnvelopes.push(init.body);
+		return ok({ id: "0".repeat(32) });
+	}
 
 	if (path === "/api/fonts") {
 		return ok({ kind: "webfonts#webfontList", items: golden.catalogue });
@@ -205,6 +215,47 @@ tokenRevoked = true;
 await send({ type: "refresh" });
 check("a revoked connection degrades to defaults", state().signedIn === false);
 check("…and forgets the dead token", storage.size === 0);
+
+// Error reporting. `ui-error` is the one capture path that needs nothing to fail — ui.html
+// forwards its own window errors through it — and the Error it reports is constructed inside
+// code.js, so its stack is a real stack from this sandbox. That is the part worth asserting:
+// a source map is resolved per frame, so unless the frames are there and are shaped the way
+// Sentry expects, uploading code.js.map achieves nothing. See plugin/sentry.ts.
+const envelopesBefore = sentryEnvelopes.length;
+
+await send({ type: "ui-error", message: "boom from the iframe" });
+
+check("a ui error is reported to Sentry", sentryEnvelopes.length === envelopesBefore + 1);
+
+const [header, itemHeader, payload] = (sentryEnvelopes.at(-1) ?? "").split("\n");
+const event = payload ? JSON.parse(payload) : {};
+const frames = event.exception?.values?.[0]?.stacktrace?.frames ?? [];
+
+check(
+	"…as one event envelope carrying the DSN",
+	JSON.parse(header ?? "{}").dsn?.includes("sentry.io") === true &&
+		JSON.parse(itemHeader ?? "{}").type === "event"
+);
+check(
+	"…tagged with the plugin surface",
+	event.tags?.surface === "plugin" && event.tags?.flow === "ui"
+);
+check("…with parsed stack frames, not a string", frames.length > 0, `${frames.length} frames`);
+check(
+	"…every frame naming the uploaded bundle, with a line number",
+	frames.every(
+		(frame) =>
+			frame.filename === "app:///code.js" &&
+			frame.abs_path === "app:///code.js" &&
+			Number.isInteger(frame.lineno) &&
+			frame.in_app === true
+	)
+);
+check(
+	"…and a release the source map can be uploaded under",
+	/^plugin@\d+\.\d+\.\d+$/.test(event.release ?? ""),
+	String(event.release)
+);
 
 console.log(failures === 0 ? "\nplugin: all checks passed" : `\nplugin: ${failures} failed`);
 process.exit(failures === 0 ? 0 : 1);

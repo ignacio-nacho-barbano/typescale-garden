@@ -28,6 +28,11 @@ inhabitants both moved out — `WEIGHTS_MAP` into `core`, and the Google Fonts s
 the Worker's `scheduled` handler — so it was deleted along with the `@services/*` path alias and the
 `create:fonts-file` script.
 
+`scripts/` at the repo root is **not** a package and has no `package.json`: it holds two
+dependency-free node scripts that two different packages' builds both need (the Sentry release string
+and the source-map upload — see "Source maps" below). They live outside the workspaces precisely
+because `client` and `plugin` share them.
+
 ## Commands
 
 ### `package-lock.json` is committed, and has to stay that way
@@ -48,9 +53,23 @@ conflict-free even on npm 9. So the lockfile is the only thing making CI reprodu
 Consequences:
 
 - **Don't re-ignore it, and commit it whenever it changes.**
-- `npm install <new-package>` can force a re-resolve and resurrect the `ERESOLVE`. If that happens,
-  the fix is upstream (Svelte 5 + `vite-plugin-svelte@7`; eslint flat config + `typescript-eslint@8`),
-  not `--legacy-peer-deps`.
+- `npm install <new-package>` can force a re-resolve and resurrect the `ERESOLVE`. The fix is the
+  **`overrides` block in the root `package.json`**, which relaxes exactly the two stale peer ranges
+  (`@sveltejs/vite-plugin-svelte`'s `vite`, `@typescript-eslint/*`'s `eslint`) and nothing else. With
+  those in place a plain `npm install` resolves, and it reproduces the hoisting above _identically_ —
+  root vite 5 / eslint 8, client vite 8 / eslint 10, no version changes anywhere. The real fix is
+  still upstream (Svelte 5 + `vite-plugin-svelte@7`; eslint flat config + `typescript-eslint@8`);
+  the overrides just stop the repo from being unable to add a dependency until then.
+- **Never `--legacy-peer-deps`.** It appears to work and breaks the Pages deploy. It makes npm ignore
+  peer declarations entirely, so nothing pulls `vite` to the root any more — and `@sveltejs/kit`
+  needs it there, via a _peer_ dependency, to `import "vite"` at build time. The result is a lockfile
+  whose clean install dies with
+  `Cannot find package 'vite' imported from node_modules/@sveltejs/kit/src/core/env.js`. It also
+  evicts root eslint 8 and drops ~95 packages. A local `node_modules` hides all of it, because an
+  incremental install leaves the previous tree's copies on disk and the build keeps finding them.
+- **Verify a lockfile change the way Pages will see it**, not the way your `node_modules` does:
+  `rsync -a --exclude node_modules --exclude .git . /tmp/check/ && cd /tmp/check && npm install && cd client && npm run build`.
+  That is the only check that catches the failure above.
 - The eslint half of this is the same root cause as the known `client#lint` failure below: eslint 10
   dropped `.eslintrc` support entirely, so `client/.eslintrc.cjs` cannot load.
 
@@ -69,6 +88,9 @@ never runs. Two consequences, both of which bit a real deploy:
   because npm is the only thing Pages invokes. The cost is that `turbo run build` builds `core` twice —
   once as client's declared dependency, once again via `prebuild` — which is wasted time but not
   incorrect. It also means `cd client && npm run build` works standalone, which it previously did not.
+- **The Sentry source-map upload is a `postbuild` hook for exactly the same reason**, and it also has
+  to run _after_ the adapter, on what Pages will actually deploy. See "Source maps" below; it exits 0
+  on every failure precisely because it sits in the deploy's critical path.
 - **The node version file must live in `client/`, not the repo root.** Pages reads it from the
   configured root directory; a `.node-version` at the repo root was committed, ignored, and the build
   ran on node 18.17.1 anyway, where vite 8's rolldown dies on
@@ -126,7 +148,8 @@ npm run db:import:local   # load scripts/atlas-import.sql — a fresh local DB i
 ```
 
 Plugin (`cd plugin`): `npm run build` (esbuild, via `build.mjs` → `code.js`, which is committed and is
-what Figma loads), `npm run check`, `npm run lint`, `npm test`, `npm run dev` for watch mode. Note
+what Figma loads), `npm run check`, `npm run lint`, `npm test`, `npm run dev` for watch mode, and
+`npm run sourcemaps:upload` at publish time (see "Source maps" under Error reporting). Note
 `dev` no longer type checks — esbuild only transpiles, so run `npm run check:watch` alongside it if
 you want that. `plugin#test` runs the _bundle_, so `plugin/turbo.json` gives it `dependsOn: ["build"]`.
 
@@ -544,6 +567,177 @@ Mongo era. Consequences to respect when changing the schema:
   `crypto.randomUUID()`. Both are opaque to the client, which persists ids.
 - `createdAt` / `lastModifiedAt` have no D1 default and are set explicitly as ISO-8601 strings.
 
+### Error reporting — Sentry, on three runtimes
+
+Sentry replaced Rollbar, which only ever covered the client (`server` carried the dependency and
+never imported it). All three surfaces report into the one `typescale-garden-app` project and are
+told apart by a **`surface` tag** — `browser`, `ssr`, `worker`, `plugin`. Keep those values in step
+across `client/src/services/sentry.ts`, `server/src/sentry.ts` and `plugin/sentry.ts`; without the
+tag a shared project mixes three unrelated runtimes into one issue list.
+
+The DSN is configured per surface, and **empty is a supported state everywhere** — it means "report
+nothing" and restores exactly the pre-Sentry behaviour. All four point at the one project
+(`typescale-garden-app`, org region `de`):
+
+| where                          | value            | reaches                             |
+| ------------------------------ | ---------------- | ----------------------------------- |
+| root `.env` (gitignored)       | `PUB_SENTRY_DSN` | local client builds                 |
+| **Cloudflare Pages env vars**  | `PUB_SENTRY_DSN` | the deployed client — browser + SSR |
+| `server/wrangler.jsonc` `vars` | `SENTRY_DSN`     | the Worker                          |
+| `plugin/sentry.ts` (a `const`) | `SENTRY_DSN`     | the Figma plugin                    |
+
+The Pages row is easy to miss and is the one that matters in production: `.env` is gitignored, so the
+Pages build never sees it, and `PUB_*` values are **inlined at build time** from the dashboard's
+environment variables. A DSN set only in `.env` means local builds report and the deployed site does
+not.
+
+A DSN is a public identifier — it only grants "write an event" — which is why it is `PUB_`-prefixed,
+lives in `vars` rather than behind `wrangler secret put`, and is hardcoded in a published plugin.
+`PUB_SENTRY_DSN` must **exist** in `.env` even when empty: `services/sentry.ts` imports it from
+`$env/static/public`, and SvelteKit fails the build on a missing name.
+
+Reporting is additionally gated on the environment, and **`PUB_APP_ENV` has three values** for this
+reason — `local` used to be spelled `dev`, which left no way to say "a deployed non-production build":
+
+| `PUB_APP_ENV` | is                                     | Sentry             | analytics |
+| ------------- | -------------------------------------- | ------------------ | --------- |
+| `local`       | a dev machine, and the e2e suite       | **no** — console   | no        |
+| `dev`         | a deployed build, i.e. a Pages preview | yes, tagged `dev`  | no        |
+| `prod`        | typescalegarden.uy                     | yes, tagged `prod` | yes       |
+
+`SENTRY_ENABLED` is `Boolean(DSN) && !IS_LOCAL` on both the client and the Worker, and the plugin's
+`ENVIRONMENT` const does the same. Note it is `!IS_LOCAL` and not `IS_DEV || IS_PROD` on purpose: an
+unrecognised value should still report, because losing errors is worse than an oddly named
+environment in the Sentry UI. `IS_PRODUCTION` in `server/src/secrets.ts` keeps failing closed the
+other way (anything that is not `dev` or `local` is production), since what it guards is whether raw
+errors are echoed in a response.
+
+Two footguns in the `local` row:
+
+- **`wrangler dev` reads `vars` from `wrangler.jsonc`, where `PUB_APP_ENV` is `"prod"`.** A local
+  Worker therefore looks like production and would file issues against the real project. Put
+  `PUB_APP_ENV=local` in `server/.dev.vars` — that file is the only local override wrangler reads.
+- **The plugin has no env system at all**, so `ENVIRONMENT` in `plugin/sentry.ts` is a committed
+  constant. Set it to `"local"` while developing against a local Worker, i.e. whenever you also
+  change `API_BASE` in `code.ts`.
+
+**The client's server half deliberately does not use a Sentry SDK.** This is the one non-obvious
+thing here, and `client/src/services/sentryEnvelope.ts` carries the full explanation. In short: every
+SDK that works on Cloudflare (`@sentry/cloudflare`, which `@sentry/sveltekit` re-exports through its
+`worker` export condition) has a top-level `import { AsyncLocalStorage } from "node:async_hooks"`,
+and a _dynamic_ `import()` does not keep it out of the bundle — the adapter bundles `_worker.js` with
+esbuild, which hoists a lazily-reached module's external imports into static top-level ones. workerd
+only resolves `node:` specifiers when `nodejs_als` / `nodejs_compat` is enabled, and the Pages
+project's flags live in the Cloudflare dashboard rather than in this repo, so a static import there
+risks the Worker failing to **start** — the whole site, not just error reporting. So SSR reports
+through a hand-built envelope POST over plain `fetch`, and the invariant to preserve is:
+
+```bash
+# Nothing in the SSR graph may pull in a Sentry SDK. Expect exactly 1 — SvelteKit's own
+# `import("node:async_hooks").then(…).catch(…)` probe, which is dynamic and harmless.
+grep -c "node:async_hooks" client/.svelte-kit/cloudflare/_worker.js
+```
+
+That is also why `services/errorLogger.ts` guards its dynamic import with `browser &&` rather than
+just checking it at runtime: `browser` is a build-time constant, so the server build drops the branch
+and the SDK with it. The browser half does use the real SDK (`hooks.client.ts`), where none of this
+applies — that is what buys automatic uncaught-exception and unhandled-rejection reporting.
+
+Per surface:
+
+- **client, browser** — `hooks.client.ts` inits the SDK and exports `handleError`; `logError` in
+  `services/errorLogger.ts` keeps its old signature, so no call site changed, and reports through
+  `captureException` (real `Error`, so Sentry groups on its stack) or `captureMessage`. This is the
+  half `release` and the uploaded source maps apply to — see "Source maps" below.
+- **client, SSR** — `hooks.server.ts` exports only `handleError`, no `handle`. 404s return early:
+  they are answers, not failures, and the hermetic e2e run produces one per test because
+  `+layout.svelte`'s SSR fetch of `/api/fonts` is not intercepted by the browser-level fakes.
+- **Worker** — `Sentry.withSentry(…)` wraps the exported handler in `src/index.ts`, which covers
+  `fetch` _and_ `scheduled`. Express errors never reach it (its error middleware answers a 500
+  first), so `utils/error-handling.ts` captures separately, and only for `status >= 500` — the 404
+  handler manufactures an `Error("Not Found")` for every unmatched path, so reporting 4xx would mean
+  one issue per crawler.
+- **fonts cron** — wrapped in `Sentry.withMonitor(…)` with the schedule duplicated from
+  `triggers.crons` (`FONTS_CRON_MONITOR` in `src/sentry.ts` — keep the two in step or Sentry reports
+  phantom misses). The check-ins are the point: `snapshot.ts` fails closed, so a refresh that breaks
+  leaves the last good catalogue serving and **a missed day is otherwise invisible**. An exception can
+  only be reported by a run that happened; the monitor is what catches a cron that stopped firing.
+- **plugin** — no SDK, by necessity as much as taste: `code.js` is committed and reviewed, and
+  Figma's sandbox has no `window`, `crypto` or even `URL`, so `plugin/sentry.ts` parses the DSN with a
+  regex and builds the event id from `Math.random`. `plugin/test/plugin.test.mjs` enforces this by
+  running the bundle in a `vm` context with an explicit global whitelist. Coverage comes from
+  wrapping `figma.ui.onmessage` (the sandbox's only entry point — there is no global `onerror` to
+  hook) plus the individual `catch` blocks; `ui.html` forwards its own `onerror` /
+  `onunhandledrejection` as a `ui-error` message rather than reporting from the iframe, which keeps
+  the DSN out of it for the same reason the bearer token is kept out. **`manifest.json` must allow
+  the host** — the exact ingest host is listed rather than a `https://*.sentry.io` wildcard, because
+  a single-label wildcard is not guaranteed to match a four-label host like
+  `o<orgId>.ingest.de.sentry.io`. A sandbox `fetch` outside `allowedDomains` is blocked outright, so
+  changing the DSN's org or region means changing the manifest too.
+
+**The e2e suite is telemetry-silent in both modes, and both mechanisms matter.** Hermetically
+`PUB_SENTRY_DSN` is `""` so the SDK is never initialised — nothing to intercept. A live run is the
+opposite: that build has a real DSN inlined, and the SDK reports uncaught errors whether or not the
+app asks it to, so `installTelemetryGuard` in `support/thirdParty.ts` has to catch `sentry.io`.
+Without it the hourly cron would file real issues for failures that are tests.
+
+#### Source maps
+
+The browser bundle and the plugin bundle are symbolicated; the SSR half is not (see the end of this
+section). Two dependency-free node scripts at the repo root do it, and there is no `@sentry/cli` and
+no `sentrySvelteKit()` vite plugin — the header of `scripts/sentry-sourcemaps.mjs` argues that at
+length, but the short version is that a postinstall-fetched binary and a plugin that auto-instruments
+`load` functions (i.e. injects `@sentry/sveltekit` into the **SSR** graph, the one thing
+`sentryEnvelope.ts` exists to prevent) both cost more here than three HTTP calls.
+
+The join is **release-based**, not debug-id-based: an event carries a `release`, the artifacts are
+uploaded under that same release, and Sentry matches them by name. So the release string is computed
+in exactly one place, `scripts/sentryRelease.mjs`, and read by both sides of each surface:
+
+| surface | release            | inlined by                                       | uploaded by                                       |
+| ------- | ------------------ | ------------------------------------------------ | ------------------------------------------------- |
+| client  | `client@<sha>`     | `vite.config.ts` `define` → `__SENTRY_RELEASE__` | `client`'s **`postbuild`**, on every build        |
+| plugin  | `plugin@<version>` | `build.mjs` `define` → `__PLUGIN_RELEASE__`      | `npm run sourcemaps:upload` in `plugin/`, by hand |
+
+A mismatch fails nothing loudly — it just silently leaves every trace unsymbolicated — which is why
+both sides call the same function rather than keeping two copies of a snippet. Things worth knowing:
+
+- **`SENTRY_AUTH_TOKEN` is the switch, and it is not in `.env`.** An **org** auth token with
+  `project:releases` scope (`SENTRY_TOKEN` in `.env` is a DSN public key, not an API token). Absent =
+  the upload is skipped with a log line, which is the normal state on a developer's machine. For the
+  deployed client it has to be set as a **Cloudflare Pages environment variable**, the same easy-to-miss
+  place as `PUB_SENTRY_DSN`. `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_URL` have working defaults in
+  the script and only need setting if the org, project or **region** changes (`de` today, and the plain
+  `sentry.io` API host does not route release-file writes for a `de` org).
+- **The upload never fails a build.** It runs as an npm `postbuild` hook, so a non-zero exit would
+  fail the Pages deploy; every failure path logs `sentry: WARNING …` and exits 0. A Sentry outage must
+  not be able to take the site down.
+- **`postbuild` is an npm lifecycle hook for the same reason `prebuild` is** — Pages runs `npm run build`
+  inside `client/` and turbo never enters the picture (see the Pages section above).
+- **The maps are deleted from `.svelte-kit/cloudflare` after uploading**, because that directory _is_
+  what Pages deploys. `SENTRY_KEEP_SOURCEMAPS=1` keeps them; `SENTRY_DRY_RUN=1` prints the artifact
+  names and touches neither Sentry nor the disk, which is the only way to check the naming without a
+  token. The plugin's `code.js.map` is gitignored and never deleted — it never leaves the machine.
+- **`build.sourcemap` is `true`, not `"hidden"`.** The `//# sourceMappingURL=` comment each chunk keeps
+  is how Sentry finds which artifact holds that chunk's map. Since the maps themselves are deleted,
+  what ships is a comment pointing at a file that is not there — deliberate, and the reason the upload
+  also attaches a `Sourcemap` header to each `.js` artifact as a second route to the same answer.
+- **The plugin parses its stack into frames** (`parseStack` in `plugin/sentry.ts`) rather than sending
+  a string, because Sentry resolves a map per _frame_. Every frame is reported as `app:///code.js`
+  whatever Figma's sandbox calls the script: the bundle is a single IIFE, so there is exactly one file
+  to be in, and the name the sandbox reports is not something this repo can pin. `app:///` is the
+  conventional scheme for a bundle never served over HTTP, and Sentry resolves it to the `~/code.js`
+  artifact. The raw stack stays in `extra` as the check on that normalization, and
+  `plugin/test/plugin.test.mjs` asserts the frame shape — a wrong shape is invisible otherwise.
+- **Bump `plugin/package.json`'s `version` when publishing to Figma.** The plugin's release is its
+  version, not a commit sha, because what a user runs is the `code.js` of a published version; two
+  different bundles sharing one release means the second upload replaces the first one's maps.
+- **`_worker.js` is skipped, so the SSR half is still unsymbolicated.** Not an oversight: it reports
+  through the hand-built envelope, which sends an unparsed stack string rather than frames, so there
+  is nothing for a map to resolve. Symbolicating it needs frames _and_ certainty about the filename
+  workerd reports, and the file that actually runs is a re-bundle adapter-cloudflare's own esbuild
+  pass makes out of SvelteKit's server chunks. Its map is still deleted from the deploy output.
+
 ### Types
 
 Root `tsconfig.json` maps `@tsg-types` → `types/index` (Google Fonts API shapes). The alias is not
@@ -579,14 +773,30 @@ One root `.env` serves both apps. SvelteKit is configured with `env.dir: "../"` 
 `process.env`, sourced from `vars` in `wrangler.jsonc` (public) plus `wrangler secret put` / a local
 `server/.dev.vars` (`DB_STRING`, `JWT_SECRET`, `SESSION_SECRET`, `FONTS_API_KEY`).
 `PUB_FEATURE_FLAGS` is a substring-matched string (e.g. `"load-save"`, `"contrast"`).
+`PUB_SENTRY_DSN` and the Worker's `SENTRY_DSN` are covered under "Error reporting" above — both may be
+empty, but `PUB_SENTRY_DSN` has to be _present_ in `.env` or the client build fails on a missing
+`$env/static/public` export. `SENTRY_TOKEN` in `.env` is unused by any code: it is a DSN public key,
+not an API token, and the DSN it belongs to is what `PUB_SENTRY_DSN` wants.
+
+`SENTRY_AUTH_TOKEN` is the one Sentry value that is a real secret, and it is deliberately _not_ a
+`PUB_*` var: it is read only by `scripts/sentry-sourcemaps.mjs`, at build time, on the machine doing
+the build — a developer's shell for the plugin, and the Cloudflare Pages build environment for the
+client. Nothing at runtime ever sees it. `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_URL`,
+`SENTRY_DRY_RUN` and `SENTRY_KEEP_SOURCEMAPS` are optional overrides on the same script.
 
 The root `.env` is **not** shared with the Worker, despite the name: wrangler only reads
 `server/.dev.vars`, so a secret that exists in the root `.env` alone is undefined under
 `wrangler dev`. `wrangler types` reflects whatever `.dev.vars` currently holds, which means deleting a
-key there silently drops it from the generated `Env` too.
+key there silently drops it from the generated `Env` too — and note this cuts both ways: running
+`npm run cf-typegen` in a checkout that has **no** `.dev.vars` (a fresh clone, or a git worktree,
+since the file is gitignored) silently drops `FONTS_API_KEY` and friends from `Env` and breaks
+`npm run check`. Regenerate only where `.dev.vars` is populated.
 
 Note `server/src/secrets.ts`: `IS_PRODUCTION` fails closed — anything other than `PUB_APP_ENV=dev`
-is treated as production.
+or `PUB_APP_ENV=local` is treated as production.
+
+`PUB_APP_ENV` is a three-value enum (`local` | `dev` | `prod`); what each one turns on is tabulated
+under "Error reporting" above, and `client/src/services/env.ts` is where the flags are derived.
 
 ## Conventions
 

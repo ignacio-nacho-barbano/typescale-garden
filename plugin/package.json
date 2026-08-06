@@ -1,6 +1,6 @@
 {
 	"name": "plugin",
-	"version": "1.1.2",
+	"version": "1.1.3",
 	"private": true,
 	"description": "An import tool for typescale-garden",
 	"main": "code.js",
@@ -10,7 +10,8 @@
 		"check:watch": "tsc -p ./tsconfig.json --noEmit --watch",
 		"lint": "eslint .",
 		"test": "node ./test/plugin.test.mjs",
-		"dev": "node ./build.mjs --watch"
+		"dev": "node ./build.mjs --watch",
+		"sourcemaps:upload": "node ../scripts/sentry-sourcemaps.mjs plugin"
 	},
 	"author": "@ignacio-nacho-barbano (Ignacio Rafael Barbano Panisello)",
 	"license": "GPL-3.0",

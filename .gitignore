@@ -13,6 +13,10 @@ dist/
 .dev.vars.*
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+# The plugin's source map. code.js *is* committed (it is what Figma loads), but its map is
+# only ever read by `npm run sourcemaps:upload --workspace plugin` right after a build, so
+# committing 100 kB of generated JSON that changes on every build would be pure noise.
+plugin/code.js.map
 certificates/
 .ssh
 .turbo/

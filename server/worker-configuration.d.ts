@@ -4,6 +4,7 @@
 interface __BaseEnv_Env {
 	FONTS: KVNamespace;
 	DB: D1Database;
+	SENTRY_DSN: "https://d67d38563f6359c0766c81e5126ad044@o4511689468608512.ingest.de.sentry.io/4511809570144336";
 	APP_PORT: "3000";
 	PUB_APP_ENV: "prod";
 	PUB_CLIENT_ORIGIN: "https://typescalegarden.uy";
@@ -27,7 +28,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "APP_PORT" | "PUB_APP_ENV" | "PUB_CLIENT_ORIGIN" | "PUB_API_URL" | "PUB_AUTH_CLIENT_ID" | "PUB_AUTH_DOMAIN" | "PUB_FEATURE_FLAGS" | "DB_STRING" | "JWT_SECRET" | "SESSION_SECRET" | "FONTS_API_KEY">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "SENTRY_DSN" | "APP_PORT" | "PUB_APP_ENV" | "PUB_CLIENT_ORIGIN" | "PUB_API_URL" | "PUB_AUTH_CLIENT_ID" | "PUB_AUTH_DOMAIN" | "PUB_FEATURE_FLAGS" | "DB_STRING" | "JWT_SECRET" | "SESSION_SECRET" | "FONTS_API_KEY">> {}
 }
 
 // Begin runtime types

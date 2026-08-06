@@ -43,18 +43,26 @@ export const AUTH_CLIENT_ID = "e2eClientId";
 export const API_BASE = `${API_URL}/api`;
 
 export const E2E_PUB_ENV: Record<string, string> = {
-	// `dev` keeps hotjar out of +layout.ts and stops errorLogger from posting to Rollbar
-	// (it console.errors instead — which is why the console-hygiene spec treats an
+	// `local` — one of three values (`local` | `dev` | `prod`; see client/src/services/env.ts).
+	// It keeps hotjar out of +layout.ts and stops errorLogger from posting to Sentry (it
+	// console.errors instead — which is why the console-hygiene spec treats an
 	// `Error Logger:` line as a failure rather than noise).
-	PUB_APP_ENV: "dev",
+	//
+	// It has to be `local` specifically, not merely "not prod": `dev` is a *deployed* Pages
+	// preview and reports to Sentry exactly like production does.
+	PUB_APP_ENV: "local",
 	PUB_API_URL: API_URL,
 	PUB_AUTH_DOMAIN: AUTH_DOMAIN,
 	PUB_AUTH_CLIENT_ID: AUTH_CLIENT_ID,
 	PUB_CLIENT_ORIGIN: BASE_URL,
-	// Rollbar is constructed regardless of environment (errorLogger.ts does it at module
-	// scope) and only the *reporting* is gated on PUB_APP_ENV, so the token has to exist.
-	// Its `captureUncaught` handler can still try to POST; thirdParty.ts aborts that host.
-	PUB_ROLLBAR_TOKEN: "e2e-disabled",
+	// Imported from `$env/static/public` by client/src/services/sentry.ts, so the name has
+	// to exist or the build fails on a missing export. Empty on purpose, and that is the
+	// whole of what keeps a hermetic run from talking to Sentry: `SENTRY_ENABLED` is
+	// `Boolean(PUB_SENTRY_DSN) && !IS_LOCAL`, so an empty DSN means the SDK is never even
+	// initialised — no global error listeners, no transport, nothing to intercept.
+	// (A *live* run is the opposite case: that build has a real DSN baked in, which is why
+	// thirdParty.ts's telemetry guard has to catch Sentry's ingest host.)
+	PUB_SENTRY_DSN: "",
 	// Substring-matched in Sidebar.svelte, where it now gates the Contrast accordion
 	// only — the File section is unconditional. Deliberately does not contain
 	// "contrast": that panel is flagged off in production, so the suite tests what

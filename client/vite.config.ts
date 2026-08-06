@@ -3,6 +3,7 @@ import { sveltekit } from "@sveltejs/kit/vite";
 import { defaultClientConditions, defaultServerConditions, type Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 import { imagetools } from "vite-imagetools";
+import { clientRelease } from "../scripts/sentryRelease.mjs";
 
 // SvelteKit >= 2.12 decides whether it is running under Svelte 4 or Svelte 5 at *runtime*, by
 // stringifying `onMount` and looking for tell-tale legacy source text
@@ -122,6 +123,25 @@ export default defineConfig({
 	plugins: [pinKitToSvelte4(), keepInlineQueryOnSvelteStyles(), sveltekit(), imagetools()],
 	test: {
 		include: ["src/**/*.{test,spec}.{js,ts}"]
+	},
+	// The release the browser SDK stamps on every event, and the one the source maps are
+	// uploaded under — the same function call on both sides, which is the only thing making
+	// them match (see scripts/sentryRelease.mjs). Read back in src/services/sentry.ts.
+	//
+	// Deliberately not a `PUB_*` env var: those come from the *dashboard* on Cloudflare
+	// Pages, so keeping the release there would mean remembering to change a dashboard
+	// setting on every deploy, and a stale one silently symbolicates against the wrong
+	// bundle.
+	define: { __SENTRY_RELEASE__: JSON.stringify(clientRelease()) },
+	build: {
+		// Needed for Sentry to un-minify a browser stack trace, and emitting them is only
+		// half of it: `postbuild` (scripts/sentry-sourcemaps.mjs) uploads the maps and then
+		// deletes them from `.svelte-kit/cloudflare`, which *is* the directory Pages
+		// deploys. `SENTRY_KEEP_SOURCEMAPS=1` keeps them for local inspection.
+		//
+		// `true` rather than `"hidden"`: the `//# sourceMappingURL=` comment it leaves in
+		// each chunk is what tells Sentry which artifact holds that chunk's map.
+		sourcemap: true
 	},
 	// `@sveltejs/vite-plugin-svelte@3` sets `resolve.conditions = ["svelte"]`. Under vite 5 that was
 	// *additive* — the docs called it "additional allowed conditions" and vite always applied its own

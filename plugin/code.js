@@ -173,6 +173,127 @@
     return tokens;
   };
 
+  // sentry.ts
+  var SENTRY_DSN = "https://d67d38563f6359c0766c81e5126ad044@o4511689468608512.ingest.de.sentry.io/4511809570144336";
+  var ENVIRONMENT = "prod";
+  var RELEASE = true ? "plugin@1.1.3" : void 0;
+  var DSN_PATTERN = /^(https?:)\/\/([0-9a-f]+)@([^/]+)\/(\d+)$/i;
+  var FRAME_FILE = "app:///code.js";
+  var MAX_FRAMES = 50;
+  function parseStack(stack) {
+    const frames = [];
+    for (const rawLine of stack.split("\n")) {
+      const trimmed = rawLine.trim();
+      const line = trimmed.replace(/^at\s+/, "").replace(/^async\s+/, "");
+      if (!line) {
+        continue;
+      }
+      const parenthesized = /^(.*?)\s*\(([^()]*)\)$/.exec(line);
+      const atSign = /^([^@]*)@(.*)$/.exec(line);
+      if (!/^at\s+/.test(trimmed) && !atSign) {
+        continue;
+      }
+      const name = parenthesized ? parenthesized[1] : atSign ? atSign[1] : "";
+      const location = parenthesized ? parenthesized[2] : atSign ? atSign[2] : line;
+      const position = /:(\d+)(?::(\d+))?$/.exec(location);
+      if (!position) {
+        continue;
+      }
+      const frame = {
+        filename: FRAME_FILE,
+        abs_path: FRAME_FILE,
+        lineno: Number(position[1]),
+        in_app: true
+      };
+      if (position[2]) {
+        frame.colno = Number(position[2]);
+      }
+      if (name) {
+        frame.function = name;
+      }
+      frames.push(frame);
+      if (frames.length === MAX_FRAMES) {
+        break;
+      }
+    }
+    return frames.reverse();
+  }
+  var endpoint;
+  function resolveEndpoint() {
+    if (endpoint !== void 0) {
+      return endpoint;
+    }
+    const match = ENVIRONMENT === "local" ? null : DSN_PATTERN.exec(SENTRY_DSN.trim());
+    endpoint = match ? { url: `${match[1]}//${match[3]}/api/${match[4]}/envelope/`, key: match[2] } : null;
+    return endpoint;
+  }
+  function newEventId() {
+    let id = "";
+    for (let index = 0; index < 32; index++) {
+      id += Math.floor(Math.random() * 16).toString(16);
+    }
+    return id;
+  }
+  function captureError(error, context, extra) {
+    const target = resolveEndpoint();
+    if (!target) {
+      return;
+    }
+    const isError = error instanceof Error;
+    const eventId = newEventId();
+    const frames = isError && error.stack ? parseStack(error.stack) : [];
+    const event = {
+      event_id: eventId,
+      timestamp: Date.now() / 1e3,
+      platform: "javascript",
+      level: "error",
+      environment: ENVIRONMENT,
+      // Undefined drops out of JSON.stringify, so a build without the `define` simply
+      // reports an unsymbolicated event rather than one Sentry rejects.
+      release: RELEASE,
+      tags: {
+        // Keep in step with client/src/services/sentry.ts and server/src/sentry.ts: all
+        // three surfaces can report into one project, and this tag is what keeps an
+        // issue list triageable.
+        surface: "plugin",
+        flow: context
+      },
+      exception: {
+        values: [
+          {
+            type: isError ? error.name : "Error",
+            value: isError ? error.message : String(error),
+            // Omitted rather than sent empty when the stack could not be parsed:
+            // `stacktrace: { frames: [] }` makes Sentry group every such event
+            // together, whereas no stacktrace at all groups on type and message.
+            stacktrace: frames.length > 0 ? { frames } : void 0
+          }
+        ]
+      },
+      // The unedited stack is kept alongside the frames on purpose — it is the check on
+      // the normalization FRAME_FILE performs, and the only thing left if the parser ever
+      // meets a stack shape it does not know. A call site may override it, which is what
+      // the `ui-error` case in code.ts does with the iframe's own stack.
+      extra: { stack: isError ? error.stack : void 0, ...extra }
+    };
+    let body;
+    try {
+      body = [
+        JSON.stringify({ event_id: eventId, sent_at: (/* @__PURE__ */ new Date()).toISOString(), dsn: SENTRY_DSN }),
+        JSON.stringify({ type: "event" }),
+        JSON.stringify(event)
+      ].join("\n");
+    } catch {
+      return;
+    }
+    void fetch(`${target.url}?sentry_key=${target.key}&sentry_version=7`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-sentry-envelope" },
+      body
+    }).catch(() => {
+    });
+  }
+
   // code.ts
   var API_BASE = "https://api.typescalegarden.uy";
   var TOKEN_KEY = "tsg-plugin-token-v1";
@@ -185,6 +306,7 @@
       return await figma.clientStorage.getAsync(TOKEN_KEY) ?? null;
     } catch (error) {
       console.error("Could not read the stored token", error);
+      captureError(error, "get-token");
       return null;
     }
   }
@@ -234,6 +356,7 @@
           figma.notify("This Figma plugin was disconnected from your account.");
         } else {
           console.error(error);
+          captureError(error, "load-typescales", { paired: true });
           postState({
             signedIn: true,
             typescales: [],
@@ -249,6 +372,7 @@
       postState({ signedIn: false, typescales: typescales.map(toListed) });
     } catch (error) {
       console.error(error);
+      captureError(error, "load-typescales", { paired: false });
       postState({
         signedIn: false,
         typescales: [],
@@ -284,6 +408,7 @@
       await loadTypescales();
     } catch (error) {
       console.error(error);
+      captureError(error, "pair");
       postState({
         signedIn: false,
         typescales: [],
@@ -327,6 +452,10 @@
       tokens = buildTokens(variants, typescale.base.breakpoint, font);
     } catch (error) {
       console.error(error);
+      captureError(error, "import-typescale", {
+        fontName: typescale.base.fontName,
+        catalogueLoaded: fontCatalogue !== null
+      });
       figma.notify("Could not work out that scale — see the console.", { error: true });
       return;
     }
@@ -353,6 +482,7 @@
       const message = `Unable to load one of the font weights: ${error}`;
       figma.notify(message, { error: true });
       console.error(message, fontsToLoad, error);
+      captureError(error, "load-fonts", { fonts: Array.from(fontsToLoad.values()) });
     }
     try {
       let lastSuccessfulFontName;
@@ -387,9 +517,22 @@
       const message = "Unable to import styles 🙁";
       figma.notify(message, { error: true });
       console.error(message, fontsToLoad, fontsUnableToBeLoaded, error);
+      captureError(error, "apply-tokens", {
+        styleCount: Object.keys(jsonStyles).length,
+        fontsUnableToBeLoaded: Array.from(fontsUnableToBeLoaded.values())
+      });
     }
   }
   figma.ui.onmessage = async (msg) => {
+    try {
+      await handleMessage(msg);
+    } catch (error) {
+      console.error(error);
+      captureError(error, msg && msg.type ? String(msg.type) : "unknown-message");
+      figma.notify("Something went wrong — see the console.", { error: true });
+    }
+  };
+  async function handleMessage(msg) {
     switch (msg.type) {
       case "init":
         await loadTypescales();
@@ -411,9 +554,20 @@
       case "import-styles":
         await applyTokens(msg.jsonStyles);
         break;
+      // Reported by ui.html's own error handlers. The iframe is a real browser context and
+      // could reach Sentry directly, but routing it through here keeps every report going
+      // out of one place under one manifest-allowed host — and keeps the DSN out of the
+      // iframe, the same reasoning that keeps the bearer token out of it.
+      case "ui-error":
+        captureError(new Error(String(msg.message)), "ui", {
+          stack: msg.stack,
+          source: msg.source
+        });
+        break;
       case "cancel":
         figma.closePlugin();
         break;
     }
-  };
+  }
 })();
+//# sourceMappingURL=code.js.map

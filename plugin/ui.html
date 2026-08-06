@@ -90,6 +90,28 @@
 	const post = (message) => parent.postMessage({ pluginMessage: message }, "*");
 	const toggle = (element, shown) => element.classList.toggle("hidden", !shown);
 
+	// Hand anything uncaught in here to the sandbox, which is the only side that reports to
+	// Sentry — see the `ui-error` case in code.ts for why it is routed rather than sent from
+	// this iframe. Registered before anything else below can throw.
+	window.onerror = (message, source, line, column, error) =>
+		post({
+			type: "ui-error",
+			message: (error && error.message) || String(message),
+			stack: error && error.stack,
+			source: `${source}:${line}:${column}`
+		});
+
+	window.onunhandledrejection = (event) => {
+		const reason = event.reason;
+
+		post({
+			type: "ui-error",
+			message: (reason && reason.message) || String(reason),
+			stack: reason && reason.stack,
+			source: "unhandledrejection"
+		});
+	};
+
 	$("connect").onclick = () => post({ type: "pair", code: $("pairing-code").value });
 	$("disconnect").onclick = () => post({ type: "unpair" });
 	$("refresh").onclick = () => post({ type: "refresh" });

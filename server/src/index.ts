@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/cloudflare";
 import { httpServerHandler } from "cloudflare:node";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -7,6 +8,7 @@ import logger from "morgan";
 import { refreshFontsSnapshot, serveFontsSnapshot } from "./fonts/snapshot";
 import { MainRouter } from "./routes";
 import { APP_PORT, CLIENT_ORIGIN } from "./secrets";
+import { FONTS_CRON_MONITOR, workerSentryOptions } from "./sentry";
 import { loadErrorHandlers } from "./utils";
 
 const app = express();
@@ -67,7 +69,7 @@ const nodeBridge = httpServerHandler({ port: APP_PORT });
 // Do NOT reach for the lower-level `handleAsNodeRequest` to do this instead: it
 // exists at runtime but is absent from @cloudflare/workers-types and the generated
 // worker-configuration.d.ts, so it breaks `npm run check`.
-export default {
+const handler = {
 	async fetch(request, env, ctx) {
 		// The fonts snapshot is served here rather than as an Express route: helmet's
 		// Cross-Origin-Resource-Policy header would block the client's cross-origin
@@ -84,6 +86,30 @@ export default {
 	// awaits this promise, so no ctx.waitUntil is needed. Throwing is the intended
 	// failure mode: it leaves the last good snapshot in KV.
 	async scheduled() {
-		await refreshFontsSnapshot();
+		// `withMonitor` brackets the run with Sentry check-ins (in-progress, then ok or
+		// error) and re-throws, so the documented fail-closed behaviour above is intact.
+		//
+		// The check-ins are the point: `withSentry` below already captures whatever this
+		// throws, but an exception can only be reported by a run that actually happened.
+		// A cron that stops firing — a deleted trigger, a suspended Worker, an account
+		// issue — produces no error at all, and snapshot.ts is deliberately built so that
+		// silence looks exactly like success from the outside. The monitor is what turns
+		// that silence into an alert.
+		await Sentry.withMonitor(FONTS_CRON_MONITOR.slug, () => refreshFontsSnapshot(), {
+			schedule: FONTS_CRON_MONITOR.schedule,
+			checkinMargin: FONTS_CRON_MONITOR.checkinMargin,
+			maxRuntime: FONTS_CRON_MONITOR.maxRuntime,
+			timezone: FONTS_CRON_MONITOR.timezone
+		});
 	}
 } satisfies ExportedHandler<Env>;
+
+// Wrapped rather than `Sentry.init()`-ed at module scope: on Workers there is no
+// long-lived process to initialise into, and the SDK needs the invocation's
+// AsyncLocalStorage context to tie an error to the request that caused it. This also
+// instruments `scheduled`, so an uncaught throw from the cron is reported without the
+// handler doing anything.
+//
+// Unhandled errors from *Express* do not reach here — its error middleware catches them
+// first and answers a 500 — which is why utils/error-handling.ts captures separately.
+export default Sentry.withSentry(() => workerSentryOptions(), handler);
