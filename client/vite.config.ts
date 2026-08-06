@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { sveltekit } from "@sveltejs/kit/vite";
-import { defaultClientConditions, defaultServerConditions, type Plugin } from "vite";
+import { defaultClientConditions, defaultServerConditions, loadEnv, type Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 import { imagetools } from "vite-imagetools";
 import { clientRelease } from "../scripts/sentryRelease.mjs";
@@ -119,7 +119,7 @@ function keepInlineQueryOnSvelteStyles(): Plugin {
 // "svg file did not start with <svg> tag" on the one import that used it. `enforce: "pre"`
 // orders transforms, not loads, so it made no difference. The logo is now a real component
 // (src/components/Logo.svelte); SVGs referenced by URL are unaffected and still live in static/.
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [pinKitToSvelte4(), keepInlineQueryOnSvelteStyles(), sveltekit(), imagetools()],
 	test: {
 		include: ["src/**/*.{test,spec}.{js,ts}"]
@@ -132,7 +132,30 @@ export default defineConfig({
 	// Pages, so keeping the release there would mean remembering to change a dashboard
 	// setting on every deploy, and a stale one silently symbolicates against the wrong
 	// bundle.
-	define: { __SENTRY_RELEASE__: JSON.stringify(clientRelease()) },
+	// The Sentry DSN, inlined the same way and for a related reason. It *is* a `PUB_*` var —
+	// set on Cloudflare Pages, or in the root `.env` locally — but it is deliberately read
+	// here rather than imported from `$env/static/public` by the modules that need it.
+	//
+	// `$env/static/public` is a virtual module built from the names that happen to be
+	// defined, so a name nothing defines is not "empty", it is a **missing export** and
+	// rolldown fails the build. That turned a var absent from the Pages dashboard into a
+	// dead deploy of the whole site — the one failure mode the rest of this integration
+	// goes out of its way to avoid (the source-map upload exits 0 on every error for the
+	// same reason; see scripts/sentry-sourcemaps.mjs). Read through `loadEnv` with an
+	// explicit `""` fallback, a missing DSN means what it means everywhere else in the
+	// codebase: report nothing.
+	//
+	// `loadEnv` reproduces exactly what SvelteKit does with these — same `env.dir: "../"`
+	// and same `publicPrefix: "PUB_"` as client/svelte.config.js — including the precedence
+	// that matters: `process.env` is applied *after* the `.env` files, so the Pages
+	// dashboard wins over a repo-root `.env`, and so does the `PUB_SENTRY_DSN: ""` the e2e
+	// suite passes through `webServer.env` to keep a hermetic run off the network.
+	define: {
+		__SENTRY_RELEASE__: JSON.stringify(clientRelease()),
+		__SENTRY_DSN__: JSON.stringify(
+			loadEnv(mode, fileURLToPath(new URL("../", import.meta.url)), "PUB_").PUB_SENTRY_DSN ?? ""
+		)
+	},
 	build: {
 		// Needed for Sentry to un-minify a browser stack trace, and emitting them is only
 		// half of it: `postbuild` (scripts/sentry-sourcemaps.mjs) uploads the maps and then
@@ -188,4 +211,4 @@ export default defineConfig({
 			}
 		}
 	}
-});
+}));

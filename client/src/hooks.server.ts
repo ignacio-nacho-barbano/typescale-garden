@@ -1,7 +1,6 @@
-import { PUB_SENTRY_DSN } from "$env/static/public";
 import type { HandleServerError } from "@sveltejs/kit";
 import { ENV } from "./services/env";
-import { SENTRY_ENABLED } from "./services/sentry";
+import { SENTRY_DSN, SENTRY_ENABLED } from "./services/sentry";
 import { captureToSentry } from "./services/sentryEnvelope";
 
 /**
@@ -29,7 +28,7 @@ export const handleError: HandleServerError = async ({ error, event, status, mes
 
 	if (SENTRY_ENABLED) {
 		const report = captureToSentry(error, {
-			dsn: PUB_SENTRY_DSN,
+			dsn: SENTRY_DSN,
 			environment: ENV.APP_ENV,
 			surface: "ssr",
 			tags: { route: event.route.id ?? event.url.pathname, method: event.request.method },

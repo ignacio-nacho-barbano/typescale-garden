@@ -1,4 +1,3 @@
-import { PUB_SENTRY_DSN } from "$env/static/public";
 import { ENV } from "./env";
 
 /**
@@ -9,6 +8,25 @@ import { ENV } from "./env";
  * A DSN is a public identifier that only grants "write an event", which is why this one
  * is `PUB_`-prefixed and inlined into the client bundle like any other public var.
  */
+
+/**
+ * `PUB_SENTRY_DSN`, replaced at build time by vite's `define` — set on Cloudflare Pages for
+ * the deployed app, in the root `.env` locally, and to `""` by the e2e suite.
+ *
+ * It is read through `define` rather than imported from `$env/static/public` on purpose:
+ * that module exports only the names something defined, so an unset var is a build-breaking
+ * missing export rather than an empty string. The full argument is in the `define` block in
+ * client/vite.config.ts. The `typeof` guard is the same belt-and-braces as `RELEASE` below —
+ * a build whose `define` went missing degrades to "reporting off" instead of throwing a
+ * `ReferenceError` while this module is being evaluated, which on the browser side would
+ * mean the app never hydrates.
+ *
+ * Empty is a supported, deliberate state: it means report nothing, which is exactly the
+ * pre-Sentry behaviour.
+ */
+declare const __SENTRY_DSN__: string;
+
+export const SENTRY_DSN = typeof __SENTRY_DSN__ === "string" ? __SENTRY_DSN__ : "";
 
 /**
  * Reporting is off unless a DSN is configured *and* this is not a local build.
@@ -28,7 +46,7 @@ import { ENV } from "./env";
  * `PUB_APP_ENV` should still report, because losing errors is worse than an oddly named
  * environment in the Sentry UI.
  */
-export const SENTRY_ENABLED = Boolean(PUB_SENTRY_DSN) && !ENV.IS_LOCAL;
+export const SENTRY_ENABLED = Boolean(SENTRY_DSN) && !ENV.IS_LOCAL;
 
 /**
  * `client@<commit sha>`, replaced at build time by vite's `define` — see the `define` block
@@ -51,7 +69,7 @@ const RELEASE = typeof __SENTRY_RELEASE__ === "string" ? __SENTRY_RELEASE__ : un
  */
 export function sentryOptions(surface: "browser" | "ssr") {
 	return {
-		dsn: PUB_SENTRY_DSN,
+		dsn: SENTRY_DSN,
 		environment: ENV.APP_ENV,
 		// What joins a minified frame to its uploaded source map. Only the browser half acts
 		// on this — the SSR envelope sends no frames for a map to resolve; see the comment in
