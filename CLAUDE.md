@@ -103,6 +103,32 @@ Switching the Pages build command to `npx turbo run build --filter=client` would
 unnecessary (it works from `client/`, and builds `core` first through the task graph) and would give
 the deploy turbo's cache. The committed setup avoids depending on a dashboard change.
 
+### Deploying the Worker
+
+`.github/workflows/deploy-server.yml` does it, on a push to main that touches the Worker bundle.
+`npm run deploy:server` from a laptop still works and is what a hotfix should use, but it is no
+longer the normal path. The job type checks, bundles (`wrangler deploy --dry-run`, which resolves
+every binding), applies pending D1 migrations, deploys, and then smoke tests `GET /api/fonts` — the
+one unauthenticated GET, answered before Express, so a 200 proves both the runtime and the KV
+binding came up.
+
+- **Its path filter covers `core` too**, not only `server`: `src/db/`, the fonts snapshot and the
+  plugin routes all import `core`, so a scale-math change ships in this bundle as much as in the
+  client's. The root manifests are in the filter for the same class of reason — a dependency bump
+  changes the bundle without touching `server/`.
+- **Migrations run before the upload,** so new code cannot outrun its schema. They are
+  forward-only and there is no automated rollback — a bad one is corrected by the next migration.
+  Wrangler's confirmation prompt auto-answers yes in CI, and an empty queue is a no-op.
+- **Two repository secrets are required**, `CLOUDFLARE_API_TOKEN` (Workers Scripts / D1 / KV: Edit)
+  and `CLOUDFLARE_ACCOUNT_ID` — `wrangler.jsonc` carries no `account_id`, and a token with access
+  to more than one account cannot infer it. A step checks for both up front, because a missing
+  token otherwise surfaces as wrangler trying to open an OAuth browser flow on a headless runner.
+- **Worker secrets are not deployed by CI.** `wrangler secret put` state lives on Cloudflare and
+  survives a deploy, so the workflow needs no copy of `JWT_SECRET`, `SESSION_SECRET` or
+  `FONTS_API_KEY`.
+- **`concurrency` does not cancel in flight** (unlike `e2e.yml`): a deploy interrupted between the
+  migration and the upload is worse than a queued one, so runs serialise.
+
 From the repo root — these fan out through turbo to every package that defines the script:
 
 ```bash
@@ -280,7 +306,8 @@ Things worth knowing before changing it:
 
 #### CI
 
-`.github/workflows/e2e.yml` — the repo's only workflow — runs the one suite three ways:
+`.github/workflows/e2e.yml` — one of the repo's two workflows, the other being `deploy-server.yml`
+(see "Deploying the Worker" below) — runs the one suite three ways:
 
 | job        | trigger                             | `E2E_TARGET`               |
 | ---------- | ----------------------------------- | -------------------------- |
