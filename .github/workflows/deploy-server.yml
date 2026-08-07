@@ -120,21 +120,39 @@ jobs:
 
       # A deployed Worker that does not answer is the failure mode this catches: the bundle
       # uploaded fine and something at the edge — a binding, a secret read at module init —
-      # kills it on the first request. `/api/fonts` is the one unauthenticated GET, and it is
-      # handled before Express, so a 200 proves both the runtime and the KV binding.
+      # kills it on the first request.
+      #
+      # Two probes, because they prove different things and only one of them can be trusted:
+      #
+      # `/api/__liveness` is any unmatched path, answered by Express's own 404 handler. It
+      # carries no `cf-cache-status` header at all, so it is never served from cache and
+      # reaches the Worker on every request — which makes Express's 404 body the one thing
+      # here that actually proves the freshly uploaded bundle booted. This is the gate.
+      #
+      # `/api/fonts` is the only probe that would exercise the KV binding, but it cannot gate
+      # anything: `snapshot.ts` serves it `public, max-age=3600, s-maxage=86400` and the cache
+      # key ignores the query string (verified — `?cb=…` still answers `cf-cache-status: HIT`),
+      # so it keeps returning 200 for up to 24 hours after the Worker has stopped working.
+      # Reported for the log, never asserted on.
       - name: Smoke test the deployment
+        env:
+          API: https://api.typescalegarden.uy
         run: |
           for attempt in 1 2 3; do
-            # `|| true` so a connection failure is an empty $code and another attempt, rather
+            # `|| true` so a connection failure is an empty $body and another attempt, rather
             # than the job's default `bash -e` aborting the loop on the first one.
-            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
-              "https://api.typescalegarden.uy/api/fonts" || true)
-            if [ "$code" = "200" ]; then
-              echo "GET /api/fonts → 200"
-              exit 0
-            fi
-            echo "attempt $attempt: GET /api/fonts → ${code:-no response}"
+            body=$(curl -sS --max-time 30 "$API/api/__liveness" || true)
+            case "$body" in
+              *'"message":"Not Found"'*)
+                echo "GET /api/__liveness → Express 404, the Worker is serving"
+                code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
+                  "$API/api/fonts" || true)
+                echo "GET /api/fonts → ${code:-no response} (edge-cached, advisory only)"
+                exit 0
+                ;;
+            esac
+            echo "attempt $attempt: /api/__liveness → ${body:-no response}"
             sleep 10
           done
-          echo "::error::The deployed Worker did not answer GET /api/fonts with a 200."
+          echo "::error::The deployed Worker never answered /api/__liveness with Express's 404 — it is not serving."
           exit 1
