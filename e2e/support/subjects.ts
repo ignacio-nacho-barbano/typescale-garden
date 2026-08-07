@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { throwIfChallenged } from "./challenge";
 import type { ApiFont, GoldenFixture, GoldenInputs } from "./golden";
 import { fixture, uiReachableFixtures } from "./golden";
 import { IS_LIVE, TARGET } from "./target";
@@ -132,6 +133,10 @@ export const fetchLiveCatalogue = async (force = false): Promise<LiveCatalogue> 
 		const response = await fetch(url);
 
 		if (!response.ok) {
+			// Before blaming the endpoint: a Cloudflare challenge also arrives as a 403 here,
+			// and it means "this runner cannot reach production", not "the Worker refused".
+			throwIfChallenged(response, url, await response.text().catch(() => ""));
+
 			throw new Error(`GET ${url} answered ${response.status} ${response.statusText}`);
 		}
 

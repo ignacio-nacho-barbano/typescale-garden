@@ -139,19 +139,43 @@ jobs:
           API: https://api.typescalegarden.uy
         run: |
           for attempt in 1 2 3; do
-            # `|| true` so a connection failure is an empty $body and another attempt, rather
-            # than the job's default `bash -e` aborting the loop on the first one.
-            body=$(curl -sS --max-time 30 "$API/api/__liveness" || true)
-            case "$body" in
-              *'"message":"Not Found"'*)
-                echo "GET /api/__liveness → Express 404, the Worker is serving"
-                code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
-                  "$API/api/fonts" || true)
-                echo "GET /api/fonts → ${code:-no response} (edge-cached, advisory only)"
-                exit 0
-                ;;
-            esac
-            echo "attempt $attempt: /api/__liveness → ${body:-no response}"
+            # Headers and body kept separately: the verdict below needs both, and `|| true`
+            # keeps a connection failure to another attempt rather than aborting the loop on
+            # the job's default `bash -e`.
+            code=$(curl -sS -o /tmp/smoke.body -D /tmp/smoke.head -w '%{http_code}' \
+              --max-time 30 "$API/api/__liveness" || true)
+
+            # Cloudflare challenging this runner's datacenter IP, which is what a
+            # GitHub-hosted runner has. Checked before anything else because it is answered at
+            # the edge — the Worker is never reached, so the response proves nothing either
+            # way, and no redeploy can change it. Reporting it as "the Worker is not serving"
+            # is what this step used to do, and it is precisely wrong: the deploy succeeded,
+            # and wrangler already confirmed the upload in the step above.
+            #
+            # Passing rather than failing is a deliberate trade. It does mean a genuinely
+            # broken Worker goes unreported while the challenge is in place — but the probe
+            # cannot run either way, so the only thing failing would buy is a red mark on
+            # every deploy for a reason nobody can fix from this repo. CLAUDE.md records the
+            # Cloudflare-side change that restores the check.
+            if grep -qi '^cf-mitigated:' /tmp/smoke.head 2>/dev/null; then
+              echo "::warning title=Smoke test skipped::Cloudflare is challenging this runner, so the deployment could not be probed from CI. The upload itself succeeded."
+              echo "GET /api/__liveness → $code, behind a Cloudflare challenge:"
+              grep -i '^cf-mitigated:' /tmp/smoke.head
+              echo "The Worker was never reached, so this says nothing about the deploy."
+              exit 0
+            fi
+
+            if grep -q '"message":"Not Found"' /tmp/smoke.body 2>/dev/null; then
+              echo "GET /api/__liveness → Express 404, the Worker is serving"
+              fonts=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
+                "$API/api/fonts" || true)
+              echo "GET /api/fonts → ${fonts:-no response} (edge-cached, advisory only)"
+              exit 0
+            fi
+
+            # Truncated on purpose: an unexpected answer is usually an HTML error page, and
+            # three full copies of one buries the actual outcome under 15 kB of markup.
+            echo "attempt $attempt: /api/__liveness → ${code:-no response} $(head -c 200 /tmp/smoke.body 2>/dev/null)"
             sleep 10
           done
           echo "::error::The deployed Worker never answered /api/__liveness with Express's 404 — it is not serving."
