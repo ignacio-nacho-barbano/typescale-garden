@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { throwIfChallenged } from "./challenge";
 import { TARGET } from "./target";
 
 /**
@@ -45,12 +46,19 @@ const call = async (
 	method: string,
 	path: string
 ): Promise<{ status: number; typescales?: LiveScale[] }> => {
-	const response = await fetch(`${TARGET.apiUrl}/api${path}`, {
+	const url = `${TARGET.apiUrl}/api${path}`;
+	const response = await fetch(url, {
 		method,
 		headers: { authorization }
 	});
 
-	if (!response.ok) return { status: response.status };
+	if (!response.ok) {
+		// A challenge is not this endpoint answering, so it must not be flattened into a
+		// status the callers below would read as "no headroom" or "nothing saved".
+		throwIfChallenged(response, url);
+
+		return { status: response.status };
+	}
 
 	const body = (await response.json()) as { typescales?: LiveScale[] };
 	return { status: response.status, typescales: body.typescales };

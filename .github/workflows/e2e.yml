@@ -117,19 +117,92 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
-  # ── the live runs: a deployed build, the real API, a real Auth0 user ────────────────────
+  # ── can a runner reach production at all? ───────────────────────────────────────────────
   #
-  # Same suite. What it cannot assert live — a controlled tenant, a forced API failure, the
-  # synthetic font shapes — is skipped with a stated reason, so the run reports its own
-  # coverage gap. What it uniquely proves is that the deployed build, CORS, auth and the
-  # catalogue endpoint all still agree with `core`.
-  live:
+  # Both `typescalegarden.uy` and `api.typescalegarden.uy` sit behind Cloudflare, whose bot
+  # mitigation challenges requests from datacenter IP ranges — which is precisely what a
+  # GitHub-hosted runner has. The challenge is answered at Cloudflare's edge, so it says
+  # nothing about the deployment, and it blocks every client the suite could possibly use:
+  # node's fetch, Playwright's request context, an in-page `fetch` (the challenge carries no
+  # CORS headers, so it surfaces as `TypeError: Failed to fetch`) and even a real Chromium
+  # navigation, which lands on a Turnstile page a headless browser does not clear.
+  # e2e/support/challenge.ts records the measurements.
+  #
+  # So this is probed rather than discovered: without it the hourly cron reports a 403 as
+  # though production had regressed, which is what it did for every run between the live job
+  # landing and this. A challenged run now ends as a skip with a stated reason — the same way
+  # the suite already treats missing credentials and a full account — instead of as a failure
+  # nobody can act on from inside this repo.
+  #
+  # It runs first and checks nothing out, so a blocked run costs seconds rather than a full
+  # `npm ci` plus a browser download. And it self-heals: the moment the Cloudflare-side rule
+  # in CLAUDE.md is in place, the probe passes and `live` runs again with no change here.
+  live-reachable:
     if: |
       github.event_name == 'schedule'
       || github.event_name == 'workflow_dispatch'
       || (github.event_name == 'deployment_status'
           && github.event.deployment_status.state == 'success'
           && github.event.deployment.environment == 'production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      blocked: ${{ steps.probe.outputs.blocked }}
+
+    steps:
+      - name: Probe the API for a Cloudflare challenge
+        id: probe
+        env:
+          # The API every live target resolves to today — `E2E_API_URL` aside, this is the
+          # default `e2e/support/target.ts` applies to `prod` and to a bare URL target alike,
+          # and the same constant deploy-server.yml's smoke test carries.
+          API: https://api.typescalegarden.uy
+        run: |
+          # Headers only: the catalogue is ~1.9 MB and the verdict is one header. `|| true`
+          # keeps a connection failure from aborting the step under `bash -e` — that is not a
+          # challenge, and it should fall through to the suite, which reports it properly.
+          headers=$(curl -sS -o /dev/null -D - --max-time 30 "$API/api/fonts" || true)
+
+          # `cf-mitigated` is set on every response Cloudflare mitigates and on nothing this
+          # repo serves, so its mere presence is the signal.
+          mitigated=$(printf '%s' "$headers" | grep -i '^cf-mitigated:' || true)
+
+          if [ -z "$mitigated" ]; then
+            echo "blocked=false" >> "$GITHUB_OUTPUT"
+            echo "No challenge — this runner can reach $API, so the live suite will run."
+            exit 0
+          fi
+
+          echo "blocked=true" >> "$GITHUB_OUTPUT"
+          echo "::warning title=Live e2e skipped::Cloudflare is challenging this runner, so the live suite cannot reach production. Not a deployment failure — see the job log and CLAUDE.md."
+          cat <<'EOF'
+          Cloudflare is challenging this runner, so the live suite was skipped.
+
+          What this is NOT: a broken deployment. The challenge is answered at Cloudflare's
+          edge and the Worker never sees the request, so production is serving real visitors
+          normally. `server/src/` contains no 403 at all.
+
+          What it IS: bot mitigation reacting to a GitHub-hosted runner's datacenter IP. It
+          blocks every client the suite could use, so there is no workaround inside this repo
+          short of faking the API — which would defeat the entire point of a live run.
+
+          To turn this back on, exempt CI at the Cloudflare edge. CLAUDE.md, under "Why the
+          live e2e run cannot reach production from CI", records the options.
+          EOF
+          printf 'observed: %s\n' "$mitigated"
+
+  # ── the live runs: a deployed build, the real API, a real Auth0 user ────────────────────
+  #
+  # Same suite. What it cannot assert live — a controlled tenant, a forced API failure, the
+  # synthetic font shapes — is skipped with a stated reason, so the run reports its own
+  # coverage gap. What it uniquely proves is that the deployed build, CORS, auth and the
+  # catalogue endpoint all still agree with `core`.
+  #
+  # The event filter lives on `live-reachable` above; a skipped dependency skips this too, so
+  # the only condition needed here is the probe's verdict.
+  live:
+    needs: live-reachable
+    if: needs.live-reachable.outputs.blocked == 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 

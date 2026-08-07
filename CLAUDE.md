@@ -322,6 +322,9 @@ rest of CI" below) and `deploy-server.yml` (see "Deploying the Worker" above).
 | `live`     | `deployment_status` (prod, success) | the URL that just deployed |
 | `live`     | `schedule`, hourly at `:17`         | `prod`                     |
 
+`live` is gated behind a `live-reachable` probe job — see "Why the live e2e run cannot reach
+production from CI" below, which is currently why it never actually runs.
+
 It deliberately does not also run `check`/`lint`, which are known-failing on main (below) and would
 make the signal permanently red. Non-obvious details:
 
@@ -336,6 +339,65 @@ make the signal permanently red. Non-obvious details:
   signed-in and write specs skip with a reason and the rest still runs anonymously, which is a useful
   signal on its own. `E2E_LIVE_WRITES` is a repository variable, so writes can be turned off without
   touching code. GitHub disables scheduled workflows after 60 days of repo inactivity.
+
+#### Why the live e2e run cannot reach production from CI
+
+**Cloudflare bot mitigation challenges GitHub-hosted runners, so no live run has ever succeeded.**
+Every scheduled run from the live job landing until the probe below was added failed identically, in
+`globalSetup`, on `GET https://api.typescalegarden.uy/api/fonts answered 403 Forbidden`. That message
+is misleading in the one way that matters: nothing in `server/src/` returns 403 at all. The response
+is Cloudflare's, carries `cf-mitigated: challenge`, and is answered at the edge — **the Worker is
+never reached**, and production serves real visitors normally throughout.
+
+Measured from a runner, it blocks every client the suite could use. This is the table that rules out
+the workarounds, so don't spend an afternoon rediscovering it:
+
+| client                                 | result                                        |
+| -------------------------------------- | --------------------------------------------- |
+| node `fetch` (what `globalSetup` uses) | 403, `cf-mitigated: challenge`                |
+| Playwright's `APIRequestContext`       | 403, `cf-mitigated: challenge`                |
+| `fetch()` inside a real Chromium page  | `TypeError: Failed to fetch`                  |
+| navigating a real Chromium to the app  | 403, a Turnstile page titled "Just a moment…" |
+
+The third row kills the obvious fix of resolving subjects through the browser: a challenge response
+carries no `Access-Control-Allow-Origin`, so the deployed app's own cross-origin call to `/api/fonts`
+fails as an opaque network error no matter how faithfully the request is made — and the app then
+silently falls back to `client/static/fonts-data.json`, a _different_ catalogue, which would turn
+every byte assertion into a confusing diff. The fourth kills it outright: a headless Chromium does not
+clear the interstitial, so the app never boots. Both origins are affected, not just the API
+subdomain. Nothing inside this repo can make a challenged request succeed short of faking the API,
+which is the one thing a live run exists not to do.
+
+So the suite does not pretend otherwise. `e2e/support/challenge.ts` recognises the challenge and
+raises `UnreachableLiveEnvironment` — a distinct type precisely so "this runner cannot reach
+production" is never reported as "production regressed" — and the `live-reachable` job probes for it
+before anything is installed, so a blocked run ends in seconds as a **skip with a stated reason**
+rather than a red X. That matches how the suite already treats missing credentials and a full
+account. `deploy-server.yml`'s smoke test does the same, and this is why it no longer fails a deploy:
+it used to report the challenge as "the deployed Worker is not serving", which was exactly wrong —
+wrangler had already confirmed the upload, and the probe simply cannot run from a runner. The
+trade-off is stated in the comment there: while the challenge is in place a genuinely broken Worker
+would go unreported by that step, but the probe cannot run either way, so failing would only buy a
+permanently red deploy nobody can fix from this repo.
+
+**Lifting it is a Cloudflare-side change, not a code change**, and it is the only thing that turns
+the live layer back on — after which both the probe and the smoke test pass again with no edit here.
+The options, cheapest first:
+
+1. **Turn off Bot Fight Mode for the API**, or scope it away from `api.typescalegarden.uy`. Blunt, but
+   the catalogue endpoint is public, credential-free and GET-only, and the authenticated routes are
+   protected by Auth0 tokens rather than by bot heuristics.
+2. **A WAF custom rule that skips bot mitigation** for a request CI can make and nobody else can —
+   matching a secret header the workflow sends. Narrower, and the one to prefer if the zone's
+   protection is wanted in general. It needs plumbing on this side too: the header on the suite's
+   non-browser fetches _and_ on the browser context, which in turn means the Worker's CORS config has
+   to allow it on the preflight.
+3. **Self-hosted runners**, whose IPs are not in a datacenter range Cloudflare distrusts. Solves it
+   for every check at once and costs the most to operate.
+
+Note that this constraint is separate from — and compounds — the Auth0 concern already noted above:
+automated logins from datacenter IPs are what trip Auth0's attack protection. Both are consequences
+of CI not looking like a person.
 
 #### The rest of CI
 
