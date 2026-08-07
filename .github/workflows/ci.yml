@@ -1,0 +1,216 @@
+# The non-browser PR gate: everything `e2e.yml` does not cover.
+#
+# Until now the repo's only check was the hermetic Playwright suite, which drives the client's
+# dev server. That leaves a lot unproven on a PR — nothing type checked the Worker, nothing
+# built the client *bundle* (the dev server never produces one), and nothing ran the unit tests.
+# A broken `server/` reached main and was only caught by `deploy-server.yml` after merge, at
+# which point it had already deployed; a broken client bundle was caught by Cloudflare Pages,
+# i.e. also after merge.
+#
+# What is deliberately NOT gated: `client#check` (18 svelte-check errors) and `client#lint`
+# (the client's `.eslintrc.cjs` cannot load under eslint 10, which dropped `.eslintrc` support
+# entirely, plus wide prettier drift). Both are long-standing and orthogonal to any given PR —
+# gating on them would make this workflow permanently red and therefore ignored, which is the
+# same reasoning that keeps them out of `e2e.yml`. They run anyway in `known-failing`, which
+# cannot fail the workflow, so the drift stays visible and the day someone fixes the eslint
+# config it goes green on its own.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push supersedes the run in flight for the same ref — unlike `deploy-server.yml`,
+# nothing here has a side effect worth protecting mid-flight.
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# Throwaway values, inlined into the CI bundle and never deployed — Pages does its own build
+# with the real values from its dashboard. They exist because `$env/static/public` is a virtual
+# module built from what is defined, so a name the client imports and CI does not define is a
+# *build error*, and `client/src/services/env.ts` additionally throws when `PUB_API_URL` is
+# falsy. That throw is why `client#test` fails without them: `stores/config.test.ts` imports
+# `errorLogger` → `sentry` → `env` and dies on collection.
+#
+# Keep in step with `E2E_PUB_ENV` in `e2e/support/env.ts`, which is the same list for the same
+# reason. `PUB_APP_ENV: local` and an empty `PUB_SENTRY_DSN` are each independently sufficient
+# to keep a CI build silent: `SENTRY_ENABLED` is `Boolean(DSN) && !IS_LOCAL`.
+env:
+  PUB_APP_ENV: local
+  PUB_API_URL: http://localhost:5173/mock-api
+  PUB_AUTH_DOMAIN: http://localhost:5173/idp
+  PUB_AUTH_CLIENT_ID: ciClientId
+  PUB_CLIENT_ORIGIN: http://localhost:5173
+  PUB_SENTRY_DSN: ""
+  PUB_FEATURE_FLAGS: load-save
+
+jobs:
+  # ── the Worker, gated at PR time with exactly what `deploy-server.yml` runs ──────────────
+  #
+  # Its own job rather than a step of `build-and-test` so the Worker has a distinct, fast
+  # signal, and so a merge can never produce a deploy that fails its own gate.
+  server:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      # `npm ci`, never `npm install` — the committed lockfile is the only thing that makes
+      # this tree installable (see CLAUDE.md). It also fails outright if `package.json` and the
+      # lockfile have drifted apart, which is the lockfile-freshness check this repo needs and
+      # gets for free.
+      - name: Install
+        run: npm ci
+
+      # `check` is `tsc --noEmit` against the committed `worker-configuration.d.ts`. `build` is
+      # `wrangler deploy --dry-run`, which genuinely bundles the Worker and resolves every
+      # binding — so a KV/D1 id that no longer exists, or an idiom `nodejs_compat` rejects,
+      # fails here rather than on main. Through turbo so `core#build` runs first: the Worker's
+      # `import "core"` resolves into `core/dist`.
+      #
+      # Runs without a `server/.dev.vars` — same as the runner — which is exactly why
+      # `worker-configuration.d.ts` must stay committed. Regenerating it with `npm run
+      # cf-typegen` from a checkout that has no `.dev.vars` silently drops `FONTS_API_KEY` and
+      # friends from `Env` and breaks this step. See CLAUDE.md.
+      - name: Type check and bundle the Worker
+        run: npx turbo run check build --filter=server
+
+  # ── everything builds, and every unit test passes ────────────────────────────────────────
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # vite-imagetools transforms the image `+page.svelte` imports, which needs sharp's native
+      # binary — and sharp is not in the root `allowScripts`, so npm >= 11 skips the install
+      # script that fetches it. Same step, same reason, as the hermetic e2e job.
+      - name: Build sharp's native binary
+        run: npm rebuild sharp
+
+      # All four packages: the client bundle, the Worker dry-run, the plugin's `code.js` and
+      # `core/dist`. The client half is the new coverage — the e2e suite drives the *dev
+      # server*, so nothing on a PR has ever produced the bundle Pages deploys.
+      #
+      # `client#build`'s `postbuild` hook (the Sentry source-map upload) runs here too and is
+      # a no-op without `SENTRY_AUTH_TOKEN`: it logs `sentry: WARNING …` and exits 0 by design,
+      # since on Pages it sits in the deploy's critical path.
+      - name: Build every package
+        run: npx turbo run build
+
+      # client + core vitest, and the plugin's dependency-free node script — which runs the
+      # *built* `code.js` in a stubbed Figma sandbox, hence `plugin#test`'s `dependsOn: build`.
+      - name: Test every package
+        run: npx turbo run test
+
+      # An invariant, not a test, and the failure it guards is the whole site rather than one
+      # feature: nothing in the SSR graph may pull in a Sentry SDK. Every SDK that works on
+      # Cloudflare has a top-level `import { AsyncLocalStorage } from "node:async_hooks"`, and
+      # a *dynamic* import does not keep it out — adapter-cloudflare bundles `_worker.js` with
+      # esbuild, which hoists a lazily-reached module's external imports into static top-level
+      # ones. workerd only resolves `node:` specifiers with `nodejs_als`/`nodejs_compat`
+      # enabled, and the Pages project's flags live in the Cloudflare dashboard rather than in
+      # this repo — so a static import there risks the Worker failing to *start*.
+      #
+      # `client/src/services/sentryEnvelope.ts` is the hand-built envelope POST that exists to
+      # prevent exactly this, and CLAUDE.md documents this grep as the check on it. Exactly one
+      # match is expected: SvelteKit's own `import("node:async_hooks").then(…).catch(…)` probe,
+      # which is dynamic and harmless. Counted with `grep -o`, not `grep -c`, because
+      # `_worker.js` is bundled — `grep -c` counts *lines*, and two imports on one minified
+      # line would read as one.
+      - name: Assert no Sentry SDK reached the SSR bundle
+        run: |
+          worker=client/.svelte-kit/cloudflare/_worker.js
+          count=$(grep -o "node:async_hooks" "$worker" | wc -l | tr -d ' ')
+          if [ "$count" != "1" ]; then
+            echo "::error file=$worker::Expected exactly 1 'node:async_hooks' (SvelteKit's own dynamic probe), found $count. Something in the SSR graph now imports a Sentry SDK statically — see 'Error reporting' in CLAUDE.md."
+            exit 1
+          fi
+          echo "SSR bundle clean: 1 'node:async_hooks' (SvelteKit's dynamic probe)"
+
+      # `plugin/code.js` is committed because it *is* what Figma loads — it is the artefact, not
+      # a build product nobody reads. So it has to match `code.ts`, and nothing else would
+      # notice if it did not: a stale bundle means the reviewed source and the published plugin
+      # have quietly diverged. Reproducible because the plugin's release string is
+      # `plugin@<version>` from package.json, not a commit sha.
+      #
+      # `npx turbo run build` above already rebuilt it, so this only reads the result.
+      - name: Assert the committed plugin bundle matches its source
+        run: |
+          if ! git diff --quiet -- plugin/code.js; then
+            echo "::error file=plugin/code.js::plugin/code.js is out of date. Run 'npm run build --workspace plugin' and commit the result."
+            git diff --stat -- plugin/code.js
+            exit 1
+          fi
+          echo "plugin/code.js matches its source"
+
+  # ── type checking and linting, minus the two known-failing client tasks ──────────────────
+  static-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # `!client` excludes `client#check` and `client#lint` only — `core`, `e2e`, `plugin` and
+      # `server` all pass today and are gated. Note `check` still builds `core` first (`^build`),
+      # since `svelte-check`/`tsc` resolve `core` through its `exports` map into `dist/`.
+      #
+      # Only `client` and `plugin` define `lint` at all, so in practice this is `plugin#lint`.
+      - name: Type check and lint
+        run: npx turbo run check lint --filter='!client'
+
+  # ── visibility only: cannot fail the workflow ────────────────────────────────────────────
+  #
+  # `client#check` and `client#lint` are known-failing on main and are not this workflow's to
+  # fix. Running them anyway means the numbers stay in the log, a PR that makes them worse is
+  # visible in review, and the day the eslint flat-config migration lands this job goes green
+  # and can be promoted into `static-analysis` by deleting the filter above.
+  known-failing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # `|| true` per task so both run even when the first fails, and neither can fail the
+      # step. `continue-on-error` on the job is the belt to this braces: without the `|| true`
+      # turbo would stop at `check` and never report `lint`.
+      - name: Client type check (informational)
+        run: npx turbo run check --filter=client || true
+
+      - name: Client lint (informational)
+        run: npx turbo run lint --filter=client || true

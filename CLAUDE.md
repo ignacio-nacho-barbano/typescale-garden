@@ -103,6 +103,37 @@ Switching the Pages build command to `npx turbo run build --filter=client` would
 unnecessary (it works from `client/`, and builds `core` first through the task graph) and would give
 the deploy turbo's cache. The committed setup avoids depending on a dashboard change.
 
+### Deploying the Worker
+
+`.github/workflows/deploy-server.yml` does it, on a push to main that touches the Worker bundle.
+`npm run deploy:server` from a laptop still works and is what a hotfix should use, but it is no
+longer the normal path. The job type checks, bundles (`wrangler deploy --dry-run`, which resolves
+every binding), applies pending D1 migrations, deploys, and then smoke tests the result.
+
+- **Its path filter covers `core` too**, not only `server`: `src/db/`, the fonts snapshot and the
+  plugin routes all import `core`, so a scale-math change ships in this bundle as much as in the
+  client's. The root manifests are in the filter for the same class of reason — a dependency bump
+  changes the bundle without touching `server/`.
+- **Migrations run before the upload,** so new code cannot outrun its schema. They are
+  forward-only and there is no automated rollback — a bad one is corrected by the next migration.
+  Wrangler's confirmation prompt auto-answers yes in CI, and an empty queue is a no-op.
+- **Two repository secrets are required**, `CLOUDFLARE_API_TOKEN` (Workers Scripts / D1 / KV: Edit)
+  and `CLOUDFLARE_ACCOUNT_ID` — `wrangler.jsonc` carries no `account_id`, and a token with access
+  to more than one account cannot infer it. A step checks for both up front, because a missing
+  token otherwise surfaces as wrangler trying to open an OAuth browser flow on a headless runner.
+- **Worker secrets are not deployed by CI.** `wrangler secret put` state lives on Cloudflare and
+  survives a deploy, so the workflow needs no copy of `JWT_SECRET`, `SESSION_SECRET` or
+  `FONTS_API_KEY`.
+- **`concurrency` does not cancel in flight** (unlike `e2e.yml`): a deploy interrupted between the
+  migration and the upload is worse than a queued one, so runs serialise.
+- **The smoke test gates on `/api/__liveness`, not on `/api/fonts`,** and this is the non-obvious
+  part. `/api/fonts` looks like the ideal probe — one unauthenticated GET, answered before Express,
+  exercising the KV binding — but it is edge-cached at `s-maxage=86400` and **the cache key ignores
+  the query string**, so no cache-buster reaches the origin and it keeps answering 200 for a day
+  after the Worker has died. Any unmatched path (`/api/__liveness`) is answered by Express's 404
+  handler with no `cf-cache-status` at all, so it hits the fresh bundle every time; that 404 body
+  is the assertion. `/api/fonts` is still probed, but only logged.
+
 From the repo root — these fan out through turbo to every package that defines the script:
 
 ```bash
@@ -280,7 +311,10 @@ Things worth knowing before changing it:
 
 #### CI
 
-`.github/workflows/e2e.yml` — the repo's only workflow — runs the one suite three ways:
+There are three workflows: `e2e.yml` (this section), `ci.yml` (everything non-browser — see "The
+rest of CI" below) and `deploy-server.yml` (see "Deploying the Worker" above).
+
+`.github/workflows/e2e.yml` runs the one suite three ways:
 
 | job        | trigger                             | `E2E_TARGET`               |
 | ---------- | ----------------------------------- | -------------------------- |
@@ -302,6 +336,41 @@ make the signal permanently red. Non-obvious details:
   signed-in and write specs skip with a reason and the rest still runs anonymously, which is a useful
   signal on its own. `E2E_LIVE_WRITES` is a repository variable, so writes can be turned off without
   touching code. GitHub disables scheduled workflows after 60 days of repo inactivity.
+
+#### The rest of CI
+
+`.github/workflows/ci.yml` is the non-browser PR gate, on `pull_request` and `push` to main. Before
+it, the hermetic Playwright suite was the repo's only check — so nothing type checked the Worker,
+nothing ever built the client **bundle** (the suite drives the dev server), and no unit test ran. A
+broken `server/` reached main and was caught only by `deploy-server.yml`, after it had deployed; a
+broken client bundle was caught by Pages, also after merge.
+
+| job               | gates                                                       |
+| ----------------- | ----------------------------------------------------------- |
+| `server`          | `turbo run check build --filter=server` — the deploy's gate |
+| `build-and-test`  | `turbo run build`, `turbo run test`, plus two invariants    |
+| `static-analysis` | `turbo run check lint --filter='!client'`                   |
+| `known-failing`   | `client#check` / `client#lint` — `continue-on-error`        |
+
+- **The workflow defines the `PUB_*` vars itself**, at workflow level, and without them neither
+  `client#build` nor `client#test` can pass — `$env/static/public` is a virtual module built from
+  what is defined, so a name the client imports and CI does not define is a build error. Throwaway
+  values: CI never deploys its bundle, Pages builds its own with the dashboard's values. Keep them
+  in step with `E2E_PUB_ENV` in `e2e/support/env.ts`, which is the same list for the same reason.
+- **`server` is its own job** rather than a step of `build-and-test`, running exactly what
+  `deploy-server.yml` runs as its gate — so a merge cannot produce a deploy that fails its own gate.
+- **Two invariants are asserted that no test covers.** The `node:async_hooks` grep over
+  `client/.svelte-kit/cloudflare/_worker.js` (see "Error reporting" — expects exactly 1, SvelteKit's
+  own dynamic probe; counted with `grep -o` and not `grep -c`, since `_worker.js` is bundled and
+  `grep -c` counts lines); and `git diff --quiet -- plugin/code.js` after a rebuild, since that file
+  is committed because it **is** what Figma loads, and a stale one means the reviewed source and the
+  published plugin have diverged. The plugin bundle is reproducible because its release string is
+  `plugin@<version>`, not a commit sha.
+- **`known-failing` cannot fail the workflow.** It exists so the two known-failing client tasks stay
+  visible and a PR that makes them worse shows up in review. When the eslint flat-config migration
+  lands it goes green, and gets promoted by deleting `--filter='!client'` in `static-analysis`.
+- `npm ci` doubles as the lockfile-freshness check: it fails outright if `package.json` and
+  `package-lock.json` have drifted apart.
 
 #### Pointing a live run at a preview deployment
 
@@ -326,7 +395,21 @@ Root `turbo.json` declares the task shapes: `build`/`check`/`test` depend on `^b
 dependencies build first), `dev` and `test:watch` are `persistent` + uncached, `deploy` depends on
 `build` and `check`. Cache keys include the root `tsconfig.json`, `types/**` and the root `.env*`
 files (`globalDependencies`) plus every `PUB_*` var, since those are inlined into the client bundle at
-build time. Cacheable outputs are declared per package in `client/turbo.json`, `core/turbo.json` and
+build time.
+
+**`build`, `check` and `test` all declare `"env": ["PUB_*"]`, and on the latter two that is not
+about caching.** Turbo filters a task's environment down to what it declares, so a task missing the
+declaration cannot see those vars _at all_, whatever the developer's `.env` holds:
+
+- `test` without it — `stores/config.test.ts` fails to collect. It imports `errorLogger` →
+  `sentry` → `services/env.ts`, which throws `There was an issue loading env variables` when
+  `PUB_API_URL` is falsy. `npm test --workspace client` passes at the same moment, which is what
+  makes this look like a turbo bug rather than a missing line.
+- `check` without it — `svelte-kit sync` generates the `$env/static/public` ambient types from
+  whatever is defined, so svelte-check reports six phantom `has no exported member 'PUB_…'`
+  errors on top of the real ones.
+
+Cacheable outputs are declared per package in `client/turbo.json`, `core/turbo.json` and
 `plugin/turbo.json`; the server emits nothing (its build is a dry-run), so it needs no override. The
 `db:*` scripts are deliberately outside turbo — they mutate a real database and must never be cached.
 
@@ -337,10 +420,26 @@ client's dev server itself (`webServer.command`), bypassing turbo, so nothing el
 `core/dist` that the client's `import "core"` resolves into. `client#build` would be the wrong
 dependency: the suite drives the dev server, not the bundle.
 
-Known pre-existing failures, unrelated to turbo: `client#check` (18 svelte-check errors) and
+**`e2e#check` needs the same edge, and for a subtler reason.** `e2e` declares no dependency on
+`core` in its `package.json` — `support/subjects.ts` reaches it by _relative path_
+(`../../core/dist/index.js`), because `core` is `"type": "module"` and these files transpile to
+CommonJS. So the root `check` task's `dependsOn: ["^build"]` resolves to **nothing** here, and the
+task was simply unordered against `core#build`. It passed on any developer's machine, where `dist/`
+was already on disk from an earlier build, and failed on a clean checkout with
+`TS2307: Cannot find module '../../core/dist/index.js'` — which is exactly what CI found the first
+time it ran. `e2e/turbo.json` now declares `check` with `dependsOn: ["core#build"]` too. The edge
+also puts `core#build`'s hash in the task's cache key, so a stale pass cannot be replayed after
+core changes.
+
+Known pre-existing failures, unrelated to turbo: `client#check` (17 svelte-check errors) and
 `client#lint` (the client's `.eslintrc.cjs` fails to load, plus wide prettier drift). `client#test`
 used to fail on 3 letterSpacing assertions; rewiring the client onto `core` fixed those, and
-`build` and `test` are now green across every package.
+`build` and `test` are now green across every package. Both known failures run in `ci.yml`'s
+`known-failing` job, which cannot fail the workflow — see "CI" below.
+
+Note the 17: it used to be quoted as 18 because the count was taken without `PUB_*` reaching
+svelte-check. With the `env` declaration above, the six phantom `$env/static/public` errors are
+gone and 17 is the real number.
 
 ## Architecture
 

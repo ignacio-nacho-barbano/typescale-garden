@@ -20,6 +20,11 @@
 		// Type checking. Emits nothing, but is still cacheable on its inputs.
 		"check": {
 			"dependsOn": ["^build"],
+			// `svelte-kit sync` generates the ambient types for `$env/static/public` from
+			// whatever `PUB_*` names are defined, so without this turbo filters them out and
+			// svelte-check reports six phantom "has no exported member 'PUB_…'" errors on top
+			// of the real ones. Same declaration, same reason, as `build` and `test`.
+			"env": ["PUB_*"],
 			"outputs": []
 		},
 		"lint": {
@@ -27,6 +32,14 @@
 		},
 		"test": {
 			"dependsOn": ["^build"],
+			// Same `PUB_*` declaration as `build`, and for a stronger reason than caching.
+			// Turbo filters a task's environment down to what it declares, so without this
+			// the client's vitest run sees no `PUB_API_URL` at all — `services/env.ts`
+			// throws "There was an issue loading env variables" on import and
+			// `stores/config.test.ts` fails to collect, whatever the developer's `.env`
+			// says. `npm test --workspace client` passes at the same moment, which is what
+			// makes it look like a turbo bug rather than a missing declaration.
+			"env": ["PUB_*"],
 			"outputs": []
 		},
 		// Browser tests. Never cached: they boot a real dev server and drive a real

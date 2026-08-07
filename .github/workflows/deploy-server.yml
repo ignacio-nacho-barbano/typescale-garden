@@ -1,0 +1,158 @@
+# Deploys the Worker (`server/`) to Cloudflare when server code lands on main.
+#
+# Replaces running `npm run deploy:server` from a laptop, which is how `api.typescalegarden.uy`
+# shipped until now — the client has had continuous deployment since it moved to Pages, and the
+# Worker was the only half still deployed by hand.
+#
+# Its own workflow rather than a job in `e2e.yml` for the same reason that one is separate: the
+# triggers do not overlap (that suite runs on every PR, this only on main), and `client#check` /
+# `client#lint` are known-failing on main, so anything sharing a workflow with them inherits a
+# permanently red signal. The gate here is `server#check` + `server#build`, both of which pass.
+name: deploy-server
+
+on:
+  push:
+    branches: [main]
+    # Only when something that ends up inside the Worker bundle changed. `core/**` is in the
+    # list because `src/db/`, the fonts snapshot and the plugin routes all import it, so a
+    # scale-math change ships in this bundle as much as in the client's. The root manifests are
+    # here because a dependency bump changes what gets bundled without touching `server/`.
+    paths:
+      - "server/**"
+      - "core/**"
+      - "types/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "turbo.json"
+      - ".node-version"
+      - ".github/workflows/deploy-server.yml"
+  # For redeploying the current main without an empty commit — a reverted secret, a Cloudflare
+  # incident, a migration applied out of band.
+  workflow_dispatch:
+
+# Never cancel a deploy in flight. Migrations are applied before the upload and are
+# forward-only, so a half-run deploy is worse than a queued one; runs are serialised instead.
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false
+
+# Nothing here writes to the repo — the credential that matters is the Cloudflare token, not
+# GITHUB_TOKEN. Narrowed explicitly so a permissive repo default does not hand a deploy job
+# write access it has no use for.
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Names the deploy in GitHub's Environments UI, and is where a required-reviewer gate would
+    # go if this ever needs one.
+    environment:
+      name: worker-production
+      url: https://api.typescalegarden.uy
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      # `npm ci`, never `npm install`: the committed lockfile is the only thing that makes this
+      # tree installable at all — a fresh resolve hits ERESOLVE on two of the client's stale
+      # peer ranges. See CLAUDE.md. No `npm rebuild sharp` here, unlike the hermetic e2e job:
+      # nothing in this workflow compiles the client.
+      - name: Install
+        run: npm ci
+
+      # Fail here rather than 30 seconds later inside wrangler, where a missing token surfaces
+      # as an attempt to open an OAuth browser flow on a headless runner.
+      - name: Check the Cloudflare credentials are present
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          missing=
+          [ -n "$CLOUDFLARE_API_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secret(s):$missing — set them in Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+      # The gate, and it is a real one. `check` is `tsc --noEmit` against the committed
+      # `worker-configuration.d.ts`; `build` is `wrangler deploy --dry-run`, which bundles the
+      # Worker and resolves every binding, so a KV/D1 id that no longer exists or a
+      # `nodejs_compat` violation fails before anything is applied to production. Through turbo
+      # so `core#build` runs first — `server`'s `import "core"` resolves into `core/dist`.
+      - name: Type check and bundle
+        run: npx turbo run check build --filter=server
+
+      # Before the upload, not after: new code that reads a column the production database does
+      # not have yet would 500 for the length of the gap. Idempotent — D1 tracks what it has
+      # applied, so a deploy with no new migration prints "No migrations to apply" and moves on.
+      # Wrangler skips its confirmation prompt when it detects CI.
+      #
+      # Forward-only, and there is no automated rollback: a migration that lands wrong has to be
+      # corrected by a follow-up migration. Review `server/migrations/` accordingly.
+      - name: Apply pending D1 migrations
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run db:migrate:remote
+
+      # `wrangler deploy` directly rather than the root `deploy:server`, whose turbo task
+      # depends on `build` — i.e. a second `--dry-run` bundle — and which would run before the
+      # migrations above rather than after them.
+      #
+      # Secrets are NOT deployed here. `wrangler secret put` state lives on Cloudflare and
+      # survives a deploy; keeping them out means this workflow needs no copy of them.
+      - name: Deploy
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npm run deploy
+
+      # A deployed Worker that does not answer is the failure mode this catches: the bundle
+      # uploaded fine and something at the edge — a binding, a secret read at module init —
+      # kills it on the first request.
+      #
+      # Two probes, because they prove different things and only one of them can be trusted:
+      #
+      # `/api/__liveness` is any unmatched path, answered by Express's own 404 handler. It
+      # carries no `cf-cache-status` header at all, so it is never served from cache and
+      # reaches the Worker on every request — which makes Express's 404 body the one thing
+      # here that actually proves the freshly uploaded bundle booted. This is the gate.
+      #
+      # `/api/fonts` is the only probe that would exercise the KV binding, but it cannot gate
+      # anything: `snapshot.ts` serves it `public, max-age=3600, s-maxage=86400` and the cache
+      # key ignores the query string (verified — `?cb=…` still answers `cf-cache-status: HIT`),
+      # so it keeps returning 200 for up to 24 hours after the Worker has stopped working.
+      # Reported for the log, never asserted on.
+      - name: Smoke test the deployment
+        env:
+          API: https://api.typescalegarden.uy
+        run: |
+          for attempt in 1 2 3; do
+            # `|| true` so a connection failure is an empty $body and another attempt, rather
+            # than the job's default `bash -e` aborting the loop on the first one.
+            body=$(curl -sS --max-time 30 "$API/api/__liveness" || true)
+            case "$body" in
+              *'"message":"Not Found"'*)
+                echo "GET /api/__liveness → Express 404, the Worker is serving"
+                code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 \
+                  "$API/api/fonts" || true)
+                echo "GET /api/fonts → ${code:-no response} (edge-cached, advisory only)"
+                exit 0
+                ;;
+            esac
+            echo "attempt $attempt: /api/__liveness → ${body:-no response}"
+            sleep 10
+          done
+          echo "::error::The deployed Worker never answered /api/__liveness with Express's 404 — it is not serving."
+          exit 1
