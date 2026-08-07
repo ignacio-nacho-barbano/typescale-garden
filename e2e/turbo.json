@@ -2,6 +2,20 @@
 	"$schema": "https://turborepo.com/schema.json",
 	"extends": ["//"],
 	"tasks": {
+		// `tsc --noEmit` over these files, and it needs `core/dist` on disk for the same
+		// reason `test:e2e` does: `support/subjects.ts` reaches core by *relative path*
+		// (`../../core/dist/index.js`), not through the package name, so `e2e` declares no
+		// dependency on `core` in its package.json and the root task's `dependsOn:
+		// ["^build"]` therefore resolves to nothing here.
+		//
+		// Without this the task is simply unordered against `core#build` and fails on a
+		// clean checkout with `TS2307: Cannot find module '../../core/dist/index.js'` — it
+		// only ever passed because a developer's tree already had `dist/` from some earlier
+		// build. It also makes `core#build`'s hash part of this task's cache key, so a
+		// stale pass cannot be replayed after core changes.
+		"check": {
+			"dependsOn": ["core#build"]
+		},
 		"test:e2e": {
 			// `core#build`, not `^build`: Playwright boots the client's dev server itself
 			// (`webServer.command`), which bypasses turbo — so nothing else would build

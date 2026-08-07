@@ -420,6 +420,17 @@ client's dev server itself (`webServer.command`), bypassing turbo, so nothing el
 `core/dist` that the client's `import "core"` resolves into. `client#build` would be the wrong
 dependency: the suite drives the dev server, not the bundle.
 
+**`e2e#check` needs the same edge, and for a subtler reason.** `e2e` declares no dependency on
+`core` in its `package.json` — `support/subjects.ts` reaches it by _relative path_
+(`../../core/dist/index.js`), because `core` is `"type": "module"` and these files transpile to
+CommonJS. So the root `check` task's `dependsOn: ["^build"]` resolves to **nothing** here, and the
+task was simply unordered against `core#build`. It passed on any developer's machine, where `dist/`
+was already on disk from an earlier build, and failed on a clean checkout with
+`TS2307: Cannot find module '../../core/dist/index.js'` — which is exactly what CI found the first
+time it ran. `e2e/turbo.json` now declares `check` with `dependsOn: ["core#build"]` too. The edge
+also puts `core#build`'s hash in the task's cache key, so a stale pass cannot be replayed after
+core changes.
+
 Known pre-existing failures, unrelated to turbo: `client#check` (17 svelte-check errors) and
 `client#lint` (the client's `.eslintrc.cjs` fails to load, plus wide prettier drift). `client#test`
 used to fail on 3 letterSpacing assertions; rewiring the client onto `core` fixed those, and
