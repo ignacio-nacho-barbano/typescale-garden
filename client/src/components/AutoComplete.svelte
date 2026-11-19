@@ -11,12 +11,24 @@
 	export let onKeyPress: KeyboardEventHandler<HTMLDivElement> | undefined = undefined;
 	export let options: string[] = [];
 	export let onSelect: ((newVal: string) => void) | undefined = undefined;
+	/** Starred options. Pinned above the rest, in the order given. */
+	export let favorites: string[] = [];
+	/** When set, every option gets a star button that calls this. */
+	export let onToggleFavorite: ((option: string) => void) | undefined = undefined;
 	let open = false;
 	// export let validators: FormValidator<typeof value>[] = [];
 	let internalValue = "";
 	let visibleOptions = options;
 	let fresh = true;
-	let list: HTMLUListElement;
+	let list: HTMLDivElement;
+
+	const pinFavorites = (optionsValues: string[], favs: string[]) => {
+		const available = new Set(optionsValues);
+		const pinned = onToggleFavorite ? favs.filter((fav) => available.has(fav)) : [];
+		const pinnedSet = new Set(pinned);
+
+		return { pinned, rest: optionsValues.filter((option) => !pinnedSet.has(option)) };
+	};
 
 	const updateVisibleOptions = (newValue: string, optionsValues: string[]) => {
 		visibleOptions =
@@ -28,18 +40,27 @@
 	};
 
 	const internalOnKeyPress: KeyboardEventHandler<HTMLDivElement> = ({ key }) => {
-		const currentIndex = options.findIndex((optVal) => optVal === value);
+		const currentIndex = orderedOptions.findIndex((optVal) => optVal === value);
 
 		if (currentIndex !== -1) {
-			if (key === "ArrowDown" && currentIndex + 1 < options.length) {
-				outputValue(options[currentIndex + 1]);
+			if (key === "ArrowDown" && currentIndex + 1 < orderedOptions.length) {
+				outputValue(orderedOptions[currentIndex + 1]);
 			} else if (key === "ArrowUp" && currentIndex - 1 >= 0) {
-				outputValue(options[currentIndex - 1]);
+				outputValue(orderedOptions[currentIndex - 1]);
 			}
 		}
 	};
 
 	$: updateVisibleOptions(internalValue, options);
+
+	// What the menu shows, and the order the arrow keys walk: favorites first. Declared
+	// after the line above on purpose — `updateVisibleOptions` assigns `visibleOptions`
+	// inside a function, which Svelte cannot see, so source order is what runs it first.
+	$: ({ pinned: visibleFavorites, rest: visibleRest } = pinFavorites(visibleOptions, favorites));
+	$: orderedOptions = (({ pinned, rest }) => [...pinned, ...rest])(
+		pinFavorites(options, favorites)
+	);
+	$: favoriteSet = new Set(favorites);
 
 	const formatOptionToId = (option: string) => option.toLowerCase().replaceAll(" ", "-");
 
@@ -86,13 +107,61 @@
 	<Menu bind:open noStyle cls="tsg-autocomplete-list">
 		{#if visibleOptions.length}
 			<slot name="options-hint" class="options-hint" />
-			<ul class="notranslate" bind:this={list}>
-				{#each visibleOptions as option}
-					<li id={formatOptionToId(option)} class:selected={placeholder === option}>
-						<button class="body-2" on:click={() => outputValue(option)}>{option}</button>
-					</li>
-				{/each}
-			</ul>
+			{#if onToggleFavorite && !favorites.length}
+				<p class="tooltip secondary">Star a font to pin it to the top</p>
+			{/if}
+			<div class="options notranslate" bind:this={list}>
+				{#if visibleFavorites.length}
+					<p class="section-label tooltip bold" id="{name}-favorites-label">Favorites</p>
+					<ul aria-labelledby="{name}-favorites-label">
+						{#each visibleFavorites as option (option)}
+							{@const isSelected = placeholder === option}
+							<li id={formatOptionToId(option)} class:selected={isSelected}>
+								<button class="body-2 option" on:click={() => outputValue(option)}>{option}</button>
+								<button
+									class="favorite-toggle active"
+									aria-pressed="true"
+									aria-label="Remove {option} from favorites"
+									on:click={() => onToggleFavorite?.(option)}
+								>
+									<svg viewBox="0 0 24 24" aria-hidden="true"
+										><polygon
+											points="12 2.5 15 8.6 21.7 9.6 16.8 14.3 18 21 12 17.8 6 21 7.2 14.3 2.3 9.6 9 8.6 12 2.5"
+										/></svg
+									>
+								</button>
+							</li>
+						{/each}
+					</ul>
+					{#if visibleRest.length}
+						<p class="section-label tooltip bold" id="{name}-all-label">All fonts</p>
+					{/if}
+				{/if}
+				{#if visibleRest.length}
+					<ul aria-labelledby={visibleFavorites.length ? `${name}-all-label` : undefined}>
+						{#each visibleRest as option (option)}
+							<li id={formatOptionToId(option)} class:selected={placeholder === option}>
+								<button class="body-2 option" on:click={() => outputValue(option)}>{option}</button>
+								{#if onToggleFavorite}
+									<button
+										class="favorite-toggle"
+										class:active={favoriteSet.has(option)}
+										aria-pressed={favoriteSet.has(option)}
+										aria-label="Add {option} to favorites"
+										on:click={() => onToggleFavorite?.(option)}
+									>
+										<svg viewBox="0 0 24 24" aria-hidden="true"
+											><polygon
+												points="12 2.5 15 8.6 21.7 9.6 16.8 14.3 18 21 12 17.8 6 21 7.2 14.3 2.3 9.6 9 8.6 12 2.5"
+											/></svg
+										>
+									</button>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</div>
 		{:else}
 			<p class="tooltip bold">No matching fonts found</p>
 		{/if}
@@ -149,7 +218,7 @@
 				display: flex;
 			}
 
-			:global(.tsg-autocomplete-list ul) {
+			:global(.tsg-autocomplete-list .options) {
 				overflow: auto;
 				padding: $s3 $s1;
 			}
@@ -159,9 +228,27 @@
 			}
 		}
 
+		.section-label {
+			margin: $s2 $s2 $s1;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			color: $c-text-sl;
+
+			& + ul + .section-label {
+				margin-top: $s3;
+				padding-top: $s3;
+				border-top: $lw solid $c-primary;
+			}
+		}
+
 		ul {
-			height: 100%;
 			list-style: none;
+
+			li {
+				display: flex;
+				align-items: center;
+				border-radius: $s3;
+			}
 
 			li.selected {
 				background: $c-accent;
@@ -170,10 +257,11 @@
 					color: $c-base;
 				}
 			}
-			button {
+			button.option {
+				flex: 1;
+				min-width: 0;
 				text-wrap: nowrap;
 				text-overflow: ellipsis;
-				width: 100%;
 				text-align: left;
 				overflow: hidden;
 				background: none;
@@ -182,6 +270,51 @@
 
 				&:hover {
 					background: linear-gradient(30deg, $c-primary, transparent 50%);
+				}
+			}
+			button.favorite-toggle {
+				flex: none;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 36px;
+				height: 36px;
+				padding: 0;
+				background: none;
+				border: none;
+				border-radius: 50%;
+				cursor: pointer;
+				color: $c-text-sl;
+
+				svg {
+					width: 18px;
+					height: 18px;
+					fill: none;
+					stroke: currentColor;
+					stroke-width: 1.8;
+					stroke-linejoin: round;
+				}
+
+				&.active {
+					color: $c-accent;
+
+					svg {
+						fill: currentColor;
+					}
+				}
+
+				&:hover,
+				&:focus-visible {
+					background: $c-primary-bg;
+				}
+			}
+
+			li.selected button.favorite-toggle {
+				color: $c-base;
+
+				&:hover,
+				&:focus-visible {
+					background: rgb(255 255 255 / 0.15);
 				}
 			}
 		}

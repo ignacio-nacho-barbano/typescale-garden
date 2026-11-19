@@ -113,7 +113,7 @@ export class App {
 		await input.pressSequentially(family.slice(0, 2));
 		await input.fill(family);
 
-		await list.locator(`li#${optionId(family)} button`).click();
+		await list.locator(`li#${optionId(family)} button.option`).click();
 
 		// The picker reports the selection by becoming the input's placeholder.
 		await expect(input).toHaveAttribute("placeholder", family);

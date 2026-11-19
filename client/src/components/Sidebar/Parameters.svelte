@@ -15,6 +15,7 @@
 		useItalicsForTitles,
 		useUppercaseForTitles
 	} from "../../stores/config";
+	import { favoriteFonts, toggleFavoriteFont } from "../../stores/favorites";
 	import AutoComplete from "../AutoComplete.svelte";
 	import Button from "../Button.svelte";
 	import Input from "../Input.svelte";
@@ -24,12 +25,18 @@
 	const FONT_CATEGORIES = ["sans-serif", "display", "serif", "handwriting"];
 
 	let activePills = [...FONT_CATEGORIES];
+	// Shows favorites alone, regardless of the category pills — so a favorite is never
+	// hidden by a category filter left on by accident.
+	let favoritesOnly = false;
 	let filteredFonts = mockFontsApiNames;
 
 	$: {
 		filteredFonts =
-			$fontsApiData?.items?.filter((c) => activePills.includes(c.category))?.map((c) => c.family) ||
-			[];
+			$fontsApiData?.items
+				?.filter((c) =>
+					favoritesOnly ? $favoriteFonts.includes(c.family) : activePills.includes(c.category)
+				)
+				?.map((c) => c.family) || [];
 	}
 </script>
 
@@ -40,11 +47,27 @@
 		placeholder={$fontName}
 		onSelect={(newVal) => ($fontName = newVal)}
 		options={filteredFonts}
+		favorites={$favoriteFonts}
+		onToggleFavorite={toggleFavoriteFont}
 	>
 		<p slot="options-hint" class="tooltip secondary">Use your keyboard to explore 🔼 🔽</p>
 	</AutoComplete>
 
 	<div class="buttons-group">
+		<button
+			type="button"
+			class="favorites-pill body-2 bold"
+			class:active={favoritesOnly}
+			aria-pressed={favoritesOnly}
+			on:click={() => (favoritesOnly = !favoritesOnly)}
+		>
+			<svg viewBox="0 0 24 24" aria-hidden="true"
+				><polygon
+					points="12 2.5 15 8.6 21.7 9.6 16.8 14.3 18 21 12 17.8 6 21 7.2 14.3 2.3 9.6 9 8.6 12 2.5"
+				/></svg
+			>
+			favorites
+		</button>
 		{#each FONT_CATEGORIES as category}
 			<Button
 				type="ghost"
@@ -97,6 +120,28 @@
 		display: flex;
 		gap: $s2;
 		flex-wrap: wrap;
+	}
+	.favorites-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: $s1;
+		padding: $s1 $s3;
+		border: $lw solid $c-accent;
+		border-radius: 999px;
+		background: transparent;
+		color: $c-accent;
+		cursor: pointer;
+
+		svg {
+			width: 14px;
+			height: 14px;
+			fill: currentColor;
+		}
+
+		&.active {
+			background: $c-accent;
+			color: $c-base;
+		}
 	}
 	.sidebar-parameters {
 		display: flex;
