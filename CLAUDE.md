@@ -524,6 +524,11 @@ lists them alone, ignoring the category pills. `client/src/stores/favorites.ts` 
   is the whole merge — and every toggle after that answer is mirrored. A failed sync is
   logged, never surfaced: the next sign-in merges again. The cost of add-only merging is
   that a favorite removed on one device comes back from another device's local list.
+- **`/api/favorites` is rate limited per user** by the Workers Rate Limiting binding
+  (`FAVORITES_RATE_LIMITER`, 60/min, `src/middlewares/rate-limit.ts`, mounted after
+  `checkUser` so it keys on the verified `sub`). CodeQL's `js/missing-rate-limiting` only
+  recognises npm limiter libraries, so it still flags these routes; those alerts are
+  dismissed with that reason. Reuse the middleware for any new authenticated write route.
 - **Favorites are not checked against the catalogue**, which changes daily; one that drops
   out is simply not shown, and returns if the family does.
 - In `AutoComplete.svelte`, the reactive statements that split favorites out are declared
