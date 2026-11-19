@@ -512,6 +512,30 @@ fetches it on mount into the `fontsApiData` writable, which holds Google's `Webf
 API is unreachable, and `core`'s one-family `mockFontsApi` if that fails too — which is why
 `currentFont` can fall back with a plain `$fontsApiData || mockFontsApi`.
 
+### Favorite fonts
+
+Each row of the family picker has a star; starred families pin above the rest (and leave
+the "All fonts" list, so the arrow keys never visit a name twice), and the "favorites" pill
+lists them alone, ignoring the category pills. `client/src/stores/favorites.ts` owns it:
+
+- **localStorage (`tsg-favorite-fonts`) is the source for everyone**, signed in or not.
+- **Signed in, it is also mirrored to `/api/favorites`** (`favorite_fonts` table, migration
+  0003). On sign-in the local list is POSTed once — POST only ever _adds_, so that one call
+  is the whole merge — and every toggle after that answer is mirrored. A failed sync is
+  logged, never surfaced: the next sign-in merges again. The cost of add-only merging is
+  that a favorite removed on one device comes back from another device's local list.
+- **`/api/favorites` is rate limited per user** by the Workers Rate Limiting binding
+  (`FAVORITES_RATE_LIMITER`, 60/min, `src/middlewares/rate-limit.ts`, mounted after
+  `checkUser` so it keys on the verified `sub`). CodeQL's `js/missing-rate-limiting` only
+  recognises npm limiter libraries, so it still flags these routes; those alerts are
+  dismissed with that reason. Reuse the middleware for any new authenticated write route.
+- **Favorites are not checked against the catalogue**, which changes daily; one that drops
+  out is simply not shown, and returns if the family does.
+- In `AutoComplete.svelte`, the reactive statements that split favorites out are declared
+  _after_ `$: updateVisibleOptions(…)` on purpose — that call assigns `visibleOptions`
+  inside a function, invisible to Svelte's dependency sort, so source order is all that
+  runs it first. Moving them up silently stops the list filtering.
+
 ### Client → server
 
 `stores/fetch.ts` exposes a **derived axios instance** — it rebuilds itself whenever the Auth0 access
@@ -651,7 +675,7 @@ schedule. The Cache API is a no-op on `*.workers.dev`, so cache behaviour is onl
 ### D1 access
 
 `server/src/db/` is the **only** place that touches the database — `d1.ts` for typescales,
-`plugin-auth.ts` for pairing codes and plugin tokens. The binding itself is still resolved in exactly
+`plugin-auth.ts` for pairing codes and plugin tokens, `favorites.ts` for favorite fonts. The binding itself is still resolved in exactly
 one function, `d1.ts`'s exported `db()`, which `plugin-auth.ts` imports; that is the invariant worth
 keeping, rather than "one module holds every query". `d1.ts` reaches the `DB` binding via
 `import { env } from "cloudflare:workers"` (Express handlers run outside the `fetch(request, env, ctx)`

@@ -51,6 +51,18 @@
 	"triggers": {
 		"crons": ["17 4 * * *"]
 	},
+	// Per-user limits, keyed on the Auth0 `sub` by src/middlewares/rate-limit.ts.
+	// express-rate-limit cannot run on Workers (see src/index.ts); this is its
+	// replacement. `namespace_id` is any account-unique integer string; `period` may
+	// only be 10 or 60. A normal session makes one favorites call per sign-in plus one
+	// per star click, so 60 a minute only bites a script.
+	"ratelimits": [
+		{
+			"name": "FAVORITES_RATE_LIMITER",
+			"namespace_id": "1001",
+			"simple": { "limit": 60, "period": 60 }
+		}
+	],
 	// Non-sensitive, client-public config. Read via process.env under nodejs_compat.
 	// Secrets (JWT_SECRET, SESSION_SECRET) are NOT here — set them with
 	// `wrangler secret put <NAME>` (prod) or in .dev.vars (local).

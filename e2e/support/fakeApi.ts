@@ -49,6 +49,8 @@ export interface ApiHandle {
 	failWith: number | null;
 	/** Flip to make `GET /api/fonts` fail, exercising the static fallback. */
 	failFonts: boolean;
+	/** Favorite font families per Auth0 sub, as `server/src/db/favorites.ts` keeps them. */
+	favorites: Map<string, string[]>;
 	seed(row: Partial<StoredTypescale> & { name: string; base: GoldenInputs }): StoredTypescale;
 }
 
@@ -75,6 +77,7 @@ export const newApiHandle = (): ApiHandle => {
 		seenSubs: [],
 		failWith: null,
 		failFonts: false,
+		favorites: new Map(),
 		seed(row) {
 			const stamp = nextTimestamp();
 			const stored: StoredTypescale = {
@@ -129,6 +132,32 @@ export async function installFakeApi(context: BrowserContext, handle: ApiHandle)
 			return route.fulfill({
 				json: { typescales: handle.rows.filter((row) => row.authorId === DEFAULT_AUTHOR) }
 			});
+		}
+
+		// `checkUser`-protected. Mirrors controllers/favorites: every answer is the whole
+		// list, alphabetical, and POST only ever adds.
+		if (path === "/api/favorites" || path.startsWith("/api/favorites/")) {
+			if (!sub) {
+				return route.fulfill({ status: 401, json: { message: "Requires authentication" } });
+			}
+
+			const current = handle.favorites.get(sub) ?? [];
+			let next = current;
+
+			if (method === "POST") {
+				const { families = [] } = JSON.parse(request.postData() || "{}") as {
+					families?: string[];
+				};
+				next = [...new Set([...current, ...families])];
+			} else if (method === "DELETE") {
+				const family = decodeURIComponent(path.slice("/api/favorites/".length));
+				next = current.filter((candidate) => candidate !== family);
+			}
+
+			next.sort((a, b) => a.localeCompare(b, "en", { sensitivity: "base" }));
+			handle.favorites.set(sub, next);
+
+			return route.fulfill({ json: { favorites: next } });
 		}
 
 		// Everything below is `checkUser`-protected in the real router.
